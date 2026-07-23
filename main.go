@@ -2,41 +2,31 @@ package main
 
 import (
 	"embed"
-	"html/template"
-	"io"
 	"io/fs"
-	"net/http"
+	"log"
+
+	"decay-main/db"
+	"decay-main/views"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-//go:embed templates/*.html
-var templatesFS embed.FS
-
 //go:embed static
 var staticFS embed.FS
 
-type Event struct {
-	Day, Month, Title, Type, Time, Link string
-}
-
-type MerchItem struct {
-	Name, Price, Placeholder string
-}
-
-type Template struct {
-	templates *template.Template
-}
-
-func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	return t.templates.ExecuteTemplate(w, name, data)
-}
-
 func main() {
-	e := echo.New()
-	e.Renderer = &Template{templates: template.Must(template.ParseFS(templatesFS, "templates/*.html"))}
+	conn, err := db.Open("decay.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
 
+	if err := db.Seed(conn); err != nil {
+		log.Fatal(err)
+	}
+
+	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
@@ -44,20 +34,31 @@ func main() {
 	e.StaticFS("/static", static)
 
 	e.GET("/", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "index.html", map[string]interface{}{
-			"Events": []Event{
-				{Day: "25", Month: "JUL", Title: "Free Mask Distro!", Type: "Meetup", Time: "4 – 6 PM", Link: "#"},
-				{Day: "26", Month: "JUL", Title: "Circuit Bending Workshop", Type: "Tech", Time: "3 – 6 PM", Link: "#"},
-				{Day: "28", Month: "JUL", Title: "Movie Club", Type: "Film", Time: "7 – 9 PM", Link: "#"},
-				{Day: "30", Month: "JUL", Title: "NO_TAPE", Type: "Workshop", Time: "7:30 PM", Link: "#"},
-			},
-			"Merch": []MerchItem{
-				{Name: "Logo Tee", Price: "$28", Placeholder: "product photo"},
-				{Name: "Static Hoodie", Price: "$58", Placeholder: "product photo"},
-				{Name: "Enamel Pin", Price: "$10", Placeholder: "product photo"},
-				{Name: "Risograph Print", Price: "$18", Placeholder: "product photo"},
-			},
-		})
+		events, err := db.ListUpcomingEvents(conn, 4)
+		if err != nil {
+			return err
+		}
+		products, err := db.ListProducts(conn)
+		if err != nil {
+			return err
+		}
+		return views.Home(events, products).Render(c.Request().Context(), c.Response())
+	})
+
+	e.GET("/blog", func(c echo.Context) error {
+		posts, err := db.ListPosts(conn)
+		if err != nil {
+			return err
+		}
+		return views.Blog(posts).Render(c.Request().Context(), c.Response())
+	})
+
+	e.GET("/photos", func(c echo.Context) error {
+		photos, err := db.ListPhotos(conn)
+		if err != nil {
+			return err
+		}
+		return views.Photos(photos).Render(c.Request().Context(), c.Response())
 	})
 
 	e.Logger.Fatal(e.Start(":8080"))

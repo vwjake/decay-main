@@ -10,6 +10,10 @@
 .env
 .env.local
 
+# SQLite data (schema lives in db/schema.sql, data is seeded on boot)
+*.db
+*.db-journal
+
 # IDE
 .vscode/
 .idea/

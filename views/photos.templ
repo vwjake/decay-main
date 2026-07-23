@@ -1,0 +1,24 @@
+package views
+
+import "decay-main/db"
+
+templ Photos(photos []db.Photo) {
+	@Layout("Photos · DECAY") {
+		<section class="about">
+			<p class="about-statement">Photos</p>
+			if len(photos) == 0 {
+				<p class="about-body">No photos uploaded yet — check back soon.</p>
+			} else {
+				<div class="merch-grid">
+					for _, p := range photos {
+						<div class="merch-item">
+							<div class="merch-photo">
+								<img src={ "/static/photos/" + p.Filename } alt={ p.Caption }/>
+							</div>
+						</div>
+					}
+				</div>
+			}
+		</section>
+	}
+}

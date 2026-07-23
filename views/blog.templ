@@ -1,0 +1,22 @@
+package views
+
+import "decay-main/db"
+
+templ Blog(posts []db.Post) {
+	@Layout("Blog · DECAY") {
+		<section class="about">
+			<p class="about-statement">Blog</p>
+			if len(posts) == 0 {
+				<p class="about-body">Nothing published yet — check back soon.</p>
+			} else {
+				<div class="event-list">
+					for _, p := range posts {
+						<a href={ templ.URL("/blog/" + p.Slug) } class="event-item">
+							<div class="event-title">{ p.Title }</div>
+						</a>
+					}
+				</div>
+			}
+		</section>
+	}
+}
