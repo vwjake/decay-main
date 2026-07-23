@@ -615,6 +615,43 @@ a {
   padding: 0 6px;
 }
 
+.admin-next {
+  border: 2px solid #111;
+  background: #f4f4f2;
+  padding: 16px;
+  margin-bottom: 8px;
+}
+
+.admin-next-title {
+  display: block;
+  font-weight: 900;
+  font-size: 18px;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
+.admin-next-when {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.admin-caption-form {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.admin-caption-form input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid #111;
+  padding: 6px;
+  font: inherit;
+  font-size: 12px;
+}
+
 .admin-check {
   display: flex;
   flex-direction: row;

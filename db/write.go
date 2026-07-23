@@ -38,6 +38,61 @@ func CreateEvent(conn *sql.DB, e Event) (int64, error) {
 	return res.LastInsertId()
 }
 
+// UpdateEvent saves edits to an event's details. It deliberately leaves
+// uid alone: subscribers key on it, so changing it would make everyone's
+// calendar drop the event and re-add it as a new one. Slug is editable
+// but defaults to unchanged for the same reason — it's published in the
+// feed and in any link people have shared.
+func UpdateEvent(conn *sql.DB, e Event) error {
+	var endsAt any
+	if e.EndsAt != nil {
+		endsAt = e.EndsAt.Format(timeLayout)
+	}
+	_, err := conn.Exec(
+		`UPDATE events SET title = ?, event_type = ?, starts_at = ?, ends_at = ?, location = ?, description = ?, link = ?, slug = ? WHERE id = ?`,
+		e.Title, e.EventType, e.StartsAt.Format(timeLayout), endsAt, e.Location, e.Description, e.Link, e.Slug, e.ID,
+	)
+	return err
+}
+
+// SlugTaken reports whether a slug is already used by a different event.
+func SlugTaken(conn *sql.DB, slug string, exceptID int64) (bool, error) {
+	var count int
+	err := conn.QueryRow(`SELECT count(*) FROM events WHERE slug = ? AND id <> ?`, slug, exceptID).Scan(&count)
+	return count > 0, err
+}
+
+// UpdateProduct saves edits to a shop item.
+func UpdateProduct(conn *sql.DB, p Product) error {
+	_, err := conn.Exec(
+		`UPDATE products SET name = ?, price_cents = ?, placeholder = ?, stripe_url = ? WHERE id = ?`,
+		p.Name, p.PriceCents, p.Placeholder, p.StripeURL, p.ID,
+	)
+	return err
+}
+
+// UpdatePost saves edits to a post's slug, title, and body. Its published
+// state is changed separately, through PublishPost and UnpublishPost.
+func UpdatePost(conn *sql.DB, id int64, slug, title, body string) error {
+	_, err := conn.Exec(
+		`UPDATE posts SET slug = ?, title = ?, body_markdown = ? WHERE id = ?`,
+		slug, title, body, id,
+	)
+	return err
+}
+
+// UnpublishPost returns a post to draft, taking it off the public blog.
+func UnpublishPost(conn *sql.DB, id int64) error {
+	_, err := conn.Exec(`UPDATE posts SET published_at = NULL WHERE id = ?`, id)
+	return err
+}
+
+// UpdatePhotoCaption saves a new caption for a gallery photo.
+func UpdatePhotoCaption(conn *sql.DB, id int64, caption string) error {
+	_, err := conn.Exec(`UPDATE photos SET caption = ? WHERE id = ?`, caption, id)
+	return err
+}
+
 // SetEventFlyer points an event at an uploaded flyer file, returning the
 // filename it replaced so the caller can delete it.
 func SetEventFlyer(conn *sql.DB, id int64, filename string) (string, error) {

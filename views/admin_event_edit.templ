@@ -22,6 +22,33 @@ templ AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, errorMsg strin
 			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
 		}
 
+		<p class="admin-heading">Details</p>
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/events/%d", ev.ID)) } class="admin-form">
+			<label>Title<input type="text" name="title" value={ ev.Title } required/></label>
+			<label>Type<input type="text" name="event_type" value={ ev.EventType } required/></label>
+			<label>
+				Starts at (Pacific time)
+				<input type="datetime-local" name="starts_at" value={ ev.StartsAt.Format("2006-01-02T15:04") } required/>
+			</label>
+			<label>
+				Ends at (optional, Pacific time)
+				<input type="datetime-local" name="ends_at" value={ endsAtValue(ev) }/>
+			</label>
+			<label>Location<input type="text" name="location" value={ ev.Location }/></label>
+			<label>Description<textarea name="description">{ ev.Description }</textarea></label>
+			<label>Link<input type="text" name="link" value={ ev.Link }/></label>
+			<label>
+				Web address
+				<input type="text" name="slug" value={ ev.Slug }/>
+			</label>
+			<p class="admin-sub mono">
+				Changing the address breaks links people have already shared.
+				The event keeps its calendar identity either way, so edits
+				reach subscribers as an update rather than a new event.
+			</p>
+			<button type="submit" class="admin-btn">Save details</button>
+		</form>
+
 		<p class="admin-heading">Flyer</p>
 		if ev.HasFlyer() {
 			<img class="admin-flyer-preview" src={ ev.FlyerWebPath() } alt={ "Flyer for " + ev.Title }/>
@@ -77,6 +104,15 @@ templ AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, errorMsg strin
 			<button type="submit" class="admin-btn">Save volunteers</button>
 		</form>
 	}
+}
+
+// endsAtValue formats an optional end time for a datetime-local input,
+// which needs an empty string rather than a zero time when there isn't one.
+func endsAtValue(ev db.Event) string {
+	if ev.EndsAt == nil {
+		return ""
+	}
+	return ev.EndsAt.Format("2006-01-02T15:04")
 }
 
 func hasRole(volunteers []db.EventVolunteer, role string) bool {

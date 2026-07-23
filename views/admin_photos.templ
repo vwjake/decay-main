@@ -19,6 +19,10 @@ templ AdminPhotos(photos []db.Photo, errorMsg string) {
 						<div class="merch-photo">
 							<img src={ "/uploads/" + p.Filename } alt={ p.Caption }/>
 						</div>
+						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/photos/%d/caption", p.ID)) } class="admin-caption-form">
+							<input type="text" name="caption" value={ p.Caption } placeholder="Caption"/>
+							<button type="submit" class="admin-btn">Save</button>
+						</form>
 						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/photos/%d/delete", p.ID)) } onsubmit="return confirm('Delete this photo?')" style="margin-top:8px">
 							<button type="submit" class="admin-btn admin-btn-danger">Delete</button>
 						</form>

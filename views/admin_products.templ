@@ -21,7 +21,9 @@ templ AdminProducts(products []db.Product, errorMsg string) {
 			</tr>
 			for _, p := range products {
 				<tr>
-					<td>{ p.Name }</td>
+					<td>
+						<a href={ templ.URL(fmt.Sprintf("/admin/products/%d", p.ID)) }>{ p.Name }</a>
+					</td>
 					<td>{ p.Price() }</td>
 					<td>{ p.Placeholder }</td>
 					<td>

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 
+	"decay-main/db"
 	"decay-main/views"
 
 	"github.com/gorilla/sessions"
@@ -27,13 +28,19 @@ func Register(e *echo.Echo, conn *sql.DB, cfg Config, sessionSecret []byte, uplo
 	e.POST("/admin/logout", logout)
 
 	g := e.Group("/admin", requireAuth)
-	g.GET("", dashboard)
+	g.GET("", dashboard(conn))
 	registerEventRoutes(g, conn, uploadsDir)
 	registerProductRoutes(g, conn)
 	registerPostRoutes(g, conn)
 	registerPhotoRoutes(g, conn, uploadsDir)
 }
 
-func dashboard(c echo.Context) error {
-	return views.AdminDashboard().Render(c.Request().Context(), c.Response())
+func dashboard(conn *sql.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		counts, err := db.Summary(conn)
+		if err != nil {
+			return err
+		}
+		return views.AdminDashboard(counts).Render(c.Request().Context(), c.Response())
+	}
 }

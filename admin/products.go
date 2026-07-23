@@ -2,8 +2,10 @@ package admin
 
 import (
 	"database/sql"
+	"errors"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"decay-main/db"
 	"decay-main/views"
@@ -14,7 +16,66 @@ import (
 func registerProductRoutes(g *echo.Group, conn *sql.DB) {
 	g.GET("/products", listProducts(conn))
 	g.POST("/products", createProduct(conn))
+	g.GET("/products/:id", editProduct(conn))
+	g.POST("/products/:id", saveProduct(conn))
 	g.POST("/products/:id/delete", deleteProduct(conn))
+}
+
+func editProduct(conn *sql.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		p, err := loadProduct(conn, c.Param("id"))
+		if err != nil {
+			return err
+		}
+		return views.AdminProductEdit(p, "").Render(c.Request().Context(), c.Response())
+	}
+}
+
+func saveProduct(conn *sql.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		p, err := loadProduct(conn, c.Param("id"))
+		if err != nil {
+			return err
+		}
+
+		rerender := func(msg string) error {
+			return views.AdminProductEdit(p, msg).Render(c.Request().Context(), c.Response())
+		}
+
+		name := strings.TrimSpace(c.FormValue("name"))
+		if name == "" {
+			return rerender("Name is required.")
+		}
+		priceDollars, err := strconv.ParseFloat(c.FormValue("price"), 64)
+		if err != nil || priceDollars < 0 {
+			return rerender("Invalid price.")
+		}
+		placeholder := strings.TrimSpace(c.FormValue("placeholder"))
+		if placeholder == "" {
+			placeholder = "product photo"
+		}
+
+		p.Name = name
+		p.PriceCents = int(priceDollars*100 + 0.5)
+		p.Placeholder = placeholder
+		p.StripeURL = strings.TrimSpace(c.FormValue("stripe_url"))
+		if err := db.UpdateProduct(conn, p); err != nil {
+			return err
+		}
+		return c.Redirect(http.StatusSeeOther, "/admin/products")
+	}
+}
+
+func loadProduct(conn *sql.DB, rawID string) (db.Product, error) {
+	id, err := strconv.ParseInt(rawID, 10, 64)
+	if err != nil {
+		return db.Product{}, echo.NewHTTPError(http.StatusBadRequest)
+	}
+	p, err := db.ProductByID(conn, id)
+	if errors.Is(err, sql.ErrNoRows) {
+		return db.Product{}, echo.NewHTTPError(http.StatusNotFound)
+	}
+	return p, err
 }
 
 func listProducts(conn *sql.DB) echo.HandlerFunc {

@@ -10,6 +10,10 @@ import (
 	"net/http"
 	"os"
 
+	// Event times are resolved against the venue's timezone, and Windows
+	// has no system timezone database to read it from.
+	_ "time/tzdata"
+
 	"decay-main/admin"
 	"decay-main/db"
 	"decay-main/ics"

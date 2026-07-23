@@ -1,0 +1,27 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/db"
+)
+
+templ AdminProductEdit(p db.Product, errorMsg string) {
+	@AdminLayout(p.Name + " · DECAY Admin") {
+		<a href="/admin/products" class="admin-back">&larr; All items</a>
+		<p class="admin-heading">{ p.Name }</p>
+		if errorMsg != "" {
+			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+		}
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/products/%d", p.ID)) } class="admin-form">
+			<label>Name<input type="text" name="name" value={ p.Name } required/></label>
+			<label>
+				Price (dollars)
+				<input type="number" name="price" step="0.01" min="0" value={ fmt.Sprintf("%.2f", float64(p.PriceCents)/100) } required/>
+			</label>
+			<label>Placeholder text<input type="text" name="placeholder" value={ p.Placeholder }/></label>
+			<label>Stripe URL<input type="text" name="stripe_url" value={ p.StripeURL }/></label>
+			<button type="submit" class="admin-btn">Save item</button>
+		</form>
+	}
+}

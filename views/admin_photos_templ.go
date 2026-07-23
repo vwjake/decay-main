@@ -111,25 +111,51 @@ func AdminPhotos(photos []db.Photo, errorMsg string) templ.Component {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var6 templ.SafeURL
-					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/photos/%d/delete", p.ID)))
+					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/photos/%d/caption", p.ID)))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_photos.templ`, Line: 22, Col: 90}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_photos.templ`, Line: 22, Col: 91}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" onsubmit=\"return confirm('Delete this photo?')\" style=\"margin-top:8px\"><button type=\"submit\" class=\"admin-btn admin-btn-danger\">Delete</button></form></div>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"admin-caption-form\"><input type=\"text\" name=\"caption\" value=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var7 string
+					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.Caption)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_photos.templ`, Line: 23, Col: 58}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" placeholder=\"Caption\"> <button type=\"submit\" class=\"admin-btn\">Save</button></form><form method=\"post\" action=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var8 templ.SafeURL
+					templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/photos/%d/delete", p.ID)))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_photos.templ`, Line: 26, Col: 90}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" onsubmit=\"return confirm('Delete this photo?')\" style=\"margin-top:8px\"><button type=\"submit\" class=\"admin-btn admin-btn-danger\">Delete</button></form></div>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, " <p class=\"admin-heading\">Upload photo</p><form method=\"post\" action=\"/admin/photos\" enctype=\"multipart/form-data\" class=\"admin-form\"><label>Image (jpg, png, gif, webp)<input type=\"file\" name=\"photo\" accept=\"image/*\" required></label> <label>Caption<input type=\"text\" name=\"caption\"></label> <button type=\"submit\" class=\"admin-btn\">Upload</button></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, " <p class=\"admin-heading\">Upload photo</p><form method=\"post\" action=\"/admin/photos\" enctype=\"multipart/form-data\" class=\"admin-form\"><label>Image (jpg, png, gif, webp)<input type=\"file\" name=\"photo\" accept=\"image/*\" required></label> <label>Caption<input type=\"text\" name=\"caption\"></label> <button type=\"submit\" class=\"admin-btn\">Upload</button></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

@@ -334,6 +334,99 @@ func EventByID(conn *sql.DB, id int64) (Event, error) {
 	return events[0], nil
 }
 
+// ProductByID fetches one shop item for editing.
+func ProductByID(conn *sql.DB, id int64) (Product, error) {
+	var p Product
+	err := conn.QueryRow(
+		`SELECT id, name, price_cents, placeholder, stripe_url FROM products WHERE id = ?`, id,
+	).Scan(&p.ID, &p.Name, &p.PriceCents, &p.Placeholder, &p.StripeURL)
+	return p, err
+}
+
+// PostByID fetches one post for editing, drafts included.
+func PostByID(conn *sql.DB, id int64) (Post, error) {
+	rows, err := conn.Query(
+		`SELECT id, slug, title, body_markdown, published_at, created_at FROM posts WHERE id = ?`, id,
+	)
+	if err != nil {
+		return Post{}, err
+	}
+	defer rows.Close()
+
+	posts, err := scanPosts(rows)
+	if err != nil {
+		return Post{}, err
+	}
+	if len(posts) == 0 {
+		return Post{}, sql.ErrNoRows
+	}
+	return posts[0], nil
+}
+
+// Counts is the at-a-glance summary the admin dashboard opens with.
+type Counts struct {
+	UpcomingEvents int
+	PastEvents     int
+	OpenRoles      int
+	MissingFlyers  int
+	Drafts         int
+	PublishedPosts int
+	Products       int
+	Photos         int
+	NextEvent      *Event
+}
+
+// Summary gathers the dashboard counts in one pass.
+func Summary(conn *sql.DB) (Counts, error) {
+	var c Counts
+
+	upcoming, err := UpcomingEvents(conn)
+	if err != nil {
+		return c, err
+	}
+	c.UpcomingEvents = len(upcoming)
+	if len(upcoming) > 0 {
+		c.NextEvent = &upcoming[0]
+	}
+	// Only upcoming events are worth chasing a flyer for.
+	for _, ev := range upcoming {
+		if !ev.HasFlyer() {
+			c.MissingFlyers++
+		}
+	}
+
+	all, err := ListAllEvents(conn)
+	if err != nil {
+		return c, err
+	}
+	c.PastEvents = len(all) - c.UpcomingEvents
+
+	// Open roles only count for events that haven't happened yet.
+	if err := conn.QueryRow(`
+		SELECT count(*) FROM event_volunteers v
+		JOIN events e ON e.id = v.event_id
+		WHERE v.volunteer_name = '' AND e.starts_at > ?`,
+		time.Now().Format(timeLayout),
+	).Scan(&c.OpenRoles); err != nil {
+		return c, err
+	}
+
+	for _, q := range []struct {
+		dest  *int
+		query string
+	}{
+		{&c.Drafts, `SELECT count(*) FROM posts WHERE published_at IS NULL`},
+		{&c.PublishedPosts, `SELECT count(*) FROM posts WHERE published_at IS NOT NULL`},
+		{&c.Products, `SELECT count(*) FROM products`},
+		{&c.Photos, `SELECT count(*) FROM photos`},
+	} {
+		if err := conn.QueryRow(q.query).Scan(q.dest); err != nil {
+			return c, err
+		}
+	}
+	return c, nil
+}
+
 // FlyerInUse reports whether any event still references a flyer file.
 // Recurring events share one, so a replaced flyer isn't always safe to
 // delete from disk.

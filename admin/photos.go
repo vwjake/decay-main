@@ -17,7 +17,21 @@ import (
 func registerPhotoRoutes(g *echo.Group, conn *sql.DB, uploadsDir string) {
 	g.GET("/photos", listPhotos(conn))
 	g.POST("/photos", uploadPhoto(conn, uploadsDir))
+	g.POST("/photos/:id/caption", savePhotoCaption(conn))
 	g.POST("/photos/:id/delete", deletePhoto(conn, uploadsDir))
+}
+
+func savePhotoCaption(conn *sql.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest)
+		}
+		if err := db.UpdatePhotoCaption(conn, id, c.FormValue("caption")); err != nil {
+			return err
+		}
+		return c.Redirect(http.StatusSeeOther, "/admin/photos")
+	}
 }
 
 func listPhotos(conn *sql.DB) echo.HandlerFunc {

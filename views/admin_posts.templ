@@ -20,7 +20,9 @@ templ AdminPosts(posts []db.Post, errorMsg string) {
 			</tr>
 			for _, p := range posts {
 				<tr>
-					<td>{ p.Title }</td>
+					<td>
+						<a href={ templ.URL(fmt.Sprintf("/admin/posts/%d", p.ID)) }>{ p.Title }</a>
+					</td>
 					<td>
 						if p.Published() {
 							Published
@@ -29,7 +31,11 @@ templ AdminPosts(posts []db.Post, errorMsg string) {
 						}
 					</td>
 					<td>
-						if !p.Published() {
+						if p.Published() {
+							<form method="post" action={ templ.URL(fmt.Sprintf("/admin/posts/%d/unpublish", p.ID)) } style="display:inline">
+								<button type="submit" class="admin-btn">Unpublish</button>
+							</form>
+						} else {
 							<form method="post" action={ templ.URL(fmt.Sprintf("/admin/posts/%d/publish", p.ID)) } style="display:inline">
 								<button type="submit" class="admin-btn">Publish</button>
 							</form>

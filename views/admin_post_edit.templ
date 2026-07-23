@@ -1,0 +1,47 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/db"
+)
+
+templ AdminPostEdit(post db.Post, errorMsg string) {
+	@AdminLayout(post.Title + " · DECAY Admin") {
+		<a href="/admin/posts" class="admin-back">&larr; All posts</a>
+		<p class="admin-heading">{ post.Title }</p>
+		if post.Published() {
+			<p class="admin-sub mono">
+				Published { post.Date() } &middot;
+				<a href={ templ.URL("/blog/" + post.Slug) } target="_blank" rel="noopener">{ "/blog/" + post.Slug }</a>
+			</p>
+		} else {
+			<p class="admin-sub mono">Draft — not visible on the site yet.</p>
+		}
+		if errorMsg != "" {
+			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+		}
+
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/posts/%d", post.ID)) } class="admin-form">
+			<label>Title<input type="text" name="title" value={ post.Title } required/></label>
+			<label>Web address<input type="text" name="slug" value={ post.Slug } required/></label>
+			<label>Body<textarea name="body" rows="18" required>{ post.Body }</textarea></label>
+			<button type="submit" class="admin-btn">Save post</button>
+		</form>
+
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/posts/%d/%s", post.ID, publishAction(post))) } class="admin-form">
+			if post.Published() {
+				<button type="submit" class="admin-btn">Return to draft</button>
+			} else {
+				<button type="submit" class="admin-btn">Publish</button>
+			}
+		</form>
+	}
+}
+
+func publishAction(post db.Post) string {
+	if post.Published() {
+		return "unpublish"
+	}
+	return "publish"
+}
