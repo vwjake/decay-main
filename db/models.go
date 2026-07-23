@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -89,8 +90,14 @@ func (v EventVolunteer) Filled() bool  { return v.Name != "" }
 
 func (e Event) HasFlyer() bool { return e.Flyer != "" }
 
-// FlyerPath is the URL the flyer image is served from.
+// FlyerPath is the URL of the original, full-resolution flyer.
 func (e Event) FlyerPath() string { return "/uploads/flyers/" + e.Flyer }
+
+// FlyerWebPath is the URL of the web-sized copy, which is what pages
+// should display — originals run to several megabytes.
+func (e Event) FlyerWebPath() string {
+	return "/uploads/flyers/web/" + strings.TrimSuffix(e.Flyer, path.Ext(e.Flyer)) + ".jpg"
+}
 
 // Paragraphs splits a description into blocks on blank lines so a template
 // can render it without trusting the source with raw HTML.
@@ -164,6 +171,48 @@ type Post struct {
 }
 
 func (p Post) Published() bool { return p.PublishedAt != nil }
+
+// Date renders a post's publication date for display.
+func (p Post) Date() string {
+	if p.PublishedAt == nil {
+		return ""
+	}
+	return p.PublishedAt.Format("January 2, 2006")
+}
+
+// Paragraphs splits a post body into blocks on blank lines, so a template
+// can render it without handing raw HTML to the browser.
+func (p Post) Paragraphs() []string {
+	var out []string
+	for _, block := range strings.Split(strings.ReplaceAll(p.Body, "\r\n", "\n"), "\n\n") {
+		if block = strings.TrimSpace(block); block != "" {
+			out = append(out, block)
+		}
+	}
+	return out
+}
+
+// PostBySlug fetches a single published post. Drafts stay unreachable
+// from the public site, so an unpublished slug is reported as missing.
+func PostBySlug(conn *sql.DB, slug string) (Post, error) {
+	rows, err := conn.Query(
+		`SELECT id, slug, title, body_markdown, published_at, created_at FROM posts WHERE slug = ? AND published_at IS NOT NULL`,
+		slug,
+	)
+	if err != nil {
+		return Post{}, err
+	}
+	defer rows.Close()
+
+	posts, err := scanPosts(rows)
+	if err != nil {
+		return Post{}, err
+	}
+	if len(posts) == 0 {
+		return Post{}, sql.ErrNoRows
+	}
+	return posts[0], nil
+}
 
 type Photo struct {
 	ID       int64

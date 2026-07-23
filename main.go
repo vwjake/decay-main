@@ -135,6 +135,17 @@ func main() {
 		return views.Blog(posts).Render(c.Request().Context(), c.Response())
 	})
 
+	e.GET("/blog/:slug", func(c echo.Context) error {
+		post, err := db.PostBySlug(conn, c.Param("slug"))
+		if errors.Is(err, sql.ErrNoRows) {
+			return echo.NewHTTPError(http.StatusNotFound)
+		}
+		if err != nil {
+			return err
+		}
+		return views.PostPage(post).Render(c.Request().Context(), c.Response())
+	})
+
 	e.GET("/photos", func(c echo.Context) error {
 		photos, err := db.ListPhotos(conn)
 		if err != nil {

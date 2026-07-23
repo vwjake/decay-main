@@ -16,7 +16,9 @@ templ EventDetail(ev db.Event, openRoles []db.EventVolunteer) {
 				<p class="event-detail-where mono">{ ev.Location }</p>
 			}
 			if ev.HasFlyer() {
-				<img class="event-flyer" src={ ev.FlyerPath() } alt={ "Flyer for " + ev.Title }/>
+				<a href={ templ.URL(ev.FlyerPath()) } target="_blank" rel="noopener">
+					<img class="event-flyer" src={ ev.FlyerWebPath() } alt={ "Flyer for " + ev.Title }/>
+				</a>
 			}
 			for _, para := range ev.Paragraphs() {
 				<p class="event-detail-body">{ para }</p>

@@ -24,7 +24,7 @@ templ AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, errorMsg strin
 
 		<p class="admin-heading">Flyer</p>
 		if ev.HasFlyer() {
-			<img class="admin-flyer-preview" src={ ev.FlyerPath() } alt={ "Flyer for " + ev.Title }/>
+			<img class="admin-flyer-preview" src={ ev.FlyerWebPath() } alt={ "Flyer for " + ev.Title }/>
 		} else {
 			<p class="admin-sub mono">No flyer yet.</p>
 		}

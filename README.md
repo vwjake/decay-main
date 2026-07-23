@@ -68,8 +68,12 @@ These are the fields iCalendar can't express, so they live on the site
 and each event has its own page at `/events/<slug>` to hold them.
 
 **Flyers** are images under `uploads/flyers/`, uploaded per event at
-`/admin/events/<id>`. They're runtime data, not committed — the imported
-set alone is ~356 MB. The feed links to a flyer with `ATTACH` rather than
+`/admin/events/<id>`. They're runtime data, not committed — the originals
+alone are ~340 MB. Pages serve a web-sized copy from
+`uploads/flyers/web/`, capped at 1200px wide and re-encoded as JPEG,
+which takes that set to ~54 MB; the original is one click behind the
+image. Both the importer and the admin upload generate the web copy, so
+it always exists. The feed links to a flyer with `ATTACH` rather than
 embedding it, so calendar clients that support it can show the image
 without the feed carrying the bytes.
 
@@ -115,6 +119,7 @@ once events are managed there, stop re-importing.
 - `db/` — SQLite schema, queries, and seed data (`events.json`)
 - `cmd/importevents/` — one-way converter from the old site's event JSON
 - `ics/` — renders events as a subscribable iCalendar feed
+- `images/` — makes web-sized copies of uploaded flyers
 - `views/` — templ page templates (`.templ` source + generated `_templ.go`)
 - `admin/` — session auth and CRUD handlers for `/admin/*`
 - `static/css`, `static/js`, `static/img` — assets, embedded into the binary at build time

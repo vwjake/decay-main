@@ -160,9 +160,9 @@ func AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, errorMsg string
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var10 string
-				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(ev.FlyerPath())
+				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(ev.FlyerWebPath())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_event_edit.templ`, Line: 27, Col: 56}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_event_edit.templ`, Line: 27, Col: 59}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 				if templ_7745c5c3_Err != nil {
@@ -175,7 +175,7 @@ func AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, errorMsg string
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue("Flyer for " + ev.Title)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_event_edit.templ`, Line: 27, Col: 88}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_event_edit.templ`, Line: 27, Col: 91}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 				if templ_7745c5c3_Err != nil {

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"decay-main/db"
+	"decay-main/images"
 	"decay-main/views"
 
 	"github.com/labstack/echo/v4"
@@ -69,11 +70,18 @@ func uploadFlyer(conn *sql.DB, uploadsDir string) echo.HandlerFunc {
 		if err != nil {
 			return rerender("Choose an image to upload.")
 		}
-		filename, err := saveImage(fileHeader, filepath.Join(uploadsDir, flyersSubdir))
+		flyerDir := filepath.Join(uploadsDir, flyersSubdir)
+		filename, err := saveImage(fileHeader, flyerDir)
 		if err != nil {
 			if errors.Is(err, errNotAnImage) {
 				return rerender("That file doesn't look like an image. Use jpg, png, gif, or webp.")
 			}
+			return err
+		}
+		if err := images.MakeWeb(
+			filepath.Join(flyerDir, filename),
+			filepath.Join(flyerDir, "web", images.WebName(filename)),
+		); err != nil {
 			return err
 		}
 
@@ -89,7 +97,8 @@ func uploadFlyer(conn *sql.DB, uploadsDir string) echo.HandlerFunc {
 				return err
 			}
 			if !inUse {
-				_ = os.Remove(filepath.Join(uploadsDir, flyersSubdir, previous))
+				_ = os.Remove(filepath.Join(flyerDir, previous))
+				_ = os.Remove(filepath.Join(flyerDir, "web", images.WebName(previous)))
 			}
 		}
 		return c.Redirect(http.StatusSeeOther, "/admin/events/"+c.Param("id"))

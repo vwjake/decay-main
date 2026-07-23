@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"decay-main/db"
+	"decay-main/images"
 
 	// The old records store wall-clock dates with no zone, so resolving
 	// them needs the Olympia zone. Windows has no system tzdata.
@@ -247,8 +248,14 @@ func copyFlyers(events []SeedEvent, src, archive, dest string) (int, error) {
 			continue
 		}
 		done[name] = true
-		if err := copyFile(from, filepath.Join(dest, name)); err != nil {
+		to := filepath.Join(dest, name)
+		if err := copyFile(from, to); err != nil {
 			return copied, err
+		}
+		// Pages serve the web copy; the original stays for anyone who
+		// clicks through.
+		if err := images.MakeWeb(to, filepath.Join(dest, "web", images.WebName(name))); err != nil {
+			return copied, fmt.Errorf("resizing %s: %w", name, err)
 		}
 		copied++
 	}

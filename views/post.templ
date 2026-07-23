@@ -1,0 +1,18 @@
+package views
+
+import "decay-main/db"
+
+templ PostPage(post db.Post) {
+	@Layout(post.Title + " · DECAY") {
+		<section class="event-detail">
+			<a href="/blog" class="event-back mono">&larr; All posts</a>
+			<h1 class="event-detail-title">{ post.Title }</h1>
+			if post.Date() != "" {
+				<p class="event-detail-when mono">{ post.Date() }</p>
+			}
+			for _, para := range post.Paragraphs() {
+				<p class="event-detail-body">{ para }</p>
+			}
+		</section>
+	}
+}
