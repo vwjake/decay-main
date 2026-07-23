@@ -11,6 +11,7 @@ import (
 	"decay-main/db"
 	"decay-main/views"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -21,6 +22,11 @@ var staticFS embed.FS
 const uploadsDir = "uploads"
 
 func main() {
+	// Loads .env into the process environment if the file exists; a
+	// missing .env (e.g. in production, where vars are set directly) is
+	// not an error.
+	_ = godotenv.Load()
+
 	conn, err := db.Open("decay.db")
 	if err != nil {
 		log.Fatal(err)
