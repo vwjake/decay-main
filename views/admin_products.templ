@@ -1,0 +1,45 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/db"
+)
+
+templ AdminProducts(products []db.Product, errorMsg string) {
+	@AdminLayout("Shop · DECAY Admin") {
+		<p class="admin-heading">Shop</p>
+		if errorMsg != "" {
+			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+		}
+		<table class="admin-table">
+			<tr>
+				<th>Name</th>
+				<th>Price</th>
+				<th>Placeholder</th>
+				<th></th>
+			</tr>
+			for _, p := range products {
+				<tr>
+					<td>{ p.Name }</td>
+					<td>{ p.Price() }</td>
+					<td>{ p.Placeholder }</td>
+					<td>
+						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/products/%d/delete", p.ID)) } onsubmit="return confirm('Delete this product?')">
+							<button type="submit" class="admin-btn admin-btn-danger">Delete</button>
+						</form>
+					</td>
+				</tr>
+			}
+		</table>
+
+		<p class="admin-heading">Add product</p>
+		<form method="post" action="/admin/products" class="admin-form">
+			<label>Name<input type="text" name="name" required/></label>
+			<label>Price (USD)<input type="number" name="price" min="0" step="0.01" required/></label>
+			<label>Placeholder text<input type="text" name="placeholder" placeholder="product photo"/></label>
+			<label>Stripe link (optional)<input type="text" name="stripe_url"/></label>
+			<button type="submit" class="admin-btn">Create</button>
+		</form>
+	}
+}

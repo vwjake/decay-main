@@ -1,0 +1,29 @@
+package views
+
+templ AdminLogin(errorMsg string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<title>Log in · DECAY Admin</title>
+			<link rel="preconnect" href="https://fonts.googleapis.com"/>
+			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+			<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+			<link rel="stylesheet" href="/static/css/style.css"/>
+		</head>
+		<body>
+			<div class="admin-login-wrap">
+				<p class="admin-heading">DECAY Admin</p>
+				if errorMsg != "" {
+					<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+				}
+				<form method="post" action="/admin/login" class="admin-form">
+					<label>Username<input type="text" name="username" required autofocus/></label>
+					<label>Password<input type="password" name="password" required/></label>
+					<button type="submit" class="admin-btn">Log in</button>
+				</form>
+			</div>
+		</body>
+	</html>
+}

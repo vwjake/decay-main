@@ -1,0 +1,78 @@
+package admin
+
+import (
+	"database/sql"
+	"net/http"
+	"strconv"
+
+	"decay-main/db"
+	"decay-main/views"
+
+	"github.com/labstack/echo/v4"
+)
+
+func registerProductRoutes(g *echo.Group, conn *sql.DB) {
+	g.GET("/products", listProducts(conn))
+	g.POST("/products", createProduct(conn))
+	g.POST("/products/:id/delete", deleteProduct(conn))
+}
+
+func listProducts(conn *sql.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		products, err := db.ListProducts(conn)
+		if err != nil {
+			return err
+		}
+		return views.AdminProducts(products, "").Render(c.Request().Context(), c.Response())
+	}
+}
+
+func createProduct(conn *sql.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		name := c.FormValue("name")
+		if name == "" {
+			return rerenderProductsError(c, conn, "Name is required.")
+		}
+		priceDollars, err := strconv.ParseFloat(c.FormValue("price"), 64)
+		if err != nil || priceDollars < 0 {
+			return rerenderProductsError(c, conn, "Invalid price.")
+		}
+
+		placeholder := c.FormValue("placeholder")
+		if placeholder == "" {
+			placeholder = "product photo"
+		}
+
+		p := db.Product{
+			Name:        name,
+			PriceCents:  int(priceDollars*100 + 0.5),
+			Placeholder: placeholder,
+			StripeURL:   c.FormValue("stripe_url"),
+		}
+		if err := db.CreateProduct(conn, p); err != nil {
+			return err
+		}
+		return c.Redirect(http.StatusSeeOther, "/admin/products")
+	}
+}
+
+func deleteProduct(conn *sql.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest)
+		}
+		if err := db.DeleteProduct(conn, id); err != nil {
+			return err
+		}
+		return c.Redirect(http.StatusSeeOther, "/admin/products")
+	}
+}
+
+func rerenderProductsError(c echo.Context, conn *sql.DB, msg string) error {
+	products, err := db.ListProducts(conn)
+	if err != nil {
+		return err
+	}
+	return views.AdminProducts(products, msg).Render(c.Request().Context(), c.Response())
+}

@@ -46,7 +46,12 @@ type Product struct {
 	StripeURL   string
 }
 
-func (p Product) Price() string { return fmt.Sprintf("$%d", p.PriceCents/100) }
+func (p Product) Price() string {
+	if p.PriceCents%100 == 0 {
+		return fmt.Sprintf("$%d", p.PriceCents/100)
+	}
+	return fmt.Sprintf("$%.2f", float64(p.PriceCents)/100)
+}
 
 type Post struct {
 	ID          int64
@@ -54,12 +59,41 @@ type Post struct {
 	Title       string
 	Body        string
 	PublishedAt *time.Time
+	CreatedAt   time.Time
 }
+
+func (p Post) Published() bool { return p.PublishedAt != nil }
 
 type Photo struct {
 	ID       int64
 	Filename string
 	Caption  string
+}
+
+func scanEvents(rows *sql.Rows) ([]Event, error) {
+	var events []Event
+	for rows.Next() {
+		var ev Event
+		var startsAt string
+		var endsAt sql.NullString
+		if err := rows.Scan(&ev.ID, &ev.Title, &ev.EventType, &startsAt, &endsAt, &ev.Location, &ev.Description, &ev.Link); err != nil {
+			return nil, err
+		}
+		var err error
+		ev.StartsAt, err = time.Parse(timeLayout, startsAt)
+		if err != nil {
+			return nil, err
+		}
+		if endsAt.Valid {
+			end, err := time.Parse(timeLayout, endsAt.String)
+			if err != nil {
+				return nil, err
+			}
+			ev.EndsAt = &end
+		}
+		events = append(events, ev)
+	}
+	return events, rows.Err()
 }
 
 // ListUpcomingEvents returns up to limit events starting now or later,
@@ -72,26 +106,14 @@ func ListUpcomingEvents(conn *sql.DB, limit int) ([]Event, error) {
 	}
 	defer rows.Close()
 
+	all, err := scanEvents(rows)
+	if err != nil {
+		return nil, err
+	}
+
 	now := time.Now()
 	var events []Event
-	for rows.Next() {
-		var ev Event
-		var startsAt string
-		var endsAt sql.NullString
-		if err := rows.Scan(&ev.ID, &ev.Title, &ev.EventType, &startsAt, &endsAt, &ev.Location, &ev.Description, &ev.Link); err != nil {
-			return nil, err
-		}
-		ev.StartsAt, err = time.Parse(timeLayout, startsAt)
-		if err != nil {
-			return nil, err
-		}
-		if endsAt.Valid {
-			end, err := time.Parse(timeLayout, endsAt.String)
-			if err != nil {
-				return nil, err
-			}
-			ev.EndsAt = &end
-		}
+	for _, ev := range all {
 		if ev.StartsAt.Before(now) {
 			continue
 		}
@@ -100,7 +122,18 @@ func ListUpcomingEvents(conn *sql.DB, limit int) ([]Event, error) {
 			break
 		}
 	}
-	return events, rows.Err()
+	return events, nil
+}
+
+// ListAllEvents returns every event, most recent start time first, for
+// admin management (unlike ListUpcomingEvents it includes past events).
+func ListAllEvents(conn *sql.DB) ([]Event, error) {
+	rows, err := conn.Query(`SELECT id, title, event_type, starts_at, ends_at, location, description, link FROM events ORDER BY starts_at DESC`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	return scanEvents(rows)
 }
 
 func ListProducts(conn *sql.DB) ([]Product, error) {
@@ -121,18 +154,13 @@ func ListProducts(conn *sql.DB) ([]Product, error) {
 	return products, rows.Err()
 }
 
-func ListPosts(conn *sql.DB) ([]Post, error) {
-	rows, err := conn.Query(`SELECT id, slug, title, body_markdown, published_at FROM posts ORDER BY published_at DESC`)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
+func scanPosts(rows *sql.Rows) ([]Post, error) {
 	var posts []Post
 	for rows.Next() {
 		var p Post
 		var publishedAt sql.NullString
-		if err := rows.Scan(&p.ID, &p.Slug, &p.Title, &p.Body, &publishedAt); err != nil {
+		var createdAt string
+		if err := rows.Scan(&p.ID, &p.Slug, &p.Title, &p.Body, &publishedAt, &createdAt); err != nil {
 			return nil, err
 		}
 		if publishedAt.Valid {
@@ -142,9 +170,34 @@ func ListPosts(conn *sql.DB) ([]Post, error) {
 			}
 			p.PublishedAt = &t
 		}
+		created, err := time.Parse("2006-01-02 15:04:05", createdAt)
+		if err != nil {
+			return nil, err
+		}
+		p.CreatedAt = created
 		posts = append(posts, p)
 	}
 	return posts, rows.Err()
+}
+
+// ListPosts returns published posts only, newest first, for the public blog.
+func ListPosts(conn *sql.DB) ([]Post, error) {
+	rows, err := conn.Query(`SELECT id, slug, title, body_markdown, published_at, created_at FROM posts WHERE published_at IS NOT NULL ORDER BY published_at DESC`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	return scanPosts(rows)
+}
+
+// ListAllPosts returns every post including drafts, newest first, for admin management.
+func ListAllPosts(conn *sql.DB) ([]Post, error) {
+	rows, err := conn.Query(`SELECT id, slug, title, body_markdown, published_at, created_at FROM posts ORDER BY created_at DESC`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	return scanPosts(rows)
 }
 
 func ListPhotos(conn *sql.DB) ([]Photo, error) {

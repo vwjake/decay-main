@@ -13,8 +13,11 @@ templ Photos(photos []db.Photo) {
 					for _, p := range photos {
 						<div class="merch-item">
 							<div class="merch-photo">
-								<img src={ "/static/photos/" + p.Filename } alt={ p.Caption }/>
+								<img src={ "/uploads/" + p.Filename } alt={ p.Caption }/>
 							</div>
+							if p.Caption != "" {
+								<div class="merch-name">{ p.Caption }</div>
+							}
 						</div>
 					}
 				</div>

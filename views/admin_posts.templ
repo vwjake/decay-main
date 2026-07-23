@@ -1,0 +1,54 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/db"
+)
+
+templ AdminPosts(posts []db.Post, errorMsg string) {
+	@AdminLayout("Blog · DECAY Admin") {
+		<p class="admin-heading">Blog</p>
+		if errorMsg != "" {
+			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+		}
+		<table class="admin-table">
+			<tr>
+				<th>Title</th>
+				<th>Status</th>
+				<th></th>
+			</tr>
+			for _, p := range posts {
+				<tr>
+					<td>{ p.Title }</td>
+					<td>
+						if p.Published() {
+							Published
+						} else {
+							Draft
+						}
+					</td>
+					<td>
+						if !p.Published() {
+							<form method="post" action={ templ.URL(fmt.Sprintf("/admin/posts/%d/publish", p.ID)) } style="display:inline">
+								<button type="submit" class="admin-btn">Publish</button>
+							</form>
+						}
+						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/posts/%d/delete", p.ID)) } onsubmit="return confirm('Delete this post?')" style="display:inline">
+							<button type="submit" class="admin-btn admin-btn-danger">Delete</button>
+						</form>
+					</td>
+				</tr>
+			}
+		</table>
+
+		<p class="admin-heading">New post</p>
+		<form method="post" action="/admin/posts" class="admin-form">
+			<label>Title<input type="text" name="title" required/></label>
+			<label>Slug<input type="text" name="slug" placeholder="my-post-title" required/></label>
+			<label>Body (Markdown)<textarea name="body" required></textarea></label>
+			<label class="inline mono"><input type="checkbox" name="publish"/> Publish immediately</label>
+			<button type="submit" class="admin-btn">Save</button>
+		</form>
+	}
+}

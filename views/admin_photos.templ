@@ -1,0 +1,37 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/db"
+)
+
+templ AdminPhotos(photos []db.Photo, errorMsg string) {
+	@AdminLayout("Photos · DECAY Admin") {
+		<p class="admin-heading">Photos</p>
+		if errorMsg != "" {
+			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+		}
+		if len(photos) > 0 {
+			<div class="merch-grid">
+				for _, p := range photos {
+					<div class="merch-item">
+						<div class="merch-photo">
+							<img src={ "/uploads/" + p.Filename } alt={ p.Caption }/>
+						</div>
+						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/photos/%d/delete", p.ID)) } onsubmit="return confirm('Delete this photo?')" style="margin-top:8px">
+							<button type="submit" class="admin-btn admin-btn-danger">Delete</button>
+						</form>
+					</div>
+				}
+			</div>
+		}
+
+		<p class="admin-heading">Upload photo</p>
+		<form method="post" action="/admin/photos" enctype="multipart/form-data" class="admin-form">
+			<label>Image (jpg, png, gif, webp)<input type="file" name="photo" accept="image/*" required/></label>
+			<label>Caption<input type="text" name="caption"/></label>
+			<button type="submit" class="admin-btn">Upload</button>
+		</form>
+	}
+}

@@ -14,6 +14,9 @@
 *.db
 *.db-journal
 
+# Runtime photo uploads (not embedded — written at runtime by /admin/photos)
+/uploads/
+
 # IDE
 .vscode/
 .idea/

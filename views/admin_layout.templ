@@ -1,0 +1,36 @@
+package views
+
+templ AdminLayout(title string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<title>{ title }</title>
+			<link rel="preconnect" href="https://fonts.googleapis.com"/>
+			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+			<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+			<link rel="stylesheet" href="/static/css/style.css"/>
+		</head>
+		<body>
+			<div class="page">
+				<header class="site-header">
+					<a href="/admin">DECAY Admin</a>
+					<nav class="site-nav mono">
+						<a href="/admin/events">Events</a>
+						<a href="/admin/products">Shop</a>
+						<a href="/admin/posts">Blog</a>
+						<a href="/admin/photos">Photos</a>
+						<a href="/" target="_blank" rel="noopener">View site</a>
+						<form method="post" action="/admin/logout" style="display:inline">
+							<button type="submit" class="admin-btn">Log out</button>
+						</form>
+					</nav>
+				</header>
+				<main class="admin-main">
+					{ children... }
+				</main>
+			</div>
+		</body>
+	</html>
+}

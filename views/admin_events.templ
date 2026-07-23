@@ -1,0 +1,54 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/db"
+)
+
+templ AdminEvents(events []db.Event, errorMsg string) {
+	@AdminLayout("Events · DECAY Admin") {
+		<p class="admin-heading">Events</p>
+		if errorMsg != "" {
+			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+		}
+		<table class="admin-table">
+			<tr>
+				<th>Title</th>
+				<th>Type</th>
+				<th>Starts</th>
+				<th>Ends</th>
+				<th></th>
+			</tr>
+			for _, ev := range events {
+				<tr>
+					<td>{ ev.Title }</td>
+					<td>{ ev.EventType }</td>
+					<td>{ ev.StartsAt.Format("Jan 2, 2006 3:04 PM") }</td>
+					<td>
+						if ev.EndsAt != nil {
+							{ ev.EndsAt.Format("3:04 PM") }
+						}
+					</td>
+					<td>
+						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/events/%d/delete", ev.ID)) } onsubmit="return confirm('Delete this event?')">
+							<button type="submit" class="admin-btn admin-btn-danger">Delete</button>
+						</form>
+					</td>
+				</tr>
+			}
+		</table>
+
+		<p class="admin-heading">Add event</p>
+		<form method="post" action="/admin/events" class="admin-form">
+			<label>Title<input type="text" name="title" required/></label>
+			<label>Type<input type="text" name="event_type" placeholder="Workshop, Film, Meetup…" required/></label>
+			<label>Starts at (Pacific time)<input type="datetime-local" name="starts_at" required/></label>
+			<label>Ends at (optional, Pacific time)<input type="datetime-local" name="ends_at"/></label>
+			<label>Location<input type="text" name="location" value="402 Washington St NE, Olympia WA"/></label>
+			<label>Description<textarea name="description"></textarea></label>
+			<label>Link<input type="text" name="link" placeholder="#"/></label>
+			<button type="submit" class="admin-btn">Create</button>
+		</form>
+	}
+}

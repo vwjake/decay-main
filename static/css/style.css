@@ -435,3 +435,132 @@ a {
   color: #999;
   margin-top: 8px;
 }
+
+/* Admin */
+
+.admin-main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+}
+
+.admin-heading {
+  font-weight: 900;
+  font-size: 20px;
+  text-transform: uppercase;
+  margin: 32px 0 16px;
+}
+
+.admin-heading:first-child {
+  margin-top: 0;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+  font-size: 13px;
+}
+
+.admin-table th,
+.admin-table td {
+  border: 1px solid #111;
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.admin-table th {
+  background: #f4f4f2;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 480px;
+  margin-bottom: 32px;
+}
+
+.admin-form label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #666;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-form label.inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-form input,
+.admin-form textarea {
+  border: 2px solid #111;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  background: #fff;
+  color: #111;
+}
+
+.admin-form input[type="checkbox"] {
+  width: auto;
+}
+
+.admin-form textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.admin-btn {
+  border: 2px solid #111;
+  background: none;
+  color: #111;
+  padding: 8px 14px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  font-family: 'Space Mono', monospace;
+}
+
+.admin-btn:hover {
+  background: #111;
+  color: #fff;
+}
+
+.admin-btn-danger {
+  border-color: #a00;
+  color: #a00;
+}
+
+.admin-btn-danger:hover {
+  background: #a00;
+  color: #fff;
+}
+
+.admin-flash {
+  padding: 10px 14px;
+  border: 2px solid #111;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.admin-flash-error {
+  border-color: #a00;
+  color: #a00;
+}
+
+.admin-login-wrap {
+  max-width: 320px;
+  margin: 80px auto;
+  padding: 0 20px;
+}

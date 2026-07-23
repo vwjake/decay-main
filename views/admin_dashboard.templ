@@ -1,0 +1,21 @@
+package views
+
+templ AdminDashboard() {
+	@AdminLayout("Dashboard · DECAY Admin") {
+		<p class="admin-heading">Dashboard</p>
+		<div class="event-list">
+			<a href="/admin/events" class="event-item">
+				<div class="event-title">Events</div>
+			</a>
+			<a href="/admin/products" class="event-item">
+				<div class="event-title">Shop</div>
+			</a>
+			<a href="/admin/posts" class="event-item">
+				<div class="event-title">Blog</div>
+			</a>
+			<a href="/admin/photos" class="event-item">
+				<div class="event-title">Photos</div>
+			</a>
+		</div>
+	}
+}
