@@ -1,0 +1,15 @@
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Env files
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
