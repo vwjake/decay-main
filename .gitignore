@@ -17,6 +17,10 @@
 # Runtime photo uploads (not embedded — written at runtime by /admin/photos)
 /uploads/
 
+# air (live reload)
+/tmp/
+build-errors.log
+
 # IDE
 .vscode/
 .idea/

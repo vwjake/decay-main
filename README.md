@@ -6,18 +6,37 @@ see [MANIFESTO.md](MANIFESTO.md) for the stack philosophy.
 
 ## Run
 
+Copy `.env.example` to `.env` and set a real `ADMIN_PASSWORD` (and
+`SESSION_SECRET`, so admin logins survive a restart):
+
 ```bash
-ADMIN_PASSWORD=change-me go run main.go
+cp .env.example .env
+go run main.go
 ```
 
-Then visit http://localhost:8080. Copy `.env.example` to `.env` (or export
-the vars yourself) for real use — `ADMIN_PASSWORD` is required, and
-`SESSION_SECRET` should be set so admin logins survive a restart.
+Then visit http://localhost:8080.
 
 The admin panel lives at `/admin/login` (username `admin` unless
 `ADMIN_USERNAME` overrides it) and manages events, shop products, blog
 posts, and photos — all stored in `decay.db` (SQLite, created and seeded
 automatically on first run).
+
+### Live reload
+
+Go doesn't hot-reload — `go run` compiles once, so every edit needs a
+manual stop/rebuild/restart, and the static assets are `go:embed`-ed
+into the binary too, so even a CSS tweak needs a rebuild. [air](https://github.com/air-verse/air)
+automates that loop:
+
+```bash
+go install github.com/air-verse/air@latest
+air
+```
+
+`.air.toml` runs `templ generate` before every build and watches `.go`,
+`.templ`, `.css`, and `.js` files, rebuilding and restarting the server
+on save. `decay.db` and `uploads/` aren't touched by a rebuild — they're
+runtime data, not compiled in.
 
 ## Structure
 
