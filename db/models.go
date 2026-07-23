@@ -3,9 +3,14 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 )
+
+// eventColumns is the select list every event query shares, so scanEvents
+// stays in step with it.
+const eventColumns = `id, title, event_type, starts_at, ends_at, location, description, link, uid, flyer, slug`
 
 const timeLayout = "2006-01-02T15:04:05-07:00"
 
@@ -18,7 +23,103 @@ type Event struct {
 	Location    string
 	Description string
 	Link        string
+	// UID is the event's iCalendar identity, carried over from the old
+	// site where it exists so calendars already subscribed to it don't
+	// see a second copy.
+	UID string
+	// Flyer is a filename under uploads/flyers/, empty if there isn't one.
+	Flyer string
+	Slug  string
 }
+
+// Slug builds an event's URL segment from its date and title, e.g.
+// "2026-07-25-free-mask-distro". The date leads so that a recurring title
+// like "Open Draw" stays unique and the URL says when it happened.
+func Slug(startsAt time.Time, title string) string {
+	var b strings.Builder
+	b.WriteString(startsAt.Format("2006-01-02"))
+	b.WriteByte('-')
+
+	lastDash := true
+	for _, r := range strings.ToLower(title) {
+		switch {
+		case r >= 'a' && r <= 'z', r >= '0' && r <= '9':
+			b.WriteRune(r)
+			lastDash = false
+		default:
+			if !lastDash {
+				b.WriteByte('-')
+				lastDash = true
+			}
+		}
+	}
+	return strings.TrimSuffix(b.String(), "-")
+}
+
+// VolunteerRoles are the jobs an event can need covered, in the order
+// they're shown. The old site used exactly these four.
+var VolunteerRoles = []string{"door", "sound", "cleanup", "promote"}
+
+// RoleLabel renders a role slug for display.
+func RoleLabel(role string) string {
+	switch role {
+	case "door":
+		return "Door"
+	case "sound":
+		return "Sound"
+	case "cleanup":
+		return "Cleanup"
+	case "promote":
+		return "Promote"
+	}
+	return role
+}
+
+// EventVolunteer is one role an event needs covered. Name is empty while
+// the slot is still open.
+type EventVolunteer struct {
+	ID      int64
+	EventID int64
+	Role    string
+	Name    string
+}
+
+func (v EventVolunteer) Label() string { return RoleLabel(v.Role) }
+func (v EventVolunteer) Filled() bool  { return v.Name != "" }
+
+func (e Event) HasFlyer() bool { return e.Flyer != "" }
+
+// FlyerPath is the URL the flyer image is served from.
+func (e Event) FlyerPath() string { return "/uploads/flyers/" + e.Flyer }
+
+// Paragraphs splits a description into blocks on blank lines so a template
+// can render it without trusting the source with raw HTML.
+func (e Event) Paragraphs() []string {
+	var out []string
+	for _, block := range strings.Split(strings.ReplaceAll(e.Description, "\r\n", "\n"), "\n\n") {
+		if block = strings.TrimSpace(block); block != "" {
+			out = append(out, block)
+		}
+	}
+	return out
+}
+
+// LongDate renders the full date for a detail page, e.g.
+// "Saturday, July 25, 2026".
+func (e Event) LongDate() string { return e.StartsAt.Format("Monday, January 2, 2006") }
+
+// Path is the event's public URL. Events imported before slugs existed
+// fall back to their id so nothing 404s.
+func (e Event) Path() string {
+	if e.Slug != "" {
+		return "/events/" + e.Slug
+	}
+	return "/events/" + strconv.FormatInt(e.ID, 10)
+}
+
+// HasLink reports whether the event points somewhere worth clicking.
+// Events carry "#" when the old site had no link for them.
+func (e Event) HasLink() bool { return e.Link != "" && e.Link != "#" }
 
 func (e Event) Day() string   { return e.StartsAt.Format("02") }
 func (e Event) Month() string { return strings.ToUpper(e.StartsAt.Format("Jan")) }
@@ -76,7 +177,7 @@ func scanEvents(rows *sql.Rows) ([]Event, error) {
 		var ev Event
 		var startsAt string
 		var endsAt sql.NullString
-		if err := rows.Scan(&ev.ID, &ev.Title, &ev.EventType, &startsAt, &endsAt, &ev.Location, &ev.Description, &ev.Link); err != nil {
+		if err := rows.Scan(&ev.ID, &ev.Title, &ev.EventType, &startsAt, &endsAt, &ev.Location, &ev.Description, &ev.Link, &ev.UID, &ev.Flyer, &ev.Slug); err != nil {
 			return nil, err
 		}
 		var err error
@@ -97,38 +198,175 @@ func scanEvents(rows *sql.Rows) ([]Event, error) {
 }
 
 // ListUpcomingEvents returns up to limit events starting now or later,
-// soonest first. Filtering happens in Go rather than SQL so the
-// comparison is against real time.Time instants, not SQLite's UTC clock.
+// soonest first.
 func ListUpcomingEvents(conn *sql.DB, limit int) ([]Event, error) {
-	rows, err := conn.Query(`SELECT id, title, event_type, starts_at, ends_at, location, description, link FROM events ORDER BY starts_at ASC`)
+	events, err := UpcomingEvents(conn)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	if len(events) > limit {
+		events = events[:limit]
+	}
+	return events, nil
+}
 
-	all, err := scanEvents(rows)
+// UpcomingEvents returns every event starting now or later, soonest
+// first. Filtering happens in Go rather than SQL so the comparison is
+// against real time.Time instants, not SQLite's UTC clock.
+func UpcomingEvents(conn *sql.DB) ([]Event, error) {
+	all, err := ListAllEvents(conn)
 	if err != nil {
 		return nil, err
 	}
+	now := time.Now()
+	var events []Event
+	// ListAllEvents is newest first; walking it backwards yields soonest first.
+	for i := len(all) - 1; i >= 0; i-- {
+		if all[i].StartsAt.Before(now) {
+			continue
+		}
+		events = append(events, all[i])
+	}
+	return events, nil
+}
 
+// PastEvents returns every event that has already started, most recent
+// first — the public archive of what has happened at the space.
+func PastEvents(conn *sql.DB) ([]Event, error) {
+	all, err := ListAllEvents(conn)
+	if err != nil {
+		return nil, err
+	}
 	now := time.Now()
 	var events []Event
 	for _, ev := range all {
 		if ev.StartsAt.Before(now) {
-			continue
-		}
-		events = append(events, ev)
-		if len(events) == limit {
-			break
+			events = append(events, ev)
 		}
 	}
 	return events, nil
 }
 
+// EventBySlug looks up a single event for its detail page. It also
+// accepts a bare numeric id, so events predating slugs stay reachable.
+// Returns sql.ErrNoRows when nothing matches.
+func EventBySlug(conn *sql.DB, slug string) (Event, error) {
+	rows, err := conn.Query(`SELECT `+eventColumns+` FROM events WHERE slug = ? OR (slug = '' AND id = ?) LIMIT 1`, slug, slug)
+	if err != nil {
+		return Event{}, err
+	}
+	defer rows.Close()
+
+	events, err := scanEvents(rows)
+	if err != nil {
+		return Event{}, err
+	}
+	if len(events) == 0 {
+		return Event{}, sql.ErrNoRows
+	}
+	return events[0], nil
+}
+
+// EventByID looks up one event for the admin panel.
+func EventByID(conn *sql.DB, id int64) (Event, error) {
+	rows, err := conn.Query(`SELECT `+eventColumns+` FROM events WHERE id = ?`, id)
+	if err != nil {
+		return Event{}, err
+	}
+	defer rows.Close()
+
+	events, err := scanEvents(rows)
+	if err != nil {
+		return Event{}, err
+	}
+	if len(events) == 0 {
+		return Event{}, sql.ErrNoRows
+	}
+	return events[0], nil
+}
+
+// FlyerInUse reports whether any event still references a flyer file.
+// Recurring events share one, so a replaced flyer isn't always safe to
+// delete from disk.
+func FlyerInUse(conn *sql.DB, filename string) (bool, error) {
+	var count int
+	err := conn.QueryRow(`SELECT count(*) FROM events WHERE flyer = ?`, filename).Scan(&count)
+	return count > 0, err
+}
+
+// VolunteersFor returns the roles an event needs covered, in the order
+// given by VolunteerRoles.
+func VolunteersFor(conn *sql.DB, eventID int64) ([]EventVolunteer, error) {
+	rows, err := conn.Query(`SELECT id, event_id, role, volunteer_name FROM event_volunteers WHERE event_id = ?`, eventID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	byRole := map[string]EventVolunteer{}
+	for rows.Next() {
+		var v EventVolunteer
+		if err := rows.Scan(&v.ID, &v.EventID, &v.Role, &v.Name); err != nil {
+			return nil, err
+		}
+		byRole[v.Role] = v
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	var volunteers []EventVolunteer
+	for _, role := range VolunteerRoles {
+		if v, ok := byRole[role]; ok {
+			volunteers = append(volunteers, v)
+			delete(byRole, role)
+		}
+	}
+	// Anything the old site recorded under a role we don't know about
+	// still belongs to the event.
+	for _, v := range byRole {
+		volunteers = append(volunteers, v)
+	}
+	return volunteers, nil
+}
+
+// OpenRoles returns just the roles still needing someone.
+func OpenRoles(volunteers []EventVolunteer) []EventVolunteer {
+	var open []EventVolunteer
+	for _, v := range volunteers {
+		if !v.Filled() {
+			open = append(open, v)
+		}
+	}
+	return open
+}
+
+// EventMonth is a run of events sharing a calendar month, used to break
+// a long list into headed sections.
+type EventMonth struct {
+	Label  string
+	Events []Event
+}
+
+// GroupByMonth splits an already-sorted event list into month sections,
+// preserving the order it was given.
+func GroupByMonth(events []Event) []EventMonth {
+	var months []EventMonth
+	for _, ev := range events {
+		label := ev.StartsAt.Format("January 2006")
+		if n := len(months); n > 0 && months[n-1].Label == label {
+			months[n-1].Events = append(months[n-1].Events, ev)
+			continue
+		}
+		months = append(months, EventMonth{Label: label, Events: []Event{ev}})
+	}
+	return months
+}
+
 // ListAllEvents returns every event, most recent start time first, for
 // admin management (unlike ListUpcomingEvents it includes past events).
 func ListAllEvents(conn *sql.DB) ([]Event, error) {
-	rows, err := conn.Query(`SELECT id, title, event_type, starts_at, ends_at, location, description, link FROM events ORDER BY starts_at DESC`)
+	rows, err := conn.Query(`SELECT ` + eventColumns + ` FROM events ORDER BY starts_at DESC`)
 	if err != nil {
 		return nil, err
 	}

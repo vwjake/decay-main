@@ -1,0 +1,66 @@
+package views
+
+import "decay-main/db"
+
+templ Events(months []db.EventMonth) {
+	@Layout("Events · DECAY") {
+		<section class="about">
+			<p class="about-statement">Events</p>
+			<p class="about-body">Everything coming up at 402 Washington St NE. Doors are open to all ages unless a listing says otherwise.</p>
+		</section>
+		<section class="events">
+			if len(months) == 0 {
+				<p class="about-body">Nothing on the calendar right now — check back soon.</p>
+			} else {
+				@eventMonths(months)
+			}
+			<a href="/events/archive" class="btn-outline mono">Past events</a>
+			<a href="/events.ics" class="btn-outline mono">Subscribe in your calendar</a>
+			<p class="subscribe-note mono">Add <span>/events.ics</span> to Nextcloud, Apple Calendar, or Google Calendar and new events show up on their own.</p>
+		</section>
+	}
+}
+
+templ EventArchive(months []db.EventMonth) {
+	@Layout("Past events · DECAY") {
+		<section class="about">
+			<p class="about-statement">Past events</p>
+			<p class="about-body">Everything DECAY has hosted, most recent first.</p>
+		</section>
+		<section class="events">
+			if len(months) == 0 {
+				<p class="about-body">Nothing here yet.</p>
+			} else {
+				@eventMonths(months)
+			}
+			<a href="/events" class="btn-outline mono">Upcoming events</a>
+		</section>
+	}
+}
+
+templ eventMonths(months []db.EventMonth) {
+	for _, month := range months {
+		<span class="event-month mono">{ month.Label }</span>
+		<div class="event-list">
+			for _, ev := range month.Events {
+				@eventRow(ev)
+			}
+		</div>
+	}
+}
+
+// eventRow links a listing to the event's own page.
+templ eventRow(ev db.Event) {
+	<a href={ templ.URL(ev.Path()) } class="event-item">
+		<div>
+			<div class="event-title">{ ev.Title }</div>
+			<div class="event-meta mono">
+				{ ev.EventType } &middot; { ev.TimeRange() }
+				if ev.HasFlyer() {
+					&middot; Flyer
+				}
+			</div>
+		</div>
+		<div class="event-date mono">{ ev.Month() } { ev.Day() }</div>
+	</a>
+}

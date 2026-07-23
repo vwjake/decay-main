@@ -163,6 +163,22 @@ a {
   background: #f4f4f2;
 }
 
+/* Month heading on the /events listing, repeated down the page. */
+.event-month {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #666;
+  margin-top: 32px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #111;
+}
+
+.event-month:first-child {
+  margin-top: 0;
+}
+
 .event-list {
   margin-top: 18px;
   display: flex;
@@ -218,6 +234,103 @@ a {
   border: 2px solid #111;
   padding: 14px;
   background: #fff;
+}
+
+.subscribe-note {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #666;
+  margin: 12px 0 0;
+  text-align: center;
+}
+
+.subscribe-note span {
+  border: 1px solid #ccc;
+  padding: 1px 4px;
+}
+
+/* Event detail */
+
+.event-detail {
+  padding: 44px 20px;
+  border-bottom: 2px solid #111;
+}
+
+.event-back {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.event-detail-title {
+  font-weight: 900;
+  font-size: 28px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  margin: 8px 0 0;
+}
+
+.event-detail-when {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 12px 0 0;
+}
+
+.event-detail-where {
+  font-size: 12px;
+  color: #666;
+  margin: 4px 0 0;
+}
+
+.event-flyer {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  margin: 24px 0;
+  border: 2px solid #111;
+}
+
+.event-detail-body {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #333;
+  margin: 16px 0 0;
+  white-space: pre-line;
+}
+
+.event-volunteers {
+  margin-top: 32px;
+  padding: 16px;
+  border: 2px solid #111;
+  background: #f4f4f2;
+}
+
+.volunteer-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.volunteer-list li {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 2px solid #111;
+  background: #fff;
+  padding: 6px 10px;
+}
+
+.volunteer-note {
+  font-size: 11px;
+  color: #666;
+  margin: 12px 0 0;
 }
 
 /* Merch */
@@ -453,6 +566,63 @@ a {
 
 .admin-heading:first-child {
   margin-top: 0;
+}
+
+.admin-back {
+  display: inline-block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.admin-sub {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #666;
+  margin: 0 0 12px;
+}
+
+.admin-tag {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid #999;
+  padding: 1px 5px;
+  margin-left: 8px;
+  color: #666;
+}
+
+.admin-flyer-preview {
+  display: block;
+  max-width: 260px;
+  height: auto;
+  border: 2px solid #111;
+  margin-bottom: 16px;
+}
+
+.admin-fieldset {
+  border: 1px solid #111;
+  padding: 12px;
+  margin: 4px 0;
+}
+
+.admin-fieldset legend {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0 6px;
+}
+
+.admin-check {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .admin-table {

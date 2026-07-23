@@ -20,16 +20,10 @@ templ Home(events []db.Event, products []db.Product) {
 			<span class="section-label mono">Upcoming events</span>
 			<div class="event-list">
 				for _, ev := range events {
-					<a href={ templ.URL(ev.Link) } class="event-item">
-						<div>
-							<div class="event-title">{ ev.Title }</div>
-							<div class="event-meta mono">{ ev.EventType } &middot; { ev.TimeRange() }</div>
-						</div>
-						<div class="event-date mono">{ ev.Month() } { ev.Day() }</div>
-					</a>
+					@eventRow(ev)
 				}
 			</div>
-			<a href="#" class="btn-outline mono">Full calendar</a>
+			<a href="/events" class="btn-outline mono">Full calendar</a>
 		</section>
 
 		<section id="merch" class="merch">

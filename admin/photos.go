@@ -2,24 +2,17 @@ package admin
 
 import (
 	"database/sql"
-	"fmt"
-	"io"
+	"errors"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
-	"time"
 
 	"decay-main/db"
 	"decay-main/views"
 
 	"github.com/labstack/echo/v4"
 )
-
-var allowedPhotoExt = map[string]bool{
-	".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".webp": true,
-}
 
 func registerPhotoRoutes(g *echo.Group, conn *sql.DB, uploadsDir string) {
 	g.GET("/photos", listPhotos(conn))
@@ -44,38 +37,11 @@ func uploadPhoto(conn *sql.DB, uploadsDir string) echo.HandlerFunc {
 			return rerenderPhotosError(c, conn, "Choose an image to upload.")
 		}
 
-		ext := strings.ToLower(filepath.Ext(fileHeader.Filename))
-		if !allowedPhotoExt[ext] {
-			return rerenderPhotosError(c, conn, "Unsupported file type. Use jpg, png, gif, or webp.")
-		}
-
-		src, err := fileHeader.Open()
+		filename, err := saveImage(fileHeader, uploadsDir)
 		if err != nil {
-			return err
-		}
-		defer src.Close()
-
-		// Extension whitelist plus a content sniff — belt and suspenders
-		// against a renamed non-image ending up on a publicly served path.
-		buf := make([]byte, 512)
-		n, _ := io.ReadFull(src, buf)
-		if !strings.HasPrefix(http.DetectContentType(buf[:n]), "image/") {
-			return rerenderPhotosError(c, conn, "That file doesn't look like an image.")
-		}
-		if _, err := src.Seek(0, io.SeekStart); err != nil {
-			return err
-		}
-
-		// Filename is entirely server-generated, never derived from the
-		// upload's original name, so there's no path-traversal surface.
-		filename := fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
-		dst, err := os.Create(filepath.Join(uploadsDir, filename))
-		if err != nil {
-			return err
-		}
-		defer dst.Close()
-
-		if _, err := io.Copy(dst, src); err != nil {
+			if errors.Is(err, errNotAnImage) {
+				return rerenderPhotosError(c, conn, "That file doesn't look like an image. Use jpg, png, gif, or webp.")
+			}
 			return err
 		}
 

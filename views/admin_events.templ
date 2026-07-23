@@ -22,7 +22,12 @@ templ AdminEvents(events []db.Event, errorMsg string) {
 			</tr>
 			for _, ev := range events {
 				<tr>
-					<td>{ ev.Title }</td>
+					<td>
+						<a href={ templ.URL(fmt.Sprintf("/admin/events/%d", ev.ID)) }>{ ev.Title }</a>
+						if ev.HasFlyer() {
+							<span class="admin-tag mono">flyer</span>
+						}
+					</td>
 					<td>{ ev.EventType }</td>
 					<td>{ ev.StartsAt.Format("Jan 2, 2006 3:04 PM") }</td>
 					<td>
@@ -48,6 +53,16 @@ templ AdminEvents(events []db.Event, errorMsg string) {
 			<label>Location<input type="text" name="location" value="402 Washington St NE, Olympia WA"/></label>
 			<label>Description<textarea name="description"></textarea></label>
 			<label>Link<input type="text" name="link" placeholder="#"/></label>
+			<fieldset class="admin-fieldset">
+				<legend>Volunteers needed</legend>
+				for _, role := range db.VolunteerRoles {
+					<label class="admin-check">
+						<input type="checkbox" name={ "volunteer_" + role } value="1"/>
+						{ db.RoleLabel(role) }
+					</label>
+				}
+			</fieldset>
+			<p class="admin-sub mono">Add the flyer after creating the event.</p>
 			<button type="submit" class="admin-btn">Create</button>
 		</form>
 	}

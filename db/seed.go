@@ -1,6 +1,33 @@
 package db
 
-import "database/sql"
+import (
+	"database/sql"
+	_ "embed"
+	"encoding/json"
+)
+
+// events.json is DECAY's real event archive, generated from the old PHP
+// site by `go run ./cmd/importevents`.
+//
+//go:embed events.json
+var eventsSeed []byte
+
+type seedEvent struct {
+	UID         string `json:"uid"`
+	Title       string `json:"title"`
+	EventType   string `json:"event_type"`
+	StartsAt    string `json:"starts_at"`
+	EndsAt      string `json:"ends_at"`
+	Location    string `json:"location"`
+	Description string `json:"description"`
+	Link        string `json:"link"`
+	Slug        string `json:"slug"`
+	Flyer       string `json:"flyer"`
+	Volunteers  []struct {
+		Role string `json:"role"`
+		Name string `json:"name"`
+	} `json:"volunteers"`
+}
 
 // Seed populates events and products on first run only, so it's safe
 // to call on every startup.
@@ -10,24 +37,36 @@ func Seed(conn *sql.DB) error {
 		return err
 	}
 	if count == 0 {
-		events := []struct {
-			title, eventType, startsAt, endsAt string
-		}{
-			{"Free Mask Distro!", "Meetup", "2026-07-25T16:00:00-07:00", "2026-07-25T18:00:00-07:00"},
-			{"Circuit Bending Workshop", "Tech", "2026-07-26T15:00:00-07:00", "2026-07-26T18:00:00-07:00"},
-			{"Movie Club", "Film", "2026-07-28T19:00:00-07:00", "2026-07-28T21:00:00-07:00"},
-			{"NO_TAPE", "Workshop", "2026-07-30T19:30:00-07:00", ""},
+		var events []seedEvent
+		if err := json.Unmarshal(eventsSeed, &events); err != nil {
+			return err
 		}
 		for _, ev := range events {
+			// ends_at is genuinely unknown for some events, so it stays
+			// NULL rather than becoming an empty timestamp string.
 			var endsAt any
-			if ev.endsAt != "" {
-				endsAt = ev.endsAt
+			if ev.EndsAt != "" {
+				endsAt = ev.EndsAt
 			}
-			if _, err := conn.Exec(
-				`INSERT INTO events (title, event_type, starts_at, ends_at, location) VALUES (?, ?, ?, ?, ?)`,
-				ev.title, ev.eventType, ev.startsAt, endsAt, "402 Washington St NE, Olympia WA",
-			); err != nil {
+			link := ev.Link
+			if link == "" {
+				link = "#"
+			}
+			res, err := conn.Exec(
+				`INSERT INTO events (title, event_type, starts_at, ends_at, location, description, link, uid, slug, flyer) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+				ev.Title, ev.EventType, ev.StartsAt, endsAt, ev.Location, ev.Description, link, ev.UID, ev.Slug, ev.Flyer,
+			)
+			if err != nil {
 				return err
+			}
+			id, err := res.LastInsertId()
+			if err != nil {
+				return err
+			}
+			for _, v := range ev.Volunteers {
+				if err := AddVolunteer(conn, id, v.Role, v.Name); err != nil {
+					return err
+				}
 			}
 		}
 	}

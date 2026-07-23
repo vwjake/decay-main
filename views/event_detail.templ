@@ -1,0 +1,40 @@
+package views
+
+import "decay-main/db"
+
+// EventDetail shows one event. openRoles is the volunteer jobs still
+// needing someone — who has already signed up is deliberately not shown
+// here, since that's the organisers' business rather than the public's.
+templ EventDetail(ev db.Event, openRoles []db.EventVolunteer) {
+	@Layout(ev.Title + " · DECAY") {
+		<section class="event-detail">
+			<a href="/events" class="event-back mono">&larr; All events</a>
+			<span class="section-label mono">{ ev.EventType }</span>
+			<h1 class="event-detail-title">{ ev.Title }</h1>
+			<p class="event-detail-when mono">{ ev.LongDate() } &middot; { ev.TimeRange() }</p>
+			if ev.Location != "" {
+				<p class="event-detail-where mono">{ ev.Location }</p>
+			}
+			if ev.HasFlyer() {
+				<img class="event-flyer" src={ ev.FlyerPath() } alt={ "Flyer for " + ev.Title }/>
+			}
+			for _, para := range ev.Paragraphs() {
+				<p class="event-detail-body">{ para }</p>
+			}
+			if len(openRoles) > 0 {
+				<div class="event-volunteers">
+					<span class="section-label mono">Volunteers needed</span>
+					<ul class="volunteer-list mono">
+						for _, role := range openRoles {
+							<li>{ role.Label() }</li>
+						}
+					</ul>
+					<p class="volunteer-note mono">Want to help? Find us on Discord or ask at the door.</p>
+				</div>
+			}
+			if ev.HasLink() {
+				<a href={ templ.URL(ev.Link) } class="btn-outline mono" target="_blank" rel="noopener">More info</a>
+			}
+		</section>
+	}
+}

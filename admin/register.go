@@ -28,7 +28,7 @@ func Register(e *echo.Echo, conn *sql.DB, cfg Config, sessionSecret []byte, uplo
 
 	g := e.Group("/admin", requireAuth)
 	g.GET("", dashboard)
-	registerEventRoutes(g, conn)
+	registerEventRoutes(g, conn, uploadsDir)
 	registerProductRoutes(g, conn)
 	registerPostRoutes(g, conn)
 	registerPhotoRoutes(g, conn, uploadsDir)

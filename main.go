@@ -2,13 +2,17 @@ package main
 
 import (
 	"crypto/rand"
+	"database/sql"
 	"embed"
+	"errors"
 	"io/fs"
 	"log"
+	"net/http"
 	"os"
 
 	"decay-main/admin"
 	"decay-main/db"
+	"decay-main/ics"
 	"decay-main/views"
 
 	"github.com/joho/godotenv"
@@ -50,6 +54,13 @@ func main() {
 		adminUsername = "admin"
 	}
 
+	// Calendar subscribers keep absolute links, so the feed needs to know
+	// where the site actually lives.
+	siteURL := os.Getenv("SITE_URL")
+	if siteURL == "" {
+		siteURL = "http://localhost:8080"
+	}
+
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -73,6 +84,47 @@ func main() {
 			return err
 		}
 		return views.Home(events, products).Render(c.Request().Context(), c.Response())
+	})
+
+	e.GET("/events", func(c echo.Context) error {
+		events, err := db.UpcomingEvents(conn)
+		if err != nil {
+			return err
+		}
+		return views.Events(db.GroupByMonth(events)).Render(c.Request().Context(), c.Response())
+	})
+
+	// The subscribable feed carries the whole calendar, past included, so
+	// there's no window rule for subscribers to be surprised by.
+	e.GET("/events.ics", func(c echo.Context) error {
+		events, err := db.ListAllEvents(conn)
+		if err != nil {
+			return err
+		}
+		return c.Blob(http.StatusOK, "text/calendar; charset=utf-8", ics.Calendar("DECAY", siteURL, events))
+	})
+
+	e.GET("/events/archive", func(c echo.Context) error {
+		events, err := db.PastEvents(conn)
+		if err != nil {
+			return err
+		}
+		return views.EventArchive(db.GroupByMonth(events)).Render(c.Request().Context(), c.Response())
+	})
+
+	e.GET("/events/:slug", func(c echo.Context) error {
+		ev, err := db.EventBySlug(conn, c.Param("slug"))
+		if errors.Is(err, sql.ErrNoRows) {
+			return echo.NewHTTPError(http.StatusNotFound)
+		}
+		if err != nil {
+			return err
+		}
+		volunteers, err := db.VolunteersFor(conn, ev.ID)
+		if err != nil {
+			return err
+		}
+		return views.EventDetail(ev, db.OpenRoles(volunteers)).Render(c.Request().Context(), c.Response())
 	})
 
 	e.GET("/blog", func(c echo.Context) error {

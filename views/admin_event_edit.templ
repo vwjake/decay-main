@@ -1,0 +1,98 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/db"
+)
+
+// AdminEventEdit manages the parts of an event that don't fit the create
+// form: its flyer image and which volunteer roles it needs covered.
+templ AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, errorMsg string) {
+	@AdminLayout(ev.Title + " · DECAY Admin") {
+		<a href="/admin/events" class="admin-back">&larr; All events</a>
+		<p class="admin-heading">{ ev.Title }</p>
+		<p class="admin-sub mono">
+			{ ev.EventType } &middot; { ev.LongDate() } &middot; { ev.TimeRange() }
+		</p>
+		<p class="admin-sub mono">
+			Public page: <a href={ templ.URL(ev.Path()) } target="_blank" rel="noopener">{ ev.Path() }</a>
+		</p>
+		if errorMsg != "" {
+			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+		}
+
+		<p class="admin-heading">Flyer</p>
+		if ev.HasFlyer() {
+			<img class="admin-flyer-preview" src={ ev.FlyerPath() } alt={ "Flyer for " + ev.Title }/>
+		} else {
+			<p class="admin-sub mono">No flyer yet.</p>
+		}
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/events/%d/flyer", ev.ID)) } enctype="multipart/form-data" class="admin-form">
+			<label>
+				if ev.HasFlyer() {
+					Replace flyer
+				} else {
+					Upload flyer
+				}
+				<input type="file" name="flyer" accept="image/*" required/>
+			</label>
+			<button type="submit" class="admin-btn">Save flyer</button>
+		</form>
+
+		<p class="admin-heading">Volunteers</p>
+		<p class="admin-sub mono">
+			Tick the jobs this event needs. The public page lists only the
+			jobs still open — names stay here.
+		</p>
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/events/%d/volunteers", ev.ID)) } class="admin-form">
+			<table class="admin-table">
+				<tr>
+					<th>Needed</th>
+					<th>Role</th>
+					<th>Covered by</th>
+				</tr>
+				for _, role := range db.VolunteerRoles {
+					<tr>
+						<td>
+							<input
+								type="checkbox"
+								name={ "needed_" + role }
+								value="1"
+								checked?={ hasRole(volunteers, role) }
+							/>
+						</td>
+						<td>{ db.RoleLabel(role) }</td>
+						<td>
+							<input
+								type="text"
+								name={ "name_" + role }
+								value={ volunteerName(volunteers, role) }
+								placeholder="Still open"
+							/>
+						</td>
+					</tr>
+				}
+			</table>
+			<button type="submit" class="admin-btn">Save volunteers</button>
+		</form>
+	}
+}
+
+func hasRole(volunteers []db.EventVolunteer, role string) bool {
+	for _, v := range volunteers {
+		if v.Role == role {
+			return true
+		}
+	}
+	return false
+}
+
+func volunteerName(volunteers []db.EventVolunteer, role string) string {
+	for _, v := range volunteers {
+		if v.Role == role {
+			return v.Name
+		}
+	}
+	return ""
+}
