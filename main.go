@@ -46,10 +46,10 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		return c.Render(http.StatusOK, "index.html", map[string]interface{}{
 			"Events": []Event{
-				{Day: "08", Month: "AUG", Title: "Open Studio Night", Type: "Studio", Time: "7 – 11 PM", Link: "#"},
-				{Day: "15", Month: "AUG", Title: "Noise / Feedback Showcase", Type: "Live Show", Time: "8 PM", Link: "#"},
-				{Day: "22", Month: "AUG", Title: "Screenprinting Workshop", Type: "Workshop", Time: "2 – 5 PM", Link: "#"},
-				{Day: "30", Month: "AUG", Title: "Member Group Show Opening", Type: "Exhibition", Time: "6 PM", Link: "#"},
+				{Day: "25", Month: "JUL", Title: "Free Mask Distro!", Type: "Meetup", Time: "4 – 6 PM", Link: "#"},
+				{Day: "26", Month: "JUL", Title: "Circuit Bending Workshop", Type: "Tech", Time: "3 – 6 PM", Link: "#"},
+				{Day: "28", Month: "JUL", Title: "Movie Club", Type: "Film", Time: "7 – 9 PM", Link: "#"},
+				{Day: "30", Month: "JUL", Title: "NO_TAPE", Type: "Workshop", Time: "7:30 PM", Link: "#"},
 			},
 			"Merch": []MerchItem{
 				{Name: "Logo Tee", Price: "$28", Placeholder: "product photo"},
