@@ -18,10 +18,10 @@ templ AdminLayout(title string, me db.User) {
 			<link rel="stylesheet" href="/static/css/style.css"/>
 		</head>
 		<body>
-			<div class="page">
-				<header class="site-header">
+			<div class="page page-admin">
+				<header class="site-header admin-header">
 					<a href="/admin">DECAY Admin</a>
-					<nav class="site-nav mono">
+					<nav class="site-nav admin-nav mono">
 						if me.Can(db.PermEvents) {
 							<a href="/admin/events">Events</a>
 						}
@@ -40,7 +40,7 @@ templ AdminLayout(title string, me db.User) {
 						<a href="/" target="_blank" rel="noopener">View site</a>
 						<span class="admin-whoami">{ me.Name() }</span>
 						<form method="post" action="/admin/logout" style="display:inline">
-							<button type="submit" class="admin-btn">Log out</button>
+							<button type="submit" class="admin-btn admin-btn-small">Log out</button>
 						</form>
 					</nav>
 				</header>

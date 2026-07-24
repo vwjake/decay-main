@@ -31,6 +31,12 @@ a {
   max-width: 880px;
 }
 
+/* The admin panel. Its tables are seven columns wide and its nav carries
+   a link per section, neither of which fits the public site's measure. */
+.page-admin {
+  max-width: 960px;
+}
+
 /* Intro splash */
 
 .intro {
@@ -54,7 +60,6 @@ a {
 .intro-frame {
   width: 150px;
   height: 150px;
-  border: 3px solid #111;
   overflow: hidden;
 }
 
@@ -702,10 +707,37 @@ a {
 /* Admin */
 
 .admin-main {
-  max-width: 720px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 32px 20px 60px;
 }
+
+/* The admin nav carries a link per section plus the signed-in name and a
+   log-out button. That's more than fits on one line at every width, so it
+   wraps instead of overflowing the header. */
+.admin-header {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.admin-nav {
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: 8px;
+  /* The nav takes the space left over and lines up to the right, so the
+     row reads logo-then-nav however many items it holds. */
+  justify-content: flex-end;
+  flex: 1;
+}
+
+/* Nav links sit on the text baseline; without this they stretch to the
+   height of the log-out button beside them. */
+.admin-nav > a,
+.admin-nav > span,
+.admin-nav > form {
+  align-self: center;
+}
+
 
 .admin-heading {
   font-weight: 900;
@@ -907,6 +939,13 @@ a {
 .admin-btn:hover {
   background: #111;
   color: #fff;
+}
+
+/* A log-out button sized to sit among the nav's text links rather than
+   tower over them. Defined after .admin-btn so it wins the cascade. */
+.admin-btn-small {
+  padding: 4px 10px;
+  font-size: 11px;
 }
 
 .admin-btn-danger {
