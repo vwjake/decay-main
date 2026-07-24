@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"decay-main/db"
+	"decay-main/images"
 	"decay-main/views"
 
 	"github.com/labstack/echo/v4"
@@ -51,11 +52,20 @@ func uploadPhoto(conn *sql.DB, uploadsDir string) echo.HandlerFunc {
 			return rerenderPhotosError(c, conn, "Choose an image to upload.")
 		}
 
-		filename, err := saveImage(fileHeader, uploadsDir)
+		dir := filepath.Join(uploadsDir, db.PhotosSubdir)
+		filename, err := saveImage(fileHeader, dir)
 		if err != nil {
 			if errors.Is(err, errNotAnImage) {
 				return rerenderPhotosError(c, conn, "That file doesn't look like an image. Use jpg, png, gif, or webp.")
 			}
+			return err
+		}
+		// Gallery shots come straight off a phone at full resolution, so
+		// the page gets a web-sized copy and the original stays behind it.
+		if err := images.MakeWeb(
+			filepath.Join(dir, filename),
+			filepath.Join(dir, "web", images.WebName(filename)),
+		); err != nil {
 			return err
 		}
 
@@ -76,7 +86,9 @@ func deletePhoto(conn *sql.DB, uploadsDir string) echo.HandlerFunc {
 		if err != nil {
 			return err
 		}
-		_ = os.Remove(filepath.Join(uploadsDir, filename))
+		dir := filepath.Join(uploadsDir, db.PhotosSubdir)
+		_ = os.Remove(filepath.Join(dir, filename))
+		_ = os.Remove(filepath.Join(dir, "web", images.WebName(filename)))
 		return c.Redirect(http.StatusSeeOther, "/admin/photos")
 	}
 }

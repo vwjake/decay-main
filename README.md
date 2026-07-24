@@ -115,6 +115,19 @@ on the site — would need a real two-way CalDAV sync with conflict rules,
 and iCalendar can't carry the fields a DECAY event needs. That's
 deliberately not built.
 
+## Photos
+
+`/photos` is the gallery, uploaded at `/admin/photos`. Files live under
+`uploads/photos/` with web-sized copies in `uploads/photos/web/`, the
+same arrangement as flyers and product shots — the page shows the copy
+and links the original behind it. Tiles are cropped square so a grid of
+mixed phone aspect ratios still reads as a grid; the uncropped original
+is one click away.
+
+Captions are optional and double as the image's alt text. Without one the
+alt is deliberately empty, which marks the image as decorative rather
+than reading a generated filename out to a screen reader.
+
 ## Flyers and volunteers
 
 These are the fields iCalendar can't express, so they live on the site

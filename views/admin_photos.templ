@@ -17,7 +17,7 @@ templ AdminPhotos(photos []db.Photo, me db.User, errorMsg string) {
 				for _, p := range photos {
 					<div class="merch-item">
 						<div class="merch-photo">
-							<img src={ "/uploads/" + p.Filename } alt={ p.Caption }/>
+							<img src={ p.WebPath() } alt={ p.Alt() }/>
 						</div>
 						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/photos/%d/caption", p.ID)) } class="admin-caption-form">
 							<input type="text" name="caption" value={ p.Caption } placeholder="Caption"/>

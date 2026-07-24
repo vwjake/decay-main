@@ -225,11 +225,29 @@ func PostBySlug(conn *sql.DB, slug string) (Post, error) {
 	return posts[0], nil
 }
 
+// PhotosSubdir keeps gallery shots apart from flyers and product photos
+// inside the uploads directory.
+const PhotosSubdir = "photos"
+
 type Photo struct {
 	ID       int64
 	Filename string
 	Caption  string
 }
+
+// Path is the original, full-resolution upload.
+func (p Photo) Path() string { return "/uploads/" + PhotosSubdir + "/" + p.Filename }
+
+// WebPath is the web-sized copy, which is what the gallery displays.
+func (p Photo) WebPath() string {
+	return "/uploads/" + PhotosSubdir + "/web/" + strings.TrimSuffix(p.Filename, path.Ext(p.Filename)) + ".jpg"
+}
+
+// Alt is the image's alternative text. A caption doubles as the
+// description; without one there's nothing meaningful to say, and an
+// empty alt correctly marks the image as decorative rather than
+// repeating a filename to a screen reader.
+func (p Photo) Alt() string { return p.Caption }
 
 func scanEvents(rows *sql.Rows) ([]Event, error) {
 	var events []Event

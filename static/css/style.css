@@ -432,6 +432,39 @@ a {
   overflow-wrap: anywhere;
 }
 
+/* Gallery */
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.gallery-item {
+  margin: 0;
+  border: 2px solid #111;
+  background: #fff;
+}
+
+/* Photos arrive in whatever shape a phone took them, so each is cropped
+   to a square tile — a mixed-aspect grid reads as a mess. The full-size
+   original is a click away, uncropped. */
+.gallery-item img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.gallery-caption {
+  font-size: 10px;
+  line-height: 1.5;
+  color: #666;
+  padding: 6px 8px;
+  border-top: 2px solid #111;
+}
+
 /* Pager */
 
 .pager {

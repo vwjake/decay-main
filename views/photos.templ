@@ -6,19 +6,22 @@ templ Photos(photos []db.Photo) {
 	@Layout("Photos · DECAY") {
 		<section class="about">
 			<p class="about-statement">Photos</p>
+			<p class="about-body">Shows, workshops, and whatever else happened at 402 Washington St NE.</p>
+		</section>
+		<section class="events">
 			if len(photos) == 0 {
-				<p class="about-body">No photos uploaded yet — check back soon.</p>
+				<p class="about-body">No photos yet — check back soon.</p>
 			} else {
-				<div class="merch-grid">
+				<div class="gallery">
 					for _, p := range photos {
-						<div class="merch-item">
-							<div class="merch-photo">
-								<img src={ "/uploads/" + p.Filename } alt={ p.Caption }/>
-							</div>
+						<figure class="gallery-item">
+							<a href={ templ.URL(p.Path()) } target="_blank" rel="noopener">
+								<img src={ p.WebPath() } alt={ p.Alt() } loading="lazy"/>
+							</a>
 							if p.Caption != "" {
-								<div class="merch-name">{ p.Caption }</div>
+								<figcaption class="gallery-caption mono">{ p.Caption }</figcaption>
 							}
-						</div>
+						</figure>
 					}
 				</div>
 			}
