@@ -86,6 +86,12 @@ same as flyers, and can be replaced per item at `/admin/products/<id>`.
 
 ## Calendar
 
+Events are shown three ways: `/calendar` is a month grid like the old
+site's, `/events` is a paginated list of what's coming up, and
+`/events/archive` is everything past. The grid is laid out in the venue's
+timezone, so a 9pm show stays on the night it started rather than sliding
+into the next day via UTC.
+
 SQLite is the record for events. They're edited at `/admin/events`, and
 the site publishes them as an iCalendar feed at `/events.ics` that
 Nextcloud, Apple Calendar, and Google Calendar can all subscribe to — so

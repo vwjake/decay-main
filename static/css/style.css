@@ -333,6 +333,93 @@ a {
   margin: 12px 0 0;
 }
 
+/* Calendar grid */
+
+/* The grid has a floor width below which a day cell can't hold a title,
+   so on a narrow screen it scrolls sideways inside this wrapper rather
+   than forcing the whole page to. */
+.calendar-scroll {
+  margin-top: 18px;
+  overflow-x: auto;
+}
+
+.calendar {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: #fff;
+}
+
+.calendar th {
+  border: 2px solid #111;
+  padding: 8px 4px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  background: #111;
+  color: #fff;
+}
+
+.cal-day {
+  border: 2px solid #111;
+  vertical-align: top;
+  height: 96px;
+  width: 14.28%;
+  padding: 4px;
+}
+
+.cal-day.is-outside {
+  background: #f4f4f2;
+}
+
+.cal-day.is-today {
+  background: #fffbe6;
+  box-shadow: inset 0 0 0 3px #111;
+}
+
+.cal-date {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.cal-day.is-today .cal-date {
+  color: #111;
+}
+
+.cal-event {
+  display: block;
+  border: 1px solid #111;
+  background: #f4f4f2;
+  padding: 3px 4px;
+  margin-bottom: 3px;
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+.cal-event:hover {
+  background: #111;
+  color: #fff;
+}
+
+.cal-event-time {
+  display: block;
+  font-size: 9px;
+  color: #666;
+}
+
+.cal-event:hover .cal-event-time {
+  color: #ccc;
+}
+
+.cal-event-title {
+  display: block;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
 /* Pager */
 
 .pager {

@@ -1,0 +1,62 @@
+package views
+
+import "decay-main/db"
+
+// Calendar renders a month as a grid, the way the old site's calendar
+// did: a week per row, Sunday first, with each day's events stacked in
+// its cell.
+templ Calendar(month db.CalendarMonth) {
+	@Layout(month.Label() + " · DECAY") {
+		<section class="about">
+			<p class="about-statement">Calendar</p>
+			<p class="about-body">What's on at 402 Washington St NE, month by month.</p>
+		</section>
+		<section class="events">
+			<nav class="pager mono">
+				<a href={ templ.URL(db.MonthURL(month.Prev)) } class="pager-link">&larr; Prev</a>
+				<span class="pager-status">{ month.Label() }</span>
+				<a href={ templ.URL(db.MonthURL(month.Next)) } class="pager-link">Next &rarr;</a>
+			</nav>
+
+			<div class="calendar-scroll">
+				<table class="calendar">
+					<thead>
+						<tr>
+							for _, day := range db.Weekdays {
+								<th class="mono">{ day }</th>
+							}
+						</tr>
+					</thead>
+					<tbody>
+						for _, week := range month.Weeks {
+							<tr>
+								for _, day := range week {
+									if day.InMonth {
+										<td class={ "cal-day", templ.KV("is-today", day.Today) }>
+											<span class="cal-date mono">{ day.Day() }</span>
+											for _, ev := range day.Events {
+												<a href={ templ.URL(ev.Path()) } class="cal-event" title={ ev.Title }>
+													<span class="cal-event-time mono">{ ev.StartClock() }</span>
+													<span class="cal-event-title">{ db.ShortTitle(ev.Title) }</span>
+												</a>
+											}
+										</td>
+									} else {
+										<td class="cal-day is-outside"></td>
+									}
+								}
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+
+			if month.Count == 0 {
+				<p class="subscribe-note mono">Nothing scheduled this month.</p>
+			}
+
+			<a href="/events" class="btn-outline mono">List view</a>
+			<a href="/events.ics" class="btn-outline mono">Subscribe in your calendar</a>
+		</section>
+	}
+}

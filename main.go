@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	// Event times are resolved against the venue's timezone, and Windows
 	// has no system timezone database to read it from.
@@ -54,6 +55,13 @@ func main() {
 	// seed the very first one — after that, accounts are managed at
 	// /admin/users and these are ignored.
 	if err := bootstrapAdmin(conn); err != nil {
+		log.Fatal(err)
+	}
+
+	// The calendar grid is laid out in the venue's own timezone, so a
+	// late show lands on the day it started rather than the UTC one.
+	venue, err := time.LoadLocation("America/Los_Angeles")
+	if err != nil {
 		log.Fatal(err)
 	}
 
@@ -104,6 +112,15 @@ func main() {
 			return err
 		}
 		return c.Blob(http.StatusOK, "text/calendar; charset=utf-8", ics.Calendar("DECAY", siteURL, events))
+	})
+
+	e.GET("/calendar", func(c echo.Context) error {
+		month := db.ParseMonth(c.QueryParam("month"), venue)
+		events, err := db.EventsInMonth(conn, month)
+		if err != nil {
+			return err
+		}
+		return views.Calendar(db.BuildCalendar(events, month, venue)).Render(c.Request().Context(), c.Response())
 	})
 
 	e.GET("/events/archive", func(c echo.Context) error {

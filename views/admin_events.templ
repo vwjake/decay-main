@@ -25,7 +25,7 @@ templ AdminEvents(events []db.Event, page db.Page, me db.User, errorMsg string) 
 			</tr>
 			for _, ev := range events {
 				<tr>
-					<td class="mono nowrap">{ ev.StartsAt.Format("Jan 2, 2006") }</td>
+					<td class="mono nowrap">{ ev.StartsAt.Format("Jan 2") }</td>
 					<td>{ ev.Title }</td>
 					<td>{ ev.EventType }</td>
 					<td class="mono nowrap">{ ev.StartsAt.Format("3:04 PM") }</td>

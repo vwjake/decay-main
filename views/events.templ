@@ -15,6 +15,7 @@ templ Events(months []db.EventMonth, page db.Page) {
 				@eventMonths(months)
 				@pager(page)
 			}
+			<a href="/calendar" class="btn-outline mono">Calendar view</a>
 			<a href="/events/archive" class="btn-outline mono">Past events</a>
 			<a href="/events.ics" class="btn-outline mono">Subscribe in your calendar</a>
 			<p class="subscribe-note mono">Add <span>/events.ics</span> to Nextcloud, Apple Calendar, or Google Calendar and new events show up on their own.</p>
