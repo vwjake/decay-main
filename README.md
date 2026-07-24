@@ -115,6 +115,19 @@ on the site — would need a real two-way CalDAV sync with conflict rules,
 and iCalendar can't carry the fields a DECAY event needs. That's
 deliberately not built.
 
+## Pages
+
+`/about`, `/support`, and `/policies` are static copy carried over from
+the old site — mission and board, how to give and who funds us, and the
+safer space policy. They're in `views/` rather than the database because
+nobody edits them week to week; when that changes they should move behind
+the admin panel.
+
+Outbound links are only to accounts DECAY actually uses: YouTube
+(`@no_tape`), Discord, Patreon, Givebutter, Instagram, and the beehiiv
+newsletter. There's no Bandcamp and the Twitch account is unused, so
+neither is linked.
+
 ## Photos
 
 `/photos` is the gallery, uploaded at `/admin/photos`. Files live under

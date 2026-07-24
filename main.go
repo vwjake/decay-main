@@ -94,6 +94,18 @@ func main() {
 		return views.Home(events, products).Render(c.Request().Context(), c.Response())
 	})
 
+	e.GET("/about", func(c echo.Context) error {
+		return views.About().Render(c.Request().Context(), c.Response())
+	})
+
+	e.GET("/support", func(c echo.Context) error {
+		return views.Support().Render(c.Request().Context(), c.Response())
+	})
+
+	e.GET("/policies", func(c echo.Context) error {
+		return views.Policies().Render(c.Request().Context(), c.Response())
+	})
+
 	e.GET("/events", func(c echo.Context) error {
 		events, err := db.UpcomingEvents(conn)
 		if err != nil {

@@ -5,15 +5,4 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => intro.remove(), 2300);
   }
 
-  const form = document.querySelector('.signup-form');
-  if (form) {
-    const button = form.querySelector('.signup-submit');
-    const defaultLabel = button.textContent;
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      button.textContent = 'THANKS!';
-      form.reset();
-      setTimeout(() => { button.textContent = defaultLabel; }, 2500);
-    });
-  }
 });
