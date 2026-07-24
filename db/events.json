@@ -1788,8 +1788,7 @@
     "slug": "2025-11-08-waisn-oly-whistle-group",
     "volunteers": [
       {
-        "role": "door",
-        "name": "Liam A Mooney"
+        "role": "door"
       }
     ]
   },
@@ -2035,8 +2034,7 @@
     "slug": "2025-11-23-oly-whistles",
     "volunteers": [
       {
-        "role": "door",
-        "name": "Liam A Mooney"
+        "role": "door"
       }
     ]
   },
@@ -2182,8 +2180,7 @@
     "slug": "2025-12-03-oly-whistles",
     "volunteers": [
       {
-        "role": "door",
-        "name": "Liam A Mooney"
+        "role": "door"
       }
     ]
   },
@@ -2563,8 +2560,7 @@
         "role": "door"
       },
       {
-        "role": "cleanup",
-        "name": "Oyj"
+        "role": "cleanup"
       }
     ]
   },
@@ -2605,12 +2601,10 @@
     "flyer": "flyer-1767136465.jpg",
     "volunteers": [
       {
-        "role": "door",
-        "name": "John"
+        "role": "door"
       },
       {
-        "role": "sound",
-        "name": "Oyj"
+        "role": "sound"
       }
     ]
   },
@@ -2923,16 +2917,13 @@
         "role": "door"
       },
       {
-        "role": "sound",
-        "name": "Huckleberry"
+        "role": "sound"
       },
       {
-        "role": "cleanup",
-        "name": "Rats"
+        "role": "cleanup"
       },
       {
-        "role": "promote",
-        "name": "Rats"
+        "role": "promote"
       }
     ]
   },
@@ -2969,8 +2960,7 @@
     "flyer": "flyer-1769021993.png",
     "volunteers": [
       {
-        "role": "cleanup",
-        "name": "Ian"
+        "role": "cleanup"
       }
     ]
   },
@@ -3104,16 +3094,13 @@
     "flyer": "flyer-1769832253.jpg",
     "volunteers": [
       {
-        "role": "door",
-        "name": "Mirrah"
+        "role": "door"
       },
       {
-        "role": "sound",
-        "name": "n/a"
+        "role": "sound"
       },
       {
-        "role": "cleanup",
-        "name": "Mirrah"
+        "role": "cleanup"
       }
     ]
   },
@@ -3175,8 +3162,7 @@
     "flyer": "flyer-1768937849.png",
     "volunteers": [
       {
-        "role": "door",
-        "name": "Jesse"
+        "role": "door"
       }
     ]
   },
@@ -3579,8 +3565,7 @@
     "flyer": "flyer-1769639908.jpg",
     "volunteers": [
       {
-        "role": "door",
-        "name": "Huckeberry"
+        "role": "door"
       }
     ]
   },
@@ -4192,8 +4177,7 @@
         "role": "door"
       },
       {
-        "role": "sound",
-        "name": "Tuesday"
+        "role": "sound"
       },
       {
         "role": "cleanup"
@@ -4285,12 +4269,10 @@
     "flyer": "flyer-1773368338.jpg",
     "volunteers": [
       {
-        "role": "door",
-        "name": "john"
+        "role": "door"
       },
       {
-        "role": "sound",
-        "name": "Tuesday"
+        "role": "sound"
       }
     ]
   },
@@ -4902,8 +4884,7 @@
     "flyer": "flyer-1777233578.png",
     "volunteers": [
       {
-        "role": "sound",
-        "name": "Roz Hughes"
+        "role": "sound"
       }
     ]
   },
@@ -5164,20 +5145,16 @@
     "slug": "2026-05-15-danse-automata-starring-static-ghost",
     "volunteers": [
       {
-        "role": "door",
-        "name": "Rot (Pending)"
+        "role": "door"
       },
       {
-        "role": "sound",
-        "name": "Moon"
+        "role": "sound"
       },
       {
-        "role": "cleanup",
-        "name": "Tatjana"
+        "role": "cleanup"
       },
       {
-        "role": "promote",
-        "name": "Tatjana"
+        "role": "promote"
       }
     ]
   },
@@ -5860,12 +5837,10 @@
         "role": "sound"
       },
       {
-        "role": "cleanup",
-        "name": "Tatjana"
+        "role": "cleanup"
       },
       {
-        "role": "promote",
-        "name": "Tatjana"
+        "role": "promote"
       }
     ]
   },

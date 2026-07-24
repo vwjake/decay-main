@@ -62,11 +62,24 @@ func SlugTaken(conn *sql.DB, slug string, exceptID int64) (bool, error) {
 	return count > 0, err
 }
 
+// SetProductImage points a product at an uploaded photo, returning the
+// filename it replaced so the caller can delete it.
+func SetProductImage(conn *sql.DB, id int64, filename string) (string, error) {
+	var previous string
+	if err := conn.QueryRow(`SELECT image FROM products WHERE id = ?`, id).Scan(&previous); err != nil {
+		return "", err
+	}
+	if _, err := conn.Exec(`UPDATE products SET image = ? WHERE id = ?`, filename, id); err != nil {
+		return "", err
+	}
+	return previous, nil
+}
+
 // UpdateProduct saves edits to a shop item.
 func UpdateProduct(conn *sql.DB, p Product) error {
 	_, err := conn.Exec(
-		`UPDATE products SET name = ?, price_cents = ?, placeholder = ?, stripe_url = ? WHERE id = ?`,
-		p.Name, p.PriceCents, p.Placeholder, p.StripeURL, p.ID,
+		`UPDATE products SET name = ?, price_cents = ?, placeholder = ?, stripe_url = ?, variants = ? WHERE id = ?`,
+		p.Name, p.PriceCents, p.Placeholder, p.StripeURL, p.Variants, p.ID,
 	)
 	return err
 }

@@ -12,6 +12,20 @@ import (
 //go:embed events.json
 var eventsSeed []byte
 
+// products.json is DECAY's real merch, generated from the shop export by
+// `go run ./cmd/importshop`. The photos it names live in uploads/, which
+// isn't committed — a fresh checkout falls back to placeholder text.
+//
+//go:embed products.json
+var productsSeed []byte
+
+type seedProduct struct {
+	Name       string `json:"name"`
+	PriceCents int    `json:"price_cents"`
+	Image      string `json:"image"`
+	Variants   string `json:"variants"`
+}
+
 type seedEvent struct {
 	UID         string `json:"uid"`
 	Title       string `json:"title"`
@@ -23,9 +37,10 @@ type seedEvent struct {
 	Link        string `json:"link"`
 	Slug        string `json:"slug"`
 	Flyer       string `json:"flyer"`
-	Volunteers  []struct {
+	// Roles the event needed covered. The seed never carries who filled
+	// them — that's recorded in the admin panel, not in this file.
+	Volunteers []struct {
 		Role string `json:"role"`
-		Name string `json:"name"`
 	} `json:"volunteers"`
 }
 
@@ -64,7 +79,7 @@ func Seed(conn *sql.DB) error {
 				return err
 			}
 			for _, v := range ev.Volunteers {
-				if err := AddVolunteer(conn, id, v.Role, v.Name); err != nil {
+				if err := AddVolunteer(conn, id, v.Role, ""); err != nil {
 					return err
 				}
 			}
@@ -75,20 +90,14 @@ func Seed(conn *sql.DB) error {
 		return err
 	}
 	if count == 0 {
-		products := []struct {
-			name        string
-			priceCents  int
-			placeholder string
-		}{
-			{"Logo Tee", 2800, "product photo"},
-			{"Static Hoodie", 5800, "product photo"},
-			{"Enamel Pin", 1000, "product photo"},
-			{"Risograph Print", 1800, "product photo"},
+		var products []seedProduct
+		if err := json.Unmarshal(productsSeed, &products); err != nil {
+			return err
 		}
 		for _, p := range products {
 			if _, err := conn.Exec(
-				`INSERT INTO products (name, price_cents, placeholder) VALUES (?, ?, ?)`,
-				p.name, p.priceCents, p.placeholder,
+				`INSERT INTO products (name, price_cents, placeholder, image, variants) VALUES (?, ?, ?, ?, ?)`,
+				p.Name, p.PriceCents, "product photo", p.Image, p.Variants,
 			); err != nil {
 				return err
 			}

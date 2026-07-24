@@ -4,21 +4,70 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
 	"decay-main/db"
+	"decay-main/images"
 	"decay-main/views"
 
 	"github.com/labstack/echo/v4"
 )
 
-func registerProductRoutes(g *echo.Group, conn *sql.DB) {
+func registerProductRoutes(g *echo.Group, conn *sql.DB, uploadsDir string) {
 	g.GET("/products", listProducts(conn))
 	g.POST("/products", createProduct(conn))
 	g.GET("/products/:id", editProduct(conn))
 	g.POST("/products/:id", saveProduct(conn))
+	g.POST("/products/:id/image", uploadProductImage(conn, uploadsDir))
 	g.POST("/products/:id/delete", deleteProduct(conn))
+}
+
+// productsSubdir keeps shop photos apart from flyers and gallery photos.
+const productsSubdir = "products"
+
+func uploadProductImage(conn *sql.DB, uploadsDir string) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		p, err := loadProduct(conn, c.Param("id"))
+		if err != nil {
+			return err
+		}
+
+		rerender := func(msg string) error {
+			return views.AdminProductEdit(p, currentUser(c), msg).Render(c.Request().Context(), c.Response())
+		}
+
+		fileHeader, err := c.FormFile("image")
+		if err != nil {
+			return rerender("Choose an image to upload.")
+		}
+		dir := filepath.Join(uploadsDir, productsSubdir)
+		filename, err := saveImage(fileHeader, dir)
+		if err != nil {
+			if errors.Is(err, errNotAnImage) {
+				return rerender("That file doesn't look like an image. Use jpg, png, gif, or webp.")
+			}
+			return err
+		}
+		if err := images.MakeWeb(
+			filepath.Join(dir, filename),
+			filepath.Join(dir, "web", images.WebName(filename)),
+		); err != nil {
+			return err
+		}
+
+		previous, err := db.SetProductImage(conn, p.ID, filename)
+		if err != nil {
+			return err
+		}
+		if previous != "" && previous != filename {
+			_ = os.Remove(filepath.Join(dir, previous))
+			_ = os.Remove(filepath.Join(dir, "web", images.WebName(previous)))
+		}
+		return c.Redirect(http.StatusSeeOther, "/admin/products/"+c.Param("id"))
+	}
 }
 
 func editProduct(conn *sql.DB) echo.HandlerFunc {
@@ -59,6 +108,7 @@ func saveProduct(conn *sql.DB) echo.HandlerFunc {
 		p.PriceCents = int(priceDollars*100 + 0.5)
 		p.Placeholder = placeholder
 		p.StripeURL = strings.TrimSpace(c.FormValue("stripe_url"))
+		p.Variants = strings.TrimSpace(c.FormValue("variants"))
 		if err := db.UpdateProduct(conn, p); err != nil {
 			return err
 		}

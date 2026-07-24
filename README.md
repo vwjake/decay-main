@@ -60,6 +60,30 @@ air
 on save. `decay.db` and `uploads/` aren't touched by a rebuild — they're
 runtime data, not compiled in.
 
+## Shop
+
+The merch listing is a **catalogue, not a store** — names, prices, photos,
+and available sizes/colours, each linking out to shop.decay.events, which
+is where orders are actually taken. Nothing here handles carts, stock, or
+payment.
+
+`db/products.json` is generated from a shop.decay.events export:
+
+```bash
+go run ./cmd/importshop -export ../shop-decay-events-export-2026-07-24-002012
+```
+
+Two quirks of that export are handled in the importer. Its point-of-sale
+prices **exclude** sales tax — a $30 shirt is listed at 27.32 — so the
+tax rate from the same file is applied back, giving the price people
+actually pay. And it has no image column at all, so products are matched
+to photos by a table in `cmd/importshop/main.go`; a new product needs a
+line there. Only the `Merch` category is imported: concessions (popcorn,
+coffee) are sold at the door and donations aren't merchandise.
+
+Photos land in `uploads/products/` with web-sized copies alongside, the
+same as flyers, and can be replaced per item at `/admin/products/<id>`.
+
 ## Calendar
 
 SQLite is the record for events. They're edited at `/admin/events`, and
@@ -105,9 +129,11 @@ cleanup, promote. A row existing means the job is needed; an empty
 
 - The public event page lists only the roles **still open**. Who has
   signed up is shown in the admin panel and nowhere else.
-- Only a volunteer's **name** is stored. The old site also kept their
-  email and phone; that contact information is not carried over, and the
-  importer drops it.
+- **The importer carries no names at all** — only which roles an event
+  needed. `db/events.json` is committed to git, and the old records hold
+  real community members' names, emails, and phone numbers. Who
+  volunteered is recorded through the admin panel, into `decay.db`, which
+  isn't committed.
 
 There's no public sign-up form yet — the page tells people to ask on
 Discord or at the door. Adding one means deciding how to handle contact
@@ -140,6 +166,7 @@ once events are managed there, stop re-importing.
 - `main.go` — server startup, routes, env config
 - `db/` — SQLite schema, queries, and seed data (`events.json`)
 - `cmd/importevents/` — one-way converter from the old site's event JSON
+- `cmd/importshop/` — one-way converter from the shop.decay.events export
 - `ics/` — renders events as a subscribable iCalendar feed
 - `images/` — makes web-sized copies of uploaded flyers
 - `views/` — templ page templates (`.templ` source + generated `_templ.go`)

@@ -36,7 +36,7 @@ func Register(e *echo.Echo, conn *sql.DB, sessionSecret []byte, uploadsDir strin
 	registerEventRoutes(events, conn, uploadsDir)
 
 	products := g.Group("", requirePermission(db.PermShop))
-	registerProductRoutes(products, conn)
+	registerProductRoutes(products, conn, uploadsDir)
 
 	posts := g.Group("", requirePermission(db.PermPosts))
 	registerPostRoutes(posts, conn)

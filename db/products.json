@@ -1,0 +1,31 @@
+[
+  {
+    "name": "Logo T-Shirt",
+    "price_cents": 3000,
+    "image": "File_000.png",
+    "variants": "Size: Small, Medium, Large, XL, 2XL"
+  },
+  {
+    "name": "Stamp T-Shirt",
+    "price_cents": 3000,
+    "image": "STAMP_Logo.png",
+    "variants": "Size: S, M, L, XL, 2XL, 3XL, 4XL · Style: Front Print, Side Print, Back Print"
+  },
+  {
+    "name": "Skull T-Shirt",
+    "price_cents": 4000,
+    "image": "IMG_5590.jpg",
+    "variants": "Size: XSmall, Small, Medium, Large, XL, 2XL"
+  },
+  {
+    "name": "Bandana",
+    "price_cents": 1000,
+    "image": "Bandana-BKBU.png"
+  },
+  {
+    "name": "Canvas Tote",
+    "price_cents": 2500,
+    "image": "TOTE-GLOBE.png",
+    "variants": "Style: GLOBE, STAMP · Color: Black, Blue, Gold"
+  }
+]

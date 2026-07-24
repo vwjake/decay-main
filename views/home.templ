@@ -2,6 +2,15 @@ package views
 
 import "decay-main/db"
 
+// shopLink sends a listing to wherever the item is actually bought. This
+// site only displays the catalogue — shop.decay.events takes the orders.
+func shopLink(p db.Product) string {
+	if p.StripeURL != "" {
+		return p.StripeURL
+	}
+	return "https://shop.decay.events"
+}
+
 templ Home(events []db.Event, products []db.Product) {
 	@Layout("DECAY") {
 		<section id="top" class="hero">
@@ -31,13 +40,23 @@ templ Home(events []db.Event, products []db.Product) {
 			<p class="merch-intro">Proceeds fund studio residencies.</p>
 			<div class="merch-grid">
 				for _, item := range products {
-					<a href="#" class="merch-item">
-						<div class="merch-photo mono">{ item.Placeholder }</div>
+					<a href={ templ.URL(shopLink(item)) } class="merch-item" target="_blank" rel="noopener">
+						if item.HasImage() {
+							<div class="merch-photo">
+								<img src={ item.ImagePath() } alt={ item.Name } loading="lazy"/>
+							</div>
+						} else {
+							<div class="merch-photo mono">{ item.Placeholder }</div>
+						}
 						<div class="merch-name">{ item.Name }</div>
 						<div class="merch-price mono">{ item.Price() }</div>
+						if item.Variants != "" {
+							<div class="merch-variants mono">{ item.Variants }</div>
+						}
 					</a>
 				}
 			</div>
+			<a href="https://shop.decay.events" class="btn-outline mono" target="_blank" rel="noopener">Visit the shop</a>
 		</section>
 
 		<section id="media" class="media">

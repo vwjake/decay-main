@@ -34,6 +34,8 @@ func migrate(conn *sql.DB) error {
 		{"events", "uid", `ALTER TABLE events ADD COLUMN uid TEXT NOT NULL DEFAULT ''`},
 		{"events", "flyer", `ALTER TABLE events ADD COLUMN flyer TEXT NOT NULL DEFAULT ''`},
 		{"events", "slug", `ALTER TABLE events ADD COLUMN slug TEXT NOT NULL DEFAULT ''`},
+		{"products", "image", `ALTER TABLE products ADD COLUMN image TEXT NOT NULL DEFAULT ''`},
+		{"products", "variants", `ALTER TABLE products ADD COLUMN variants TEXT NOT NULL DEFAULT ''`},
 	}
 	for _, m := range migrations {
 		has, err := hasColumn(conn, m.table, m.column)

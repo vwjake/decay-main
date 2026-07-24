@@ -152,6 +152,17 @@ type Product struct {
 	PriceCents  int
 	Placeholder string
 	StripeURL   string
+	Image       string
+	Variants    string
+}
+
+// HasImage reports whether there's a photo to show instead of the
+// placeholder text.
+func (p Product) HasImage() bool { return p.Image != "" }
+
+// ImagePath is the web-sized copy, which is what pages should display.
+func (p Product) ImagePath() string {
+	return "/uploads/products/web/" + strings.TrimSuffix(p.Image, path.Ext(p.Image)) + ".jpg"
 }
 
 func (p Product) Price() string {
@@ -338,8 +349,8 @@ func EventByID(conn *sql.DB, id int64) (Event, error) {
 func ProductByID(conn *sql.DB, id int64) (Product, error) {
 	var p Product
 	err := conn.QueryRow(
-		`SELECT id, name, price_cents, placeholder, stripe_url FROM products WHERE id = ?`, id,
-	).Scan(&p.ID, &p.Name, &p.PriceCents, &p.Placeholder, &p.StripeURL)
+		`SELECT `+productColumns+` FROM products WHERE id = ?`, id,
+	).Scan(&p.ID, &p.Name, &p.PriceCents, &p.Placeholder, &p.StripeURL, &p.Image, &p.Variants)
 	return p, err
 }
 
@@ -516,8 +527,10 @@ func ListAllEvents(conn *sql.DB) ([]Event, error) {
 	return scanEvents(rows)
 }
 
+const productColumns = `id, name, price_cents, placeholder, stripe_url, image, variants`
+
 func ListProducts(conn *sql.DB) ([]Product, error) {
-	rows, err := conn.Query(`SELECT id, name, price_cents, placeholder, stripe_url FROM products ORDER BY id ASC`)
+	rows, err := conn.Query(`SELECT ` + productColumns + ` FROM products ORDER BY id ASC`)
 	if err != nil {
 		return nil, err
 	}
@@ -526,7 +539,7 @@ func ListProducts(conn *sql.DB) ([]Product, error) {
 	var products []Product
 	for rows.Next() {
 		var p Product
-		if err := rows.Scan(&p.ID, &p.Name, &p.PriceCents, &p.Placeholder, &p.StripeURL); err != nil {
+		if err := rows.Scan(&p.ID, &p.Name, &p.PriceCents, &p.Placeholder, &p.StripeURL, &p.Image, &p.Variants); err != nil {
 			return nil, err
 		}
 		products = append(products, p)

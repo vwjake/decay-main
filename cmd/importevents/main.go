@@ -77,13 +77,13 @@ type SeedEvent struct {
 	Volunteers  []SeedVolunteer `json:"volunteers,omitempty"`
 }
 
-// SeedVolunteer is one role an event needed covered. Name is empty when
-// the slot was never filled. Only the name comes across — the old records
-// also hold volunteers' email and phone, which the new site has no use
-// for and shouldn't be storing.
+// SeedVolunteer is one role an event needed covered. Only the role comes
+// across, never who covered it: the old records hold real community
+// members' names, emails, and phone numbers, and db/events.json is
+// committed to a git repository. Who volunteered is recorded in the admin
+// panel, which isn't.
 type SeedVolunteer struct {
 	Role string `json:"role"`
-	Name string `json:"name,omitempty"`
 }
 
 const venueAddress = "402 Washington St NE, Olympia WA"
@@ -376,8 +376,9 @@ func convert(path, name string, loc *time.Location) (*SeedEvent, error) {
 	}, nil
 }
 
-// volunteers flattens the old record's role map, keeping only roles that
-// were actually asked for and only the volunteer's name.
+// volunteers flattens the old record's role map down to which roles the
+// event needed covered. Whoever filled a slot is read only to infer that
+// the role was needed at all — their name is not carried over.
 func volunteers(old oldEvent) []SeedVolunteer {
 	var out []SeedVolunteer
 	for _, role := range db.VolunteerRoles {
@@ -394,16 +395,13 @@ func volunteers(old oldEvent) []SeedVolunteer {
 		if err := json.Unmarshal(raw, &info); err != nil {
 			continue // the empty-array form: nothing recorded
 		}
-		name := ""
-		if info.Volunteer != nil {
-			name = strings.TrimSpace(info.Volunteer.Name)
-		}
 		// A filled slot implies the role was needed, even if the flag
 		// was later cleared.
-		if !info.IsNeeded && name == "" {
+		filled := info.Volunteer != nil && strings.TrimSpace(info.Volunteer.Name) != ""
+		if !info.IsNeeded && !filled {
 			continue
 		}
-		out = append(out, SeedVolunteer{Role: role, Name: name})
+		out = append(out, SeedVolunteer{Role: role})
 	}
 	return out
 }

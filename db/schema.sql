@@ -68,6 +68,12 @@ CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     price_cents INTEGER NOT NULL,
+    -- Text shown in place of a photo when there isn't one yet.
     placeholder TEXT NOT NULL DEFAULT '',
-    stripe_url TEXT NOT NULL DEFAULT ''
+    stripe_url TEXT NOT NULL DEFAULT '',
+    -- Filename under uploads/products/. Empty falls back to placeholder.
+    image TEXT NOT NULL DEFAULT '',
+    -- Sizes, colours, prints — shown as text, since the site doesn't
+    -- take orders. shop.decay.events still handles the actual selling.
+    variants TEXT NOT NULL DEFAULT ''
 );

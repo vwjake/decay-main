@@ -19,9 +19,28 @@ templ AdminProductEdit(p db.Product, me db.User, errorMsg string) {
 				Price (dollars)
 				<input type="number" name="price" step="0.01" min="0" value={ fmt.Sprintf("%.2f", float64(p.PriceCents)/100) } required/>
 			</label>
-			<label>Placeholder text<input type="text" name="placeholder" value={ p.Placeholder }/></label>
-			<label>Stripe URL<input type="text" name="stripe_url" value={ p.StripeURL }/></label>
+			<label>Variants (shown as text)<input type="text" name="variants" value={ p.Variants }/></label>
+			<label>Placeholder text (shown when there's no photo)<input type="text" name="placeholder" value={ p.Placeholder }/></label>
+			<label>Buy link<input type="text" name="stripe_url" value={ p.StripeURL } placeholder="https://shop.decay.events/..."/></label>
 			<button type="submit" class="admin-btn">Save item</button>
+		</form>
+
+		<p class="admin-heading">Photo</p>
+		if p.HasImage() {
+			<img class="admin-flyer-preview" src={ p.ImagePath() } alt={ p.Name }/>
+		} else {
+			<p class="admin-sub mono">No photo yet — the listing shows the placeholder text.</p>
+		}
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/products/%d/image", p.ID)) } enctype="multipart/form-data" class="admin-form">
+			<label>
+				if p.HasImage() {
+					Replace photo
+				} else {
+					Upload photo
+				}
+				<input type="file" name="image" accept="image/*" required/>
+			</label>
+			<button type="submit" class="admin-btn">Save photo</button>
 		</form>
 	}
 }
