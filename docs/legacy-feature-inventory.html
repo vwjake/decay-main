@@ -1,0 +1,919 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DECAY legacy site — feature inventory</title>
+
+<style>
+  /* ---- Tokens ------------------------------------------------------
+     Palette is lifted from DECAY's own brutalist system: hard #111 rules,
+     warm off-white grounds, monospace labels. Neutrals carry a slight
+     warm bias so they sit with the paper rather than reading as flat grey.
+  */
+  :root {
+    --ground: #f4f4f2;
+    --card: #ffffff;
+    --ink: #111110;
+    --ink-soft: #55554e;
+    --ink-faint: #83837a;
+    --rule: #111110;
+    --rule-soft: #d3d3cc;
+
+    --done: #1c6b40;
+    --done-bg: #e4f0e8;
+    --partial: #855808;
+    --partial-bg: #f6ecd8;
+    --todo: #55554e;
+    --todo-bg: #e9e9e4;
+    --dropped: #6a4a6d;
+    --dropped-bg: #eee7ef;
+
+    --shadow: 4px 4px 0 var(--rule);
+    --step--1: 0.72rem;
+    --step-0: 0.95rem;
+    --step-1: 1.15rem;
+    --step-2: 1.6rem;
+    --step-3: 2.6rem;
+
+    --sans: ui-sans-serif, system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #141413;
+      --card: #1d1d1b;
+      --ink: #ecece6;
+      --ink-soft: #a8a89e;
+      --ink-faint: #85857b;
+      --rule: #ecece6;
+      --rule-soft: #3a3a36;
+
+      --done: #7cc79a;
+      --done-bg: #1b2c22;
+      --partial: #dcb063;
+      --partial-bg: #2e2617;
+      --todo: #a8a89e;
+      --todo-bg: #262623;
+      --dropped: #c1a3c6;
+      --dropped-bg: #272130;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #141413;
+    --card: #1d1d1b;
+    --ink: #ecece6;
+    --ink-soft: #a8a89e;
+    --ink-faint: #85857b;
+    --rule: #ecece6;
+    --rule-soft: #3a3a36;
+    --done: #7cc79a;
+    --done-bg: #1b2c22;
+    --partial: #dcb063;
+    --partial-bg: #2e2617;
+    --todo: #a8a89e;
+    --todo-bg: #262623;
+    --dropped: #c1a3c6;
+    --dropped-bg: #272130;
+  }
+
+  :root[data-theme="light"] {
+    --ground: #f4f4f2;
+    --card: #ffffff;
+    --ink: #111110;
+    --ink-soft: #55554e;
+    --ink-faint: #83837a;
+    --rule: #111110;
+    --rule-soft: #d3d3cc;
+    --done: #1c6b40;
+    --done-bg: #e4f0e8;
+    --partial: #855808;
+    --partial-bg: #f6ecd8;
+    --todo: #55554e;
+    --todo-bg: #e9e9e4;
+    --dropped: #6a4a6d;
+    --dropped-bg: #eee7ef;
+  }
+
+  /* ---- Base -------------------------------------------------------- */
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: var(--step-0);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 74rem;
+    margin: 0 auto;
+    padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1rem, 3vw, 2rem) 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  a { color: inherit; }
+  :where(a, button):focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .label {
+    font-family: var(--mono);
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--ink-faint);
+  }
+
+  /* ---- Masthead ---------------------------------------------------- */
+  .masthead {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    border-bottom: 3px solid var(--rule);
+    padding-bottom: 1.5rem;
+  }
+
+  .masthead h1 {
+    font-size: var(--step-3);
+    line-height: 1.02;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    text-transform: uppercase;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  .standfirst {
+    max-width: 60ch;
+    color: var(--ink-soft);
+    font-size: var(--step-1);
+    margin: 0;
+  }
+
+  /* ---- Summary ----------------------------------------------------- */
+  .tally {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+    gap: 0.75rem;
+  }
+
+  .tally-cell {
+    border: 2px solid var(--rule);
+    background: var(--card);
+    padding: 0.9rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .tally-num {
+    font-family: var(--mono);
+    font-size: var(--step-2);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  .tally-cell[data-kind="done"] .tally-num { color: var(--done); }
+  .tally-cell[data-kind="partial"] .tally-num { color: var(--partial); }
+  .tally-cell[data-kind="todo"] .tally-num { color: var(--todo); }
+  .tally-cell[data-kind="dropped"] .tally-num { color: var(--dropped); }
+
+  /* ---- Filters ----------------------------------------------------- */
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .filters .label { margin-right: 0.35rem; }
+
+  .filter {
+    font-family: var(--mono);
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border: 2px solid var(--rule);
+    background: var(--card);
+    color: var(--ink);
+    padding: 0.4rem 0.7rem;
+    cursor: pointer;
+  }
+
+  .filter[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--ground);
+  }
+
+  /* ---- Sections ---------------------------------------------------- */
+  .area {
+    border: 2px solid var(--rule);
+    background: var(--card);
+    box-shadow: var(--shadow);
+  }
+
+  .area-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    padding: 1rem 1.15rem;
+    border-bottom: 2px solid var(--rule);
+    background: var(--ground);
+  }
+
+  .area-head h2 {
+    font-size: var(--step-1);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    margin: 0;
+  }
+
+  .area-note {
+    font-size: var(--step--1);
+    color: var(--ink-soft);
+    max-width: 46ch;
+  }
+
+  .rows { display: flex; flex-direction: column; }
+
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.4rem 1.25rem;
+    align-items: start;
+    padding: 0.85rem 1.15rem;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+
+  .rows .row:last-child { border-bottom: 0; }
+  .row[hidden] { display: none; }
+
+  .row-name {
+    font-weight: 700;
+    letter-spacing: -0.005em;
+  }
+
+  .row-desc {
+    grid-column: 1;
+    color: var(--ink-soft);
+    font-size: calc(var(--step-0) * 0.94);
+    max-width: 68ch;
+  }
+
+  .row-desc code {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    background: var(--ground);
+    border: 1px solid var(--rule-soft);
+    padding: 0.05em 0.3em;
+  }
+
+  .chip {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+    align-self: start;
+    font-family: var(--mono);
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    border: 2px solid currentColor;
+    padding: 0.2rem 0.5rem;
+  }
+
+  .chip[data-status="done"] { color: var(--done); background: var(--done-bg); }
+  .chip[data-status="partial"] { color: var(--partial); background: var(--partial-bg); }
+  .chip[data-status="todo"] { color: var(--todo); background: var(--todo-bg); }
+  .chip[data-status="dropped"] { color: var(--dropped); background: var(--dropped-bg); }
+
+  /* ---- Data table -------------------------------------------------- */
+  .scroller { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: calc(var(--step-0) * 0.94);
+  }
+
+  th, td {
+    text-align: left;
+    padding: 0.6rem 1.15rem;
+    border-bottom: 1px solid var(--rule-soft);
+    white-space: nowrap;
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    font-weight: 400;
+  }
+
+  td.num {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+  }
+
+  tbody tr:last-child td { border-bottom: 0; }
+
+  /* ---- Footnote ---------------------------------------------------- */
+  .footnote {
+    border-top: 3px solid var(--rule);
+    padding-top: 1.25rem;
+    color: var(--ink-soft);
+    font-size: calc(var(--step-0) * 0.94);
+    max-width: 68ch;
+  }
+
+  .empty {
+    padding: 1.15rem;
+    font-family: var(--mono);
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+  }
+
+  @media (max-width: 34rem) {
+    .row { grid-template-columns: minmax(0, 1fr); }
+    .chip { grid-row: auto; grid-column: 1; justify-self: start; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <span class="label">decay.events &middot; legacy PHP site</span>
+    <h1>Feature inventory</h1>
+    <p class="standfirst">
+      Everything the old site does, and where each piece stands in the Go
+      rewrite. Compiled by reading all 142 PHP files and the flat-file data
+      store, not from memory.
+    </p>
+  </header>
+
+  <section aria-label="Summary" class="tally" id="tally">
+    <div class="tally-cell" data-kind="done">
+      <span class="tally-num" data-count="done">0</span>
+      <span class="label">Migrated</span>
+    </div>
+    <div class="tally-cell" data-kind="partial">
+      <span class="tally-num" data-count="partial">0</span>
+      <span class="label">Partial</span>
+    </div>
+    <div class="tally-cell" data-kind="todo">
+      <span class="tally-num" data-count="todo">0</span>
+      <span class="label">Not yet</span>
+    </div>
+    <div class="tally-cell" data-kind="dropped">
+      <span class="tally-num" data-count="dropped">0</span>
+      <span class="label">Deliberately dropped</span>
+    </div>
+    <div class="tally-cell">
+      <span class="tally-num" data-count="all">0</span>
+      <span class="label">Features total</span>
+    </div>
+  </section>
+
+  <div class="filters" role="group" aria-label="Filter by migration status">
+    <span class="label">Show</span>
+    <button class="filter" type="button" data-filter="all" aria-pressed="true">All</button>
+    <button class="filter" type="button" data-filter="done" aria-pressed="false">Migrated</button>
+    <button class="filter" type="button" data-filter="partial" aria-pressed="false">Partial</button>
+    <button class="filter" type="button" data-filter="todo" aria-pressed="false">Not yet</button>
+    <button class="filter" type="button" data-filter="dropped" aria-pressed="false">Dropped</button>
+  </div>
+
+  <!-- ================= PUBLIC PAGES ================= -->
+  <section class="area">
+    <div class="area-head">
+      <h2>Public pages</h2>
+      <p class="area-note">What a visitor sees. Most of the writing already exists as real copy.</p>
+    </div>
+    <div class="rows">
+      <div class="row" data-status="done">
+        <span class="row-name">Home</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">Landing page with upcoming events, merch, media and newsletter sign-up.</p>
+      </div>
+      <div class="row" data-status="done">
+        <span class="row-name">About</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">Mission, five stated goals, founding story, and the six-member board of directors.</p>
+      </div>
+      <div class="row" data-status="done">
+        <span class="row-name">Support &amp; Donate</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">Two pages on the old site, merged into one: Givebutter, Patreon, postal donations, and the funder/partner logos.</p>
+      </div>
+      <div class="row" data-status="done">
+        <span class="row-name">Policies</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">Safer space policy, prohibited behaviours, and the <code>concerns@</code> reporting address.</p>
+      </div>
+      <div class="row" data-status="partial">
+        <span class="row-name">Get Involved</span>
+        <span class="chip" data-status="partial">Partial</span>
+        <p class="row-desc">The volunteering explainer and perks are folded into Support; the forms it links to are not built.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Groups hub + five group pages</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Open Draw, No Tape, Decentralized Tech, Movie Club, Mutual Aid. Full written copy, section blocks and hero images already sit in <code>site-content.json</code>.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Community links</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">52 curated links to other Olympia organisations, editable from the admin panel.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Contact</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Message form with CSRF token, arithmetic captcha, honeypot field and email delivery. Needs a mail path before it can move.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Public user profiles</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Per-person page driven by the user records.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Custom 404</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">The rewrite currently returns Echo's default not-found response.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EVENTS & CALENDAR ================= -->
+  <section class="area">
+    <div class="area-head">
+      <h2>Events &amp; calendar</h2>
+      <p class="area-note">The heart of the old site, and the part most fully rebuilt. The unmigrated items are mostly operational record-keeping.</p>
+    </div>
+    <div class="rows">
+      <div class="row" data-status="done">
+        <span class="row-name">Month calendar grid</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">Week-per-row grid with previous/next month navigation and events stacked per day.</p>
+      </div>
+      <div class="row" data-status="done">
+        <span class="row-name">List view &amp; archive</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">Chronological upcoming list plus the full past-events archive, both paginated.</p>
+      </div>
+      <div class="row" data-status="done">
+        <span class="row-name">Event detail page</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">Per-event page with flyer, description, times and open volunteer roles.</p>
+      </div>
+      <div class="row" data-status="done">
+        <span class="row-name">Flyer upload</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">Per-event image with generated web-sized copies. Replaces the old thumbnail pipeline.</p>
+      </div>
+      <div class="row" data-status="done">
+        <span class="row-name">Categories &amp; programs</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">Hand-typed categories normalised into event types; recurring programs preserved as types.</p>
+      </div>
+      <div class="row" data-status="done">
+        <span class="row-name">Quarterly archive rollover</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">The old site moved finished quarters into dated folders. One table now holds all 676 events; the split is a query, not a filesystem move.</p>
+      </div>
+      <div class="row" data-status="partial">
+        <span class="row-name">Volunteer slots per event</span>
+        <span class="chip" data-status="partial">Partial</span>
+        <p class="row-desc">Door, sound, cleanup and promote roles carry over and the public page shows what's open. Nobody can sign up yet.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Printable calendar</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Print-optimised month sheet for putting on the wall.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">RSS event feed</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">"Decay DIY Shows" RSS at a fixed URL. The rewrite publishes iCalendar instead, which is a different audience.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Day view</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Everything scheduled on one date, events and meetings together.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Recurring events</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Pattern, until-date and explicit date list. The fields exist in the old records but were unused — every weekly event is a separate file.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Event duplication</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Copy an event as the basis for the next one — the practical workaround for no recurrence.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Bulk delete</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Select and remove many events at once.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Keyholder assignment</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Two keyholder slots per event, naming who opens and closes the building.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Event financials</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Door gross, concessions, merch sales, artist pay, donations, expenses and net, recorded per event.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Post-event reports</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Actual attendance, who filed it, and a written summary.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Grant reporting fields</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Youth participation and youth-organised percentages, artists engaged, accessibility notes, funder logo presence, community benefit. This is what the Inspire grant is reported against.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Event schema validation</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Records checked against <code>schema.json</code> on save. The rewrite gets much of this from the database's own column types.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= INTAKE & FORMS ================= -->
+  <section class="area">
+    <div class="area-head">
+      <h2>Intake &amp; forms</h2>
+      <p class="area-note">Everything the public can submit. None of it has moved — each needs a decision about where the data lands.</p>
+    </div>
+    <div class="rows">
+      <div class="row" data-status="todo">
+        <span class="row-name">Event booking request</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">"Host an event at DECAY" form capturing organiser, contact, date, bill, attendance estimate and needs.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Booking request queue</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Admin review, edit and approval, turning an accepted request into a calendar event. 19 live requests, 217 records in total.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Impact survey</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Nine questions on safety, diversity, connection, gaps and volunteering interest, with a results dashboard. Grant-facing.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Diversity survey</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Demographic collection with separate internal and public-facing variants and two results views.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Bio survey</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Name, pronouns, role and biography, collected for people involved with the space.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Spam defences</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">CSRF tokens, a hidden honeypot field and an arithmetic captcha, applied across every public form.</p>
+      </div>
+      <div class="row" data-status="dropped">
+        <span class="row-name">Volunteer shift form</span>
+        <span class="chip" data-status="dropped">Dropped</span>
+        <p class="row-desc">Booked a specific shift in advance. Parked for now — when it returns it's a fill-in form, not a registry.</p>
+      </div>
+      <div class="row" data-status="dropped">
+        <span class="row-name">Volunteer list sign-up</span>
+        <span class="chip" data-status="dropped">Dropped</span>
+        <p class="row-desc">Joined a call-list for occasional help. Replaced by the newsletter.</p>
+      </div>
+      <div class="row" data-status="dropped">
+        <span class="row-name">Volunteer directory</span>
+        <span class="chip" data-status="dropped">Dropped</span>
+        <p class="row-desc">Names, emails, phone numbers and availability in a TSV plus JSON. Deliberately not carried over — the rewrite stores no volunteer contact details at all.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ADMIN: CONTENT ================= -->
+  <section class="area">
+    <div class="area-head">
+      <h2>Admin — content &amp; operations</h2>
+      <p class="area-note">The day-to-day panel. The rewrite covers publishing; the old site also ran the organisation from here.</p>
+    </div>
+    <div class="rows">
+      <div class="row" data-status="done">
+        <span class="row-name">Dashboard</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">Rebuilt to lead with what needs attention rather than a list of links.</p>
+      </div>
+      <div class="row" data-status="done">
+        <span class="row-name">Event management</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">Create, edit, delete, flyer upload and volunteer roles, with a paginated table.</p>
+      </div>
+      <div class="row" data-status="done">
+        <span class="row-name">Blog</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">New in the rewrite — the old site had no blog. Drafts, publish and unpublish.</p>
+      </div>
+      <div class="row" data-status="done">
+        <span class="row-name">Shop catalogue</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">New in the rewrite. Imported from the shop export; display only, orders stay on shop.decay.events.</p>
+      </div>
+      <div class="row" data-status="done">
+        <span class="row-name">Photo gallery</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">New in the rewrite. Upload with captions and generated web-sized copies.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Meetings calendar</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">A second calendar for board and organising meetings, optionally anonymised on the public grid. 76 records.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Standard operating procedures</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">21 written procedures — event booking, closing, promo, board onboarding, expense reimbursement, grant process, digital security — each with its own feedback thread.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Reminders</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Dated notes surfaced on the calendar as badges.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Site content editor</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Edits the copy behind the groups pages without a deploy. The rewrite's prose pages are currently in templates.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Community links editor</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Curates the 52-entry local links directory.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Activity log</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Append-only audit trail of admin actions, written as JSON lines and browsable in the panel.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ADMIN: PEOPLE ================= -->
+  <section class="area">
+    <div class="area-head">
+      <h2>Admin — people &amp; access</h2>
+      <p class="area-note">The old site modelled real roles at the space. The rewrite has accounts and permissions, but only one role defined so far.</p>
+    </div>
+    <div class="rows">
+      <div class="row" data-status="done">
+        <span class="row-name">Login &amp; sessions</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">Per-account sign-in with hashed passwords and server-side session checks on every request.</p>
+      </div>
+      <div class="row" data-status="partial">
+        <span class="row-name">Roles &amp; capabilities</span>
+        <span class="chip" data-status="partial">Partial</span>
+        <p class="row-desc">The old model had three roles — Mega Admin, Admin and Agent (keyholder) — over capabilities like <code>events.manage</code>, <code>events.manage_own</code>, <code>volunteers.assign</code> and <code>events.book</code>. The rewrite checks permissions the same way but defines only <code>master</code>.</p>
+      </div>
+      <div class="row" data-status="partial">
+        <span class="row-name">User accounts</span>
+        <span class="chip" data-status="partial">Partial</span>
+        <p class="row-desc">Create, edit, set password and delete all work. The old site's 29 user records, with their roles and history, have not been imported.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Password reset by email</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Forgot-password and reset flow, with attempt throttling recorded to disk. Currently an admin sets a new password directly.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Invite-token sign-up</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Single-use links that let someone create their own account at a chosen role, instead of an admin typing a password for them.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Keyholder sign-up</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Token-gated onboarding specifically for keyholders.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Key tracker</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Who physically holds which key to the building, and when it changed hands. The single largest admin page on the old site.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Volunteer hours</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Hours tracked per person per event — the basis of the free-entry perk and of grant reporting.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Retire a user</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Deactivates an account while keeping its history, rather than deleting it.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Welcome email</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Sends new people their orientation message from the panel.</p>
+      </div>
+      <div class="row" data-status="dropped">
+        <span class="row-name">Volunteer records</span>
+        <span class="chip" data-status="dropped">Dropped</span>
+        <p class="row-desc">24 volunteer profiles with contact details, promoted from user records. Parked along with the rest of the volunteer system.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= INTEGRATIONS ================= -->
+  <section class="area">
+    <div class="area-head">
+      <h2>Integrations</h2>
+      <p class="area-note">Outside services the old site talks to. Two are heavily wired in; the rest are links.</p>
+    </div>
+    <div class="rows">
+      <div class="row" data-status="done">
+        <span class="row-name">Calendar subscription</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">The old site <em>pushed</em> events into Nextcloud over CalDAV with stored credentials. The rewrite publishes a feed that Nextcloud and phones subscribe to instead — read-only, no credentials, and event identities are preserved so nothing duplicates.</p>
+      </div>
+      <div class="row" data-status="done">
+        <span class="row-name">Newsletter, donations &amp; socials</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">beehiiv, Givebutter, Patreon, Instagram, Discord and YouTube, all linked. Twitch is deliberately not — the account isn't used.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Discord announcements</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Webhook posts to the server when events are created or changed.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Discord scheduled events</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Creates a matching scheduled event inside Discord so members see it in the server's own events list.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Outbound email</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Contact replies, welcome messages and password resets all depend on this. Nothing in the rewrite sends mail yet.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Text to speech</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Generates spoken audio from typed text — used for announcements in the space.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PLATFORM ================= -->
+  <section class="area">
+    <div class="area-head">
+      <h2>Platform &amp; housekeeping</h2>
+      <p class="area-note">Infrastructure. Several items are answered by the rewrite's architecture rather than reimplemented.</p>
+    </div>
+    <div class="rows">
+      <div class="row" data-status="done">
+        <span class="row-name">Data storage</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">Flat JSON files, one per record, replaced by SQLite. Removes the hand-rolled load/save/lock helpers entirely.</p>
+      </div>
+      <div class="row" data-status="done">
+        <span class="row-name">Image handling</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">Upload validation by extension and content sniffing, plus generated web-sized copies in place of the old thumbnail script.</p>
+      </div>
+      <div class="row" data-status="done">
+        <span class="row-name">Response caching</span>
+        <span class="chip" data-status="done">Migrated</span>
+        <p class="row-desc">The old site cached parsed JSON to PHP files for events, meetings, reminders, requests and users. A compiled binary querying SQLite doesn't need the layer.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Server health monitor</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Checks disk, memory, PHP error log and data integrity, with a dashboard and a scheduled runner.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Broken link checker</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Crawls the site and reports links that no longer resolve.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Subdomain checker</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Confirms subdomains still resolve and respond.</p>
+      </div>
+      <div class="row" data-status="todo">
+        <span class="row-name">Markdown rendering</span>
+        <span class="chip" data-status="todo">Not yet</span>
+        <p class="row-desc">Blog bodies are stored as Markdown but currently rendered as plain paragraphs.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DATA ================= -->
+  <section class="area">
+    <div class="area-head">
+      <h2>What's in the old data store</h2>
+      <p class="area-note">Record counts as of this audit — the volume behind each feature.</p>
+    </div>
+    <div class="scroller">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Record type</th>
+            <th scope="col">Count</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Events (live + archived)</td><td class="num">676</td><td>Imported</td></tr>
+          <tr><td>Flyer images</td><td class="num">207</td><td>Imported</td></tr>
+          <tr><td>Booking requests</td><td class="num">217</td><td>Not imported</td></tr>
+          <tr><td>Meetings</td><td class="num">76</td><td>Not imported</td></tr>
+          <tr><td>Community links</td><td class="num">52</td><td>Not imported</td></tr>
+          <tr><td>User accounts</td><td class="num">29</td><td>Not imported</td></tr>
+          <tr><td>Volunteer profiles</td><td class="num">24</td><td>Deliberately dropped</td></tr>
+          <tr><td>Written procedures</td><td class="num">21</td><td>Not imported</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="footnote">
+    Compiled from the <code>decay</code> repository — 142 PHP files across the
+    public site, admin panel and handlers, plus the <code>data/</code> tree.
+    Status reflects <code>decay-main</code> at commit <code>77f9ed5</code>.
+    "Migrated" includes features the rewrite answers differently rather than
+    copying: the calendar feed replaces the CalDAV push, and SQLite replaces
+    both the flat-file store and its cache.
+  </p>
+
+</div>
+
+<script>
+  (function () {
+    var rows = Array.prototype.slice.call(document.querySelectorAll(".row"));
+
+    // Counts are derived from the rows themselves so the summary can't drift
+    // out of step with the list.
+    var counts = { done: 0, partial: 0, todo: 0, dropped: 0 };
+    rows.forEach(function (row) {
+      var s = row.getAttribute("data-status");
+      if (counts.hasOwnProperty(s)) counts[s] += 1;
+    });
+    Object.keys(counts).forEach(function (k) {
+      var el = document.querySelector('[data-count="' + k + '"]');
+      if (el) el.textContent = counts[k];
+    });
+    var total = document.querySelector('[data-count="all"]');
+    if (total) total.textContent = rows.length;
+
+    var buttons = Array.prototype.slice.call(document.querySelectorAll(".filter"));
+    buttons.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var want = btn.getAttribute("data-filter");
+        buttons.forEach(function (b) {
+          b.setAttribute("aria-pressed", String(b === btn));
+        });
+        rows.forEach(function (row) {
+          var match = want === "all" || row.getAttribute("data-status") === want;
+          row.hidden = !match;
+        });
+        // An area with nothing left to show says so rather than sitting empty.
+        document.querySelectorAll(".area").forEach(function (area) {
+          var list = area.querySelector(".rows");
+          if (!list) return;
+          var visible = list.querySelectorAll(".row:not([hidden])").length;
+          var note = list.querySelector(".empty");
+          if (visible === 0 && !note) {
+            note = document.createElement("p");
+            note.className = "empty";
+            note.textContent = "Nothing in this area";
+            list.appendChild(note);
+          } else if (visible > 0 && note) {
+            note.remove();
+          }
+        });
+      });
+    });
+  })();
+</script>
+</body>
+</html>
