@@ -1,6 +1,21 @@
 package views
 
 templ Layout(title string) {
+	@layoutWith(title, "page") {
+		{ children... }
+	}
+}
+
+// WideLayout is the same page in a wider column. The month calendar needs
+// seven readable columns, which the site's usual narrow measure can't
+// give it.
+templ WideLayout(title string) {
+	@layoutWith(title, "page page-wide") {
+		{ children... }
+	}
+}
+
+templ layoutWith(title, pageClass string) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -14,7 +29,7 @@ templ Layout(title string) {
 			<script src="https://unpkg.com/htmx.org@1.9.12"></script>
 		</head>
 		<body>
-			<div class="page">
+			<div class={ pageClass }>
 				<div class="intro">
 					<div class="intro-frame">
 						<img src="/static/img/intro.gif" alt=""/>

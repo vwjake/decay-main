@@ -6,7 +6,7 @@ import "decay-main/db"
 // did: a week per row, Sunday first, with each day's events stacked in
 // its cell.
 templ Calendar(month db.CalendarMonth) {
-	@Layout(month.Label() + " · DECAY") {
+	@WideLayout(month.Label() + " · DECAY") {
 		<section class="about">
 			<p class="about-statement">Calendar</p>
 			<p class="about-body">What's on at 402 Washington St NE, month by month.</p>

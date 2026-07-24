@@ -77,12 +77,7 @@ templ eventRow(ev db.Event) {
 	<a href={ templ.URL(ev.Path()) } class="event-item">
 		<div>
 			<div class="event-title">{ ev.Title }</div>
-			<div class="event-meta mono">
-				{ ev.EventType } &middot; { ev.TimeRange() }
-				if ev.HasFlyer() {
-					&middot; Flyer
-				}
-			</div>
+			<div class="event-meta mono">{ ev.EventType } &middot; { ev.TimeRange() }</div>
 		</div>
 		<div class="event-date mono">{ ev.Month() } { ev.Day() }</div>
 	</a>

@@ -25,6 +25,12 @@ a {
   min-height: 100vh;
 }
 
+/* The calendar page. Seven columns need more measure than the site's
+   usual narrow column gives them. */
+.page-wide {
+  max-width: 880px;
+}
+
 /* Intro splash */
 
 .intro {
@@ -335,9 +341,10 @@ a {
 
 /* Calendar grid */
 
-/* The grid has a floor width below which a day cell can't hold a title,
-   so on a narrow screen it scrolls sideways inside this wrapper rather
-   than forcing the whole page to. */
+/* Below a certain width a day cell can't hold a legible event, so the
+   grid keeps a floor and scrolls sideways inside this wrapper rather than
+   forcing the whole page to scroll. On anything wider than a phone it
+   fits and this never engages. */
 .calendar-scroll {
   margin-top: 18px;
   overflow-x: auto;
@@ -345,7 +352,7 @@ a {
 
 .calendar {
   width: 100%;
-  min-width: 640px;
+  min-width: 460px;
   border-collapse: collapse;
   table-layout: fixed;
   background: #fff;
