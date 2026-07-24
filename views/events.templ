@@ -2,7 +2,7 @@ package views
 
 import "decay-main/db"
 
-templ Events(months []db.EventMonth) {
+templ Events(months []db.EventMonth, page db.Page) {
 	@Layout("Events · DECAY") {
 		<section class="about">
 			<p class="about-statement">Events</p>
@@ -13,6 +13,7 @@ templ Events(months []db.EventMonth) {
 				<p class="about-body">Nothing on the calendar right now — check back soon.</p>
 			} else {
 				@eventMonths(months)
+				@pager(page)
 			}
 			<a href="/events/archive" class="btn-outline mono">Past events</a>
 			<a href="/events.ics" class="btn-outline mono">Subscribe in your calendar</a>
@@ -21,7 +22,7 @@ templ Events(months []db.EventMonth) {
 	}
 }
 
-templ EventArchive(months []db.EventMonth) {
+templ EventArchive(months []db.EventMonth, page db.Page) {
 	@Layout("Past events · DECAY") {
 		<section class="about">
 			<p class="about-statement">Past events</p>
@@ -32,9 +33,30 @@ templ EventArchive(months []db.EventMonth) {
 				<p class="about-body">Nothing here yet.</p>
 			} else {
 				@eventMonths(months)
+				@pager(page)
 			}
 			<a href="/events" class="btn-outline mono">Upcoming events</a>
 		</section>
+	}
+}
+
+// pager renders the previous/next controls. Both slots are always laid
+// out, even when one is unusable, so the row doesn't shift between pages.
+templ pager(page db.Page) {
+	if page.Multiple() {
+		<nav class="pager mono">
+			if page.HasPrev() {
+				<a href={ templ.URL(page.PrevURL()) } class="pager-link">&larr; Prev</a>
+			} else {
+				<span class="pager-link is-disabled">&larr; Prev</span>
+			}
+			<span class="pager-status">{ page.Range() }</span>
+			if page.HasNext() {
+				<a href={ templ.URL(page.NextURL()) } class="pager-link">Next &rarr;</a>
+			} else {
+				<span class="pager-link is-disabled">Next &rarr;</span>
+			}
+		</nav>
 	}
 }
 

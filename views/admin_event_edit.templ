@@ -103,6 +103,15 @@ templ AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, me db.User, er
 			</table>
 			<button type="submit" class="admin-btn">Save volunteers</button>
 		</form>
+
+		<p class="admin-heading">Delete</p>
+		<p class="admin-sub mono">
+			Deleting removes the event from the site and from the calendar
+			feed. Anyone subscribed loses it at their next refresh.
+		</p>
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/events/%d/delete", ev.ID)) } onsubmit="return confirm('Delete this event? This cannot be undone.')" class="admin-form">
+			<button type="submit" class="admin-btn admin-btn-danger">Delete event</button>
+		</form>
 	}
 }
 

@@ -91,7 +91,9 @@ func main() {
 		if err != nil {
 			return err
 		}
-		return views.Events(db.GroupByMonth(events)).Render(c.Request().Context(), c.Response())
+		events, page := db.Paginate(events, db.PageNumber(c.QueryParam("page")), db.PerPagePublic)
+		page.Path = "/events"
+		return views.Events(db.GroupByMonth(events), page).Render(c.Request().Context(), c.Response())
 	})
 
 	// The subscribable feed carries the whole calendar, past included, so
@@ -109,7 +111,9 @@ func main() {
 		if err != nil {
 			return err
 		}
-		return views.EventArchive(db.GroupByMonth(events)).Render(c.Request().Context(), c.Response())
+		events, page := db.Paginate(events, db.PageNumber(c.QueryParam("page")), db.PerPagePublic)
+		page.Path = "/events/archive"
+		return views.EventArchive(db.GroupByMonth(events), page).Render(c.Request().Context(), c.Response())
 	})
 
 	e.GET("/events/:slug", func(c echo.Context) error {

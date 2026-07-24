@@ -6,43 +6,46 @@ import (
 	"decay-main/db"
 )
 
-templ AdminEvents(events []db.Event, me db.User, errorMsg string) {
+templ AdminEvents(events []db.Event, page db.Page, me db.User, errorMsg string) {
 	@AdminLayout("Events · DECAY Admin", me) {
 		<p class="admin-heading">Events</p>
 		if errorMsg != "" {
 			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
 		}
+		<p class="admin-sub mono">{ page.Range() }</p>
 		<table class="admin-table">
 			<tr>
+				<th>Date</th>
 				<th>Title</th>
 				<th>Type</th>
-				<th>Starts</th>
-				<th>Ends</th>
+				<th>Start</th>
+				<th>End</th>
+				<th></th>
 				<th></th>
 			</tr>
 			for _, ev := range events {
 				<tr>
-					<td>
-						<a href={ templ.URL(fmt.Sprintf("/admin/events/%d", ev.ID)) }>{ ev.Title }</a>
-						if ev.HasFlyer() {
-							<span class="admin-tag mono">flyer</span>
-						}
-					</td>
+					<td class="mono nowrap">{ ev.StartsAt.Format("Jan 2, 2006") }</td>
+					<td>{ ev.Title }</td>
 					<td>{ ev.EventType }</td>
-					<td>{ ev.StartsAt.Format("Jan 2, 2006 3:04 PM") }</td>
-					<td>
+					<td class="mono nowrap">{ ev.StartsAt.Format("3:04 PM") }</td>
+					<td class="mono nowrap">
 						if ev.EndsAt != nil {
 							{ ev.EndsAt.Format("3:04 PM") }
+						} else {
+							&mdash;
 						}
 					</td>
 					<td>
-						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/events/%d/delete", ev.ID)) } onsubmit="return confirm('Delete this event?')">
-							<button type="submit" class="admin-btn admin-btn-danger">Delete</button>
-						</form>
+						<a href={ templ.URL(fmt.Sprintf("/admin/events/%d", ev.ID)) }>Edit</a>
+					</td>
+					<td>
+						<a href={ templ.URL(ev.Path()) } target="_blank" rel="noopener">View</a>
 					</td>
 				</tr>
 			}
 		</table>
+		@adminPager(page)
 
 		<p class="admin-heading">Add event</p>
 		<form method="post" action="/admin/events" class="admin-form">
@@ -65,5 +68,25 @@ templ AdminEvents(events []db.Event, me db.User, errorMsg string) {
 			<p class="admin-sub mono">Add the flyer after creating the event.</p>
 			<button type="submit" class="admin-btn">Create</button>
 		</form>
+	}
+}
+
+// adminPager is the pager for admin tables, which sit inside a narrower
+// column than the public lists.
+templ adminPager(page db.Page) {
+	if page.Multiple() {
+		<nav class="pager mono">
+			if page.HasPrev() {
+				<a href={ templ.URL(page.PrevURL()) } class="pager-link">&larr; Prev</a>
+			} else {
+				<span class="pager-link is-disabled">&larr; Prev</span>
+			}
+			<span class="pager-status">{ page.Label() }</span>
+			if page.HasNext() {
+				<a href={ templ.URL(page.NextURL()) } class="pager-link">Next &rarr;</a>
+			} else {
+				<span class="pager-link is-disabled">Next &rarr;</span>
+			}
+		</nav>
 	}
 }

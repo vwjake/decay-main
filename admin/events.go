@@ -46,12 +46,20 @@ func registerEventRoutes(g *echo.Group, conn *sql.DB, uploadsDir string) {
 
 func listEvents(conn *sql.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		events, err := db.ListAllEvents(conn)
-		if err != nil {
-			return err
-		}
-		return views.AdminEvents(events, currentUser(c), "").Render(c.Request().Context(), c.Response())
+		return renderEvents(c, conn, "")
 	}
+}
+
+// renderEvents draws one page of the event table, keeping the ?page= the
+// request arrived on so a validation error doesn't bounce back to page 1.
+func renderEvents(c echo.Context, conn *sql.DB, msg string) error {
+	events, err := db.ListAllEvents(conn)
+	if err != nil {
+		return err
+	}
+	events, page := db.Paginate(events, db.PageNumber(c.QueryParam("page")), db.PerPageAdmin)
+	page.Path = "/admin/events"
+	return views.AdminEvents(events, page, currentUser(c), msg).Render(c.Request().Context(), c.Response())
 }
 
 // editEvent is the per-event page where the flyer and volunteer roles are
@@ -307,9 +315,5 @@ func parseAdminTime(raw string) (time.Time, error) {
 }
 
 func rerenderEventsError(c echo.Context, conn *sql.DB, msg string) error {
-	events, err := db.ListAllEvents(conn)
-	if err != nil {
-		return err
-	}
-	return views.AdminEvents(events, currentUser(c), msg).Render(c.Request().Context(), c.Response())
+	return renderEvents(c, conn, msg)
 }

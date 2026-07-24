@@ -97,7 +97,8 @@ other way round. Subscribing is read-only and needs no credentials:
 - **Apple / Google Calendar** — "Subscribe to calendar" / "From URL".
 
 The feed carries the whole calendar, past events included, so there's no
-window rule to be surprised by. Each event's `uid` column is its
+window rule to be surprised by — unlike the pages, it isn't paginated,
+since a calendar client wants the lot in one fetch. Each event's `uid` column is its
 iCalendar identity: it has to stay stable for the life of an event, or
 subscribers get a duplicate every time they refresh. Events imported from
 the old site reuse the `caldav_uid` it already pushed to Nextcloud, so

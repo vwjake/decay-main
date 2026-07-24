@@ -26,21 +26,13 @@ templ AdminDashboard(c db.Counts, me db.User) {
 			<p class="admin-sub mono">Nothing on the calendar yet.</p>
 		}
 
-		if c.OpenRoles > 0 || c.MissingFlyers > 0 || c.Drafts > 0 {
+		if c.OpenRoles > 0 || c.Drafts > 0 {
 			<p class="admin-heading">Needs attention</p>
 			<div class="event-list">
 				if c.OpenRoles > 0 {
 					<a href="/admin/events" class="event-item">
 						<div class="event-title">{ plural(c.OpenRoles, "volunteer slot", "volunteer slots") } unfilled</div>
 						<div class="event-date mono">{ fmt.Sprint(c.OpenRoles) }</div>
-					</a>
-				}
-				if c.MissingFlyers > 0 {
-					<a href="/admin/events" class="event-item">
-						<div class="event-title">
-							{ plural(c.MissingFlyers, "upcoming event", "upcoming events") } without a flyer
-						</div>
-						<div class="event-date mono">{ fmt.Sprint(c.MissingFlyers) }</div>
 					</a>
 				}
 				if c.Drafts > 0 {

@@ -379,7 +379,6 @@ type Counts struct {
 	UpcomingEvents int
 	PastEvents     int
 	OpenRoles      int
-	MissingFlyers  int
 	Drafts         int
 	PublishedPosts int
 	Products       int
@@ -399,13 +398,6 @@ func Summary(conn *sql.DB) (Counts, error) {
 	if len(upcoming) > 0 {
 		c.NextEvent = &upcoming[0]
 	}
-	// Only upcoming events are worth chasing a flyer for.
-	for _, ev := range upcoming {
-		if !ev.HasFlyer() {
-			c.MissingFlyers++
-		}
-	}
-
 	all, err := ListAllEvents(conn)
 	if err != nil {
 		return c, err
