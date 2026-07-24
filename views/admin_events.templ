@@ -6,8 +6,8 @@ import (
 	"decay-main/db"
 )
 
-templ AdminEvents(events []db.Event, errorMsg string) {
-	@AdminLayout("Events · DECAY Admin") {
+templ AdminEvents(events []db.Event, me db.User, errorMsg string) {
+	@AdminLayout("Events · DECAY Admin", me) {
 		<p class="admin-heading">Events</p>
 		if errorMsg != "" {
 			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>

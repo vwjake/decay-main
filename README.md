@@ -16,10 +16,32 @@ go run main.go
 
 Then visit http://localhost:8080.
 
-The admin panel lives at `/admin/login` (username `admin` unless
-`ADMIN_USERNAME` overrides it) and manages events, shop products, blog
-posts, and photos — all stored in `decay.db` (SQLite, created and seeded
-automatically on first run).
+The admin panel lives at `/admin/login` and manages events, shop
+products, blog posts, and photos — all stored in `decay.db` (SQLite,
+created and seeded automatically on first run).
+
+## Accounts
+
+Everyone signs in with their own account. Accounts live in the `users`
+table with bcrypt-hashed passwords and are managed at `/admin/users`.
+
+`ADMIN_USERNAME` and `ADMIN_PASSWORD` create the **first** account and
+nothing more. Once any account exists they're ignored — changing them
+won't change a password or let anyone in, so the real credential lives in
+the database from that point on. (Startup deliberately accepts a short
+`ADMIN_PASSWORD` for that first account and warns instead of refusing:
+the admin panel is the only place to change it, so refusing to boot would
+lock everyone out of fixing it.)
+
+Access is by permission, not by role name — `events`, `posts`, `shop`,
+`photos`, and `users`. Roles map to sets of those in `db/roles.go`, and
+handlers check the permission, so adding a narrower role later means
+adding an entry there and changing no handlers. **`master` is the only
+role so far** and grants everything.
+
+Two things the panel refuses, because both would lock everyone out
+permanently: deleting the account you're signed in as, and removing the
+last account that can manage accounts.
 
 ### Live reload
 
@@ -121,7 +143,8 @@ once events are managed there, stop re-importing.
 - `ics/` — renders events as a subscribable iCalendar feed
 - `images/` — makes web-sized copies of uploaded flyers
 - `views/` — templ page templates (`.templ` source + generated `_templ.go`)
-- `admin/` — session auth and CRUD handlers for `/admin/*`
+- `admin/` — session auth, permission checks, and CRUD handlers for `/admin/*`
+- `db/roles.go` — the permission set each role grants
 - `static/css`, `static/js`, `static/img` — assets, embedded into the binary at build time
 - `uploads/` — photo and flyer uploads written at runtime (not embedded, not committed)
 

@@ -1,6 +1,11 @@
 package views
 
-templ AdminLayout(title string) {
+import "decay-main/db"
+
+// AdminLayout frames every admin page. The nav shows only the sections
+// the signed-in account can reach, so it never offers a link that would
+// come back as a 403.
+templ AdminLayout(title string, me db.User) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -17,11 +22,23 @@ templ AdminLayout(title string) {
 				<header class="site-header">
 					<a href="/admin">DECAY Admin</a>
 					<nav class="site-nav mono">
-						<a href="/admin/events">Events</a>
-						<a href="/admin/products">Shop</a>
-						<a href="/admin/posts">Blog</a>
-						<a href="/admin/photos">Photos</a>
+						if me.Can(db.PermEvents) {
+							<a href="/admin/events">Events</a>
+						}
+						if me.Can(db.PermShop) {
+							<a href="/admin/products">Shop</a>
+						}
+						if me.Can(db.PermPosts) {
+							<a href="/admin/posts">Blog</a>
+						}
+						if me.Can(db.PermPhotos) {
+							<a href="/admin/photos">Photos</a>
+						}
+						if me.Can(db.PermUsers) {
+							<a href="/admin/users">Accounts</a>
+						}
 						<a href="/" target="_blank" rel="noopener">View site</a>
+						<span class="admin-whoami">{ me.Name() }</span>
 						<form method="post" action="/admin/logout" style="display:inline">
 							<button type="submit" class="admin-btn">Log out</button>
 						</form>

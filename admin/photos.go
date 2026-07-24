@@ -40,7 +40,7 @@ func listPhotos(conn *sql.DB) echo.HandlerFunc {
 		if err != nil {
 			return err
 		}
-		return views.AdminPhotos(photos, "").Render(c.Request().Context(), c.Response())
+		return views.AdminPhotos(photos, currentUser(c), "").Render(c.Request().Context(), c.Response())
 	}
 }
 
@@ -86,5 +86,5 @@ func rerenderPhotosError(c echo.Context, conn *sql.DB, msg string) error {
 	if err != nil {
 		return err
 	}
-	return views.AdminPhotos(photos, msg).Render(c.Request().Context(), c.Response())
+	return views.AdminPhotos(photos, currentUser(c), msg).Render(c.Request().Context(), c.Response())
 }

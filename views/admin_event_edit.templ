@@ -8,8 +8,8 @@ import (
 
 // AdminEventEdit manages the parts of an event that don't fit the create
 // form: its flyer image and which volunteer roles it needs covered.
-templ AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, errorMsg string) {
-	@AdminLayout(ev.Title + " · DECAY Admin") {
+templ AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, me db.User, errorMsg string) {
+	@AdminLayout(ev.Title+" · DECAY Admin", me) {
 		<a href="/admin/events" class="admin-back">&larr; All events</a>
 		<p class="admin-heading">{ ev.Title }</p>
 		<p class="admin-sub mono">

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"embed"
 	"errors"
+	"fmt"
 	"io/fs"
 	"log"
 	"net/http"
@@ -49,13 +50,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	adminPassword := os.Getenv("ADMIN_PASSWORD")
-	if adminPassword == "" {
-		log.Fatal("ADMIN_PASSWORD must be set to run the admin panel (see .env.example)")
-	}
-	adminUsername := os.Getenv("ADMIN_USERNAME")
-	if adminUsername == "" {
-		adminUsername = "admin"
+	// Accounts live in the database. ADMIN_USERNAME/ADMIN_PASSWORD only
+	// seed the very first one — after that, accounts are managed at
+	// /admin/users and these are ignored.
+	if err := bootstrapAdmin(conn); err != nil {
+		log.Fatal(err)
 	}
 
 	// Calendar subscribers keep absolute links, so the feed needs to know
@@ -73,10 +72,7 @@ func main() {
 	e.StaticFS("/static", static)
 	e.Static("/uploads", uploadsDir)
 
-	admin.Register(e, conn, admin.Config{
-		Username: adminUsername,
-		Password: adminPassword,
-	}, sessionSecret(), uploadsDir)
+	admin.Register(e, conn, sessionSecret(), uploadsDir)
 
 	e.GET("/", func(c echo.Context) error {
 		events, err := db.ListUpcomingEvents(conn, 4)
@@ -159,6 +155,43 @@ func main() {
 	})
 
 	e.Logger.Fatal(e.Start(":8080"))
+}
+
+// bootstrapAdmin creates the first master account from the environment
+// when the database has none. Once any account exists this does nothing,
+// so ADMIN_PASSWORD stops being a live credential the moment the panel is
+// set up — it can't be used to log in, only to create that first account.
+func bootstrapAdmin(conn *sql.DB) error {
+	var count int
+	if err := conn.QueryRow(`SELECT count(*) FROM users`).Scan(&count); err != nil {
+		return err
+	}
+	if count > 0 {
+		return nil
+	}
+
+	password := os.Getenv("ADMIN_PASSWORD")
+	if password == "" {
+		return errors.New("no accounts exist yet — set ADMIN_PASSWORD to create the first one (see .env.example)")
+	}
+	username := os.Getenv("ADMIN_USERNAME")
+	if username == "" {
+		username = "admin"
+	}
+
+	created, err := db.EnsureFirstUser(conn, username, password)
+	if err != nil {
+		return fmt.Errorf("creating the first account: %w", err)
+	}
+	if created {
+		log.Printf("created the first admin account %q from ADMIN_USERNAME/ADMIN_PASSWORD — "+
+			"manage accounts at /admin/users from now on", username)
+		if len([]rune(password)) < db.MinPasswordLength {
+			log.Printf("WARNING: that password is under %d characters. Change it at /admin/users; "+
+				"ADMIN_PASSWORD is ignored from here on.", db.MinPasswordLength)
+		}
+	}
+	return nil
 }
 
 func sessionSecret() []byte {

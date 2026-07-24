@@ -6,8 +6,8 @@ import (
 	"decay-main/db"
 )
 
-templ AdminPostEdit(post db.Post, errorMsg string) {
-	@AdminLayout(post.Title + " · DECAY Admin") {
+templ AdminPostEdit(post db.Post, me db.User, errorMsg string) {
+	@AdminLayout(post.Title+" · DECAY Admin", me) {
 		<a href="/admin/posts" class="admin-back">&larr; All posts</a>
 		<p class="admin-heading">{ post.Title }</p>
 		if post.Published() {

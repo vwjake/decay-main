@@ -8,8 +8,8 @@ import (
 
 // AdminDashboard opens the panel with what needs attention rather than a
 // bare list of links: what's on next, and what's missing from it.
-templ AdminDashboard(c db.Counts) {
-	@AdminLayout("Dashboard · DECAY Admin") {
+templ AdminDashboard(c db.Counts, me db.User) {
+	@AdminLayout("Dashboard · DECAY Admin", me) {
 		<p class="admin-heading">Dashboard</p>
 
 		if c.NextEvent != nil {
@@ -60,6 +60,9 @@ templ AdminDashboard(c db.Counts) {
 				fmt.Sprintf("%d published · %d draft", c.PublishedPosts, c.Drafts))
 			@adminLink("/admin/products", "Shop", fmt.Sprintf("%d items", c.Products))
 			@adminLink("/admin/photos", "Photos", fmt.Sprintf("%d photos", c.Photos))
+			if me.Can(db.PermUsers) {
+				@adminLink("/admin/users", "Accounts", "who can sign in here")
+			}
 		</div>
 	}
 }

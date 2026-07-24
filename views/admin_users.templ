@@ -1,0 +1,116 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/db"
+)
+
+templ AdminUsers(users []db.User, me db.User, errorMsg string) {
+	@AdminLayout("Accounts · DECAY Admin", me) {
+		<p class="admin-heading">Accounts</p>
+		if errorMsg != "" {
+			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+		}
+		<table class="admin-table">
+			<tr>
+				<th>Name</th>
+				<th>Username</th>
+				<th>Role</th>
+				<th>Last signed in</th>
+				<th></th>
+			</tr>
+			for _, u := range users {
+				<tr>
+					<td>
+						<a href={ templ.URL(fmt.Sprintf("/admin/users/%d", u.ID)) }>{ u.Name() }</a>
+						if u.ID == me.ID {
+							<span class="admin-tag mono">you</span>
+						}
+					</td>
+					<td class="mono">{ u.Username }</td>
+					<td>{ u.RoleLabel() }</td>
+					<td class="mono">{ u.LastLogin() }</td>
+					<td>
+						if u.ID != me.ID {
+							<form method="post" action={ templ.URL(fmt.Sprintf("/admin/users/%d/delete", u.ID)) } onsubmit="return confirm('Delete this account?')">
+								<button type="submit" class="admin-btn admin-btn-danger">Delete</button>
+							</form>
+						}
+					</td>
+				</tr>
+			}
+		</table>
+
+		<p class="admin-heading">New account</p>
+		<form method="post" action="/admin/users" class="admin-form">
+			<label>Username<input type="text" name="username" required autocomplete="off"/></label>
+			<label>Display name (optional)<input type="text" name="display_name" autocomplete="off"/></label>
+			<label>
+				{ fmt.Sprintf("Password (at least %d characters)", db.MinPasswordLength) }
+				<input type="password" name="password" required autocomplete="new-password" minlength={ fmt.Sprint(db.MinPasswordLength) }/>
+			</label>
+			<label>
+				Role
+				<select name="role">
+					for _, r := range db.RoleNames {
+						<option value={ r }>{ db.RoleLabelFor(r) }</option>
+					}
+				</select>
+			</label>
+			<p class="admin-sub mono">
+				Master is the only role so far and grants everything, including
+				managing accounts. Narrower roles get added in code.
+			</p>
+			<button type="submit" class="admin-btn">Create account</button>
+		</form>
+	}
+}
+
+templ AdminUserEdit(user db.User, me db.User, errorMsg string) {
+	@AdminLayout(user.Name()+" · DECAY Admin", me) {
+		<a href="/admin/users" class="admin-back">&larr; All accounts</a>
+		<p class="admin-heading">{ user.Name() }</p>
+		<p class="admin-sub mono">
+			{ user.Username } &middot; created { user.CreatedAt.Format("Jan 2, 2006") } &middot;
+			last signed in { user.LastLogin() }
+		</p>
+		if errorMsg != "" {
+			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+		}
+
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/users/%d", user.ID)) } class="admin-form">
+			<label>Display name<input type="text" name="display_name" value={ user.DisplayName }/></label>
+			<label>
+				Role
+				<select name="role">
+					for _, r := range db.RoleNames {
+						<option value={ r } selected?={ r == user.Role }>{ db.RoleLabelFor(r) }</option>
+					}
+				</select>
+			</label>
+			<button type="submit" class="admin-btn">Save account</button>
+		</form>
+
+		<p class="admin-heading">Access</p>
+		<ul class="volunteer-list mono">
+			for _, p := range db.AllPermissions {
+				if user.Can(p) {
+					<li>{ p.Label() }</li>
+				}
+			}
+		</ul>
+
+		<p class="admin-heading">Set a new password</p>
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/users/%d/password", user.ID)) } class="admin-form">
+			<label>
+				{ fmt.Sprintf("New password (at least %d characters)", db.MinPasswordLength) }
+				<input type="password" name="password" required autocomplete="new-password" minlength={ fmt.Sprint(db.MinPasswordLength) }/>
+			</label>
+			if user.ID != me.ID {
+				<p class="admin-sub mono">This signs nobody out — tell them their new password directly.</p>
+			}
+			<button type="submit" class="admin-btn">Set password</button>
+		</form>
+	}
+}

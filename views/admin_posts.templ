@@ -6,8 +6,8 @@ import (
 	"decay-main/db"
 )
 
-templ AdminPosts(posts []db.Post, errorMsg string) {
-	@AdminLayout("Blog · DECAY Admin") {
+templ AdminPosts(posts []db.Post, me db.User, errorMsg string) {
+	@AdminLayout("Blog · DECAY Admin", me) {
 		<p class="admin-heading">Blog</p>
 		if errorMsg != "" {
 			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>

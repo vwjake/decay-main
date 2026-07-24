@@ -637,6 +637,21 @@ a {
   margin-top: 4px;
 }
 
+.admin-whoami {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #666;
+}
+
+.admin-form select {
+  border: 2px solid #111;
+  padding: 8px;
+  font: inherit;
+  font-size: 13px;
+  background: #fff;
+}
+
 .admin-caption-form {
   display: flex;
   gap: 6px;

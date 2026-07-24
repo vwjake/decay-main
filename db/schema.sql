@@ -31,6 +31,23 @@ CREATE TABLE IF NOT EXISTS event_volunteers (
     UNIQUE (event_id, role)
 );
 
+-- Admin accounts. Roles are defined in Go (db/roles.go) rather than in a
+-- table, so the set of permissions a role grants is reviewable in code and
+-- can't drift per-database. Only 'master' exists so far.
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
+    display_name TEXT NOT NULL DEFAULT '',
+    password_hash TEXT NOT NULL,
+    role TEXT NOT NULL DEFAULT 'master',
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    last_login_at TEXT
+);
+
+-- Usernames are compared case-insensitively so "Jake" and "jake" can't
+-- both exist and confuse who is who.
+CREATE UNIQUE INDEX IF NOT EXISTS users_username ON users(lower(username));
+
 CREATE TABLE IF NOT EXISTS posts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     slug TEXT UNIQUE NOT NULL,

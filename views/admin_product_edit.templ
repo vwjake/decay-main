@@ -6,8 +6,8 @@ import (
 	"decay-main/db"
 )
 
-templ AdminProductEdit(p db.Product, errorMsg string) {
-	@AdminLayout(p.Name + " · DECAY Admin") {
+templ AdminProductEdit(p db.Product, me db.User, errorMsg string) {
+	@AdminLayout(p.Name+" · DECAY Admin", me) {
 		<a href="/admin/products" class="admin-back">&larr; All items</a>
 		<p class="admin-heading">{ p.Name }</p>
 		if errorMsg != "" {

@@ -13,7 +13,7 @@ import (
 )
 
 // Register wires up session middleware and every /admin route on e.
-func Register(e *echo.Echo, conn *sql.DB, cfg Config, sessionSecret []byte, uploadsDir string) {
+func Register(e *echo.Echo, conn *sql.DB, sessionSecret []byte, uploadsDir string) {
 	store := sessions.NewCookieStore(sessionSecret)
 	store.Options = &sessions.Options{
 		Path:     "/",
@@ -24,15 +24,27 @@ func Register(e *echo.Echo, conn *sql.DB, cfg Config, sessionSecret []byte, uplo
 	e.Use(session.Middleware(store))
 
 	e.GET("/admin/login", loginForm)
-	e.POST("/admin/login", login(cfg))
+	e.POST("/admin/login", login(conn))
 	e.POST("/admin/logout", logout)
 
-	g := e.Group("/admin", requireAuth)
+	g := e.Group("/admin", requireAuth(conn))
 	g.GET("", dashboard(conn))
-	registerEventRoutes(g, conn, uploadsDir)
-	registerProductRoutes(g, conn)
-	registerPostRoutes(g, conn)
-	registerPhotoRoutes(g, conn, uploadsDir)
+
+	// Each section is gated on its own permission, so a role that grants
+	// only some of them reaches only those pages.
+	events := g.Group("", requirePermission(db.PermEvents))
+	registerEventRoutes(events, conn, uploadsDir)
+
+	products := g.Group("", requirePermission(db.PermShop))
+	registerProductRoutes(products, conn)
+
+	posts := g.Group("", requirePermission(db.PermPosts))
+	registerPostRoutes(posts, conn)
+
+	photos := g.Group("", requirePermission(db.PermPhotos))
+	registerPhotoRoutes(photos, conn, uploadsDir)
+
+	registerUserRoutes(g, conn)
 }
 
 func dashboard(conn *sql.DB) echo.HandlerFunc {
@@ -41,6 +53,6 @@ func dashboard(conn *sql.DB) echo.HandlerFunc {
 		if err != nil {
 			return err
 		}
-		return views.AdminDashboard(counts).Render(c.Request().Context(), c.Response())
+		return views.AdminDashboard(counts, currentUser(c)).Render(c.Request().Context(), c.Response())
 	}
 }

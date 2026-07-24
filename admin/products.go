@@ -27,7 +27,7 @@ func editProduct(conn *sql.DB) echo.HandlerFunc {
 		if err != nil {
 			return err
 		}
-		return views.AdminProductEdit(p, "").Render(c.Request().Context(), c.Response())
+		return views.AdminProductEdit(p, currentUser(c), "").Render(c.Request().Context(), c.Response())
 	}
 }
 
@@ -39,7 +39,7 @@ func saveProduct(conn *sql.DB) echo.HandlerFunc {
 		}
 
 		rerender := func(msg string) error {
-			return views.AdminProductEdit(p, msg).Render(c.Request().Context(), c.Response())
+			return views.AdminProductEdit(p, currentUser(c), msg).Render(c.Request().Context(), c.Response())
 		}
 
 		name := strings.TrimSpace(c.FormValue("name"))
@@ -84,7 +84,7 @@ func listProducts(conn *sql.DB) echo.HandlerFunc {
 		if err != nil {
 			return err
 		}
-		return views.AdminProducts(products, "").Render(c.Request().Context(), c.Response())
+		return views.AdminProducts(products, currentUser(c), "").Render(c.Request().Context(), c.Response())
 	}
 }
 
@@ -135,5 +135,5 @@ func rerenderProductsError(c echo.Context, conn *sql.DB, msg string) error {
 	if err != nil {
 		return err
 	}
-	return views.AdminProducts(products, msg).Render(c.Request().Context(), c.Response())
+	return views.AdminProducts(products, currentUser(c), msg).Render(c.Request().Context(), c.Response())
 }

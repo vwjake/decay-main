@@ -50,7 +50,7 @@ func listEvents(conn *sql.DB) echo.HandlerFunc {
 		if err != nil {
 			return err
 		}
-		return views.AdminEvents(events, "").Render(c.Request().Context(), c.Response())
+		return views.AdminEvents(events, currentUser(c), "").Render(c.Request().Context(), c.Response())
 	}
 }
 
@@ -62,7 +62,7 @@ func editEvent(conn *sql.DB) echo.HandlerFunc {
 		if err != nil {
 			return err
 		}
-		return views.AdminEventEdit(ev, volunteers, "").Render(c.Request().Context(), c.Response())
+		return views.AdminEventEdit(ev, volunteers, currentUser(c), "").Render(c.Request().Context(), c.Response())
 	}
 }
 
@@ -77,7 +77,7 @@ func saveEvent(conn *sql.DB) echo.HandlerFunc {
 		}
 
 		rerender := func(msg string) error {
-			return views.AdminEventEdit(ev, volunteers, msg).Render(c.Request().Context(), c.Response())
+			return views.AdminEventEdit(ev, volunteers, currentUser(c), msg).Render(c.Request().Context(), c.Response())
 		}
 
 		title := strings.TrimSpace(c.FormValue("title"))
@@ -147,7 +147,7 @@ func uploadFlyer(conn *sql.DB, uploadsDir string) echo.HandlerFunc {
 		}
 
 		rerender := func(msg string) error {
-			return views.AdminEventEdit(ev, volunteers, msg).Render(c.Request().Context(), c.Response())
+			return views.AdminEventEdit(ev, volunteers, currentUser(c), msg).Render(c.Request().Context(), c.Response())
 		}
 
 		fileHeader, err := c.FormFile("flyer")
@@ -311,5 +311,5 @@ func rerenderEventsError(c echo.Context, conn *sql.DB, msg string) error {
 	if err != nil {
 		return err
 	}
-	return views.AdminEvents(events, msg).Render(c.Request().Context(), c.Response())
+	return views.AdminEvents(events, currentUser(c), msg).Render(c.Request().Context(), c.Response())
 }

@@ -38,7 +38,7 @@ func editPost(conn *sql.DB) echo.HandlerFunc {
 		if err != nil {
 			return err
 		}
-		return views.AdminPostEdit(post, "").Render(c.Request().Context(), c.Response())
+		return views.AdminPostEdit(post, currentUser(c), "").Render(c.Request().Context(), c.Response())
 	}
 }
 
@@ -53,12 +53,12 @@ func savePost(conn *sql.DB) echo.HandlerFunc {
 		title := strings.TrimSpace(c.FormValue("title"))
 		body := c.FormValue("body")
 		if slug == "" || title == "" || body == "" {
-			return views.AdminPostEdit(post, "Title, address, and body are required.").
+			return views.AdminPostEdit(post, currentUser(c), "Title, address, and body are required.").
 				Render(c.Request().Context(), c.Response())
 		}
 
 		if err := db.UpdatePost(conn, post.ID, slug, title, body); err != nil {
-			return views.AdminPostEdit(post, "That address is already taken.").
+			return views.AdminPostEdit(post, currentUser(c), "That address is already taken.").
 				Render(c.Request().Context(), c.Response())
 		}
 		return c.Redirect(http.StatusSeeOther, "/admin/posts/"+c.Param("id"))
@@ -96,7 +96,7 @@ func listPosts(conn *sql.DB) echo.HandlerFunc {
 		if err != nil {
 			return err
 		}
-		return views.AdminPosts(posts, "").Render(c.Request().Context(), c.Response())
+		return views.AdminPosts(posts, currentUser(c), "").Render(c.Request().Context(), c.Response())
 	}
 }
 
@@ -147,5 +147,5 @@ func rerenderPostsError(c echo.Context, conn *sql.DB, msg string) error {
 	if err != nil {
 		return err
 	}
-	return views.AdminPosts(posts, msg).Render(c.Request().Context(), c.Response())
+	return views.AdminPosts(posts, currentUser(c), msg).Render(c.Request().Context(), c.Response())
 }
