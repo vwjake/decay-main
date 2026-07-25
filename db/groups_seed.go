@@ -7,8 +7,8 @@ import "database/sql"
 // reads: "# Heading" per section, "- item" per bullet, plain lines as
 // paragraphs.
 type groupSeed struct {
-	slug, name, summary, description, pills, body string
-	enabled                                       bool
+	slug, name, summary, description, pills, body, matchTerms string
+	enabled                                                   bool
 }
 
 var groupSeeds = []groupSeed{
@@ -18,6 +18,7 @@ var groupSeeds = []groupSeed{
 		summary:     "Casual drawing hang for artists of every level. Bring your own supplies or use what's available, share prompts, and get feedback in a low-pressure setting.",
 		description: "Open Draw is a casual drawing hang for artists of every level. Bring your own tools or use what’s on hand, swap prompts, and work alongside other people who like to make things.",
 		pills:       "Drop-in friendly\nAll skill levels\nQuiet & social corners",
+		matchTerms:  "Open Draw",
 		enabled:     true,
 		body: `# What to bring
 - Sketchbook or loose paper
@@ -43,6 +44,7 @@ Bring a friend or come solo—either way you’ll find someone to trade ideas wi
 		summary:     "Open practice and jam space for musicians to improvise, test ideas, and collaborate without the pressure of a formal show.",
 		description: "No Tape is an open practice space for musicians to improvise, collaborate, and workshop songs without the pressure of a formal show. Audio-video synthesis and stage lights are also practiced and experimented with.",
 		pills:       "Collaborative jams\nAmplified & acoustic\nListeners welcome",
+		matchTerms:  "No Tape",
 		enabled:     true,
 		body: `# Bring along
 - Instruments, pedals, laptops, or other gear you want to experiment with
@@ -69,6 +71,7 @@ Let folks know if you’re trying collaborative jams for the first time. Someone
 		summary:     "Hands-on meetups for people interested in peer-to-peer tools, self-hosting, and resilient community technology.",
 		description: "Decentralized Tech meetups explore peer-to-peer tools, self-hosting, and resilient community technology through demos and collaborative tinkering.",
 		pills:       "Hands-on demos\nPeer learning\nBeginner friendly",
+		matchTerms:  "Decentralized Tech",
 		enabled:     true,
 		body: `# Topics we cover
 - Mesh networking, offline-first tools, and local-first software
@@ -96,6 +99,7 @@ Tell us what you want to learn or share—we’ll point you toward a table that 
 		summary:     "Collective film nights with rotating hosts. Expect themed lineups, post-screening chats, and an easy-going vibe.",
 		description: "Movie Club gathers people to watch films together, swap recommendations, and talk about what we just saw. Expect rotating hosts and themes.",
 		pills:       "Rotating curators\nSnacks encouraged\nDiscussion after",
+		matchTerms:  "Movie Club",
 		enabled:     true,
 		body: `# How screenings work
 - Rotating curators set the lineup and handle playback
@@ -121,6 +125,7 @@ Movie Club is low-pressure. If you’re shy, sit near the back and enjoy. If you
 		summary:     "Neighbors supporting neighbors through skill-sharing, resource swaps, and responsive community care projects.",
 		description: "Mutual Aid at DECAY connects neighbors who want to support one another through skill-sharing, resource swaps, and rapid response when needs come up.",
 		pills:       "Community care\nResource swaps\nSkill sharing",
+		matchTerms:  "Mutual Aid",
 		// Disabled on the old site; kept unlisted until it's ready to run.
 		enabled: false,
 		body: `# How we work
@@ -154,9 +159,28 @@ func seedGroups(conn *sql.DB) error {
 	}
 	for i, g := range groupSeeds {
 		if _, err := conn.Exec(
-			`INSERT INTO groups (slug, name, summary, description, pills, body, position, enabled)
-			 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-			g.slug, g.name, g.summary, g.description, g.pills, g.body, i, g.enabled,
+			`INSERT INTO groups (slug, name, summary, description, pills, body, match_terms, position, enabled)
+			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			g.slug, g.name, g.summary, g.description, g.pills, g.body, g.matchTerms, i, g.enabled,
+		); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// backfillGroupMatchTerms fills in the default match terms for the seeded
+// groups on databases that were created before the column existed — the
+// terms tie the carried-over programs to their events. It only touches
+// rows whose terms are still blank, so an admin's own edits stand.
+func backfillGroupMatchTerms(conn *sql.DB) error {
+	for _, g := range groupSeeds {
+		if g.matchTerms == "" {
+			continue
+		}
+		if _, err := conn.Exec(
+			`UPDATE groups SET match_terms = ? WHERE slug = ? AND match_terms = ''`,
+			g.matchTerms, g.slug,
 		); err != nil {
 			return err
 		}

@@ -73,6 +73,10 @@ CREATE TABLE IF NOT EXISTS groups (
     hero_image TEXT NOT NULL DEFAULT '',
     hero_alt TEXT NOT NULL DEFAULT '',
     body TEXT NOT NULL DEFAULT '',
+    -- Terms (one per line) that tie events to this group. A term matches
+    -- when it appears in an event's title or type, so the group page can
+    -- show its own upcoming schedule off the shared calendar.
+    match_terms TEXT NOT NULL DEFAULT '',
     position INTEGER NOT NULL DEFAULT 0,
     enabled INTEGER NOT NULL DEFAULT 1,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))

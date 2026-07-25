@@ -23,9 +23,22 @@ type Group struct {
 	HeroImage string
 	HeroAlt   string
 	// Body is the titled sections in the small markup ParseBody understands.
-	Body     string
-	Position int
-	Enabled  bool
+	Body string
+	// MatchTerms are the terms (one per line) that tie events to this group.
+	MatchTerms string
+	Position   int
+	Enabled    bool
+}
+
+// MatchTermList splits the stored terms, dropping blanks.
+func (g Group) MatchTermList() []string {
+	var out []string
+	for _, line := range strings.Split(g.MatchTerms, "\n") {
+		if line = strings.TrimSpace(line); line != "" {
+			out = append(out, line)
+		}
+	}
+	return out
 }
 
 func (g Group) HasHero() bool { return g.HeroImage != "" }
@@ -135,18 +148,57 @@ func ParseBody(body string) []GroupBlock {
 	return blocks
 }
 
-const groupColumns = `id, slug, name, summary, description, pills, hero_image, hero_alt, body, position, enabled`
+const groupColumns = `id, slug, name, summary, description, pills, hero_image, hero_alt, body, match_terms, position, enabled`
 
 func scanGroups(rows *sql.Rows) ([]Group, error) {
 	var groups []Group
 	for rows.Next() {
 		var g Group
-		if err := rows.Scan(&g.ID, &g.Slug, &g.Name, &g.Summary, &g.Description, &g.Pills, &g.HeroImage, &g.HeroAlt, &g.Body, &g.Position, &g.Enabled); err != nil {
+		if err := rows.Scan(&g.ID, &g.Slug, &g.Name, &g.Summary, &g.Description, &g.Pills, &g.HeroImage, &g.HeroAlt, &g.Body, &g.MatchTerms, &g.Position, &g.Enabled); err != nil {
 			return nil, err
 		}
 		groups = append(groups, g)
 	}
 	return groups, rows.Err()
+}
+
+// normalizeMatch lowercases and turns underscores and hyphens into spaces,
+// so a term like "No Tape" matches an event titled "NO_TAPE".
+func normalizeMatch(s string) string {
+	return strings.NewReplacer("_", " ", "-", " ").Replace(strings.ToLower(s))
+}
+
+// UpcomingForGroup returns up to limit upcoming events that belong to the
+// group, soonest first. A term matches when it appears in an event's title
+// or type. A group with no terms matches nothing — its page just shows no
+// schedule rather than the whole calendar.
+func UpcomingForGroup(conn *sql.DB, g Group, limit int) ([]Event, error) {
+	terms := g.MatchTermList()
+	if len(terms) == 0 {
+		return nil, nil
+	}
+	for i, t := range terms {
+		terms[i] = normalizeMatch(t)
+	}
+
+	upcoming, err := UpcomingEvents(conn)
+	if err != nil {
+		return nil, err
+	}
+	var out []Event
+	for _, ev := range upcoming {
+		hay := normalizeMatch(ev.Title + " " + ev.EventType)
+		for _, t := range terms {
+			if strings.Contains(hay, t) {
+				out = append(out, ev)
+				break
+			}
+		}
+		if limit > 0 && len(out) >= limit {
+			break
+		}
+	}
+	return out, nil
 }
 
 // ListGroups returns every group in display order, for admin management.
@@ -207,9 +259,9 @@ func GroupByID(conn *sql.DB, id int64) (Group, error) {
 // CreateGroup inserts a group and returns its new id.
 func CreateGroup(conn *sql.DB, g Group) (int64, error) {
 	res, err := conn.Exec(
-		`INSERT INTO groups (slug, name, summary, description, pills, hero_alt, body, position, enabled)
-		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		g.Slug, g.Name, g.Summary, g.Description, g.Pills, g.HeroAlt, g.Body, g.Position, g.Enabled,
+		`INSERT INTO groups (slug, name, summary, description, pills, hero_alt, body, match_terms, position, enabled)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		g.Slug, g.Name, g.Summary, g.Description, g.Pills, g.HeroAlt, g.Body, g.MatchTerms, g.Position, g.Enabled,
 	)
 	if err != nil {
 		return 0, err
@@ -221,8 +273,8 @@ func CreateGroup(conn *sql.DB, g Group) (int64, error) {
 // separately through SetGroupHero.
 func UpdateGroup(conn *sql.DB, g Group) error {
 	_, err := conn.Exec(
-		`UPDATE groups SET slug = ?, name = ?, summary = ?, description = ?, pills = ?, hero_alt = ?, body = ?, position = ?, enabled = ? WHERE id = ?`,
-		g.Slug, g.Name, g.Summary, g.Description, g.Pills, g.HeroAlt, g.Body, g.Position, g.Enabled, g.ID,
+		`UPDATE groups SET slug = ?, name = ?, summary = ?, description = ?, pills = ?, hero_alt = ?, body = ?, match_terms = ?, position = ?, enabled = ? WHERE id = ?`,
+		g.Slug, g.Name, g.Summary, g.Description, g.Pills, g.HeroAlt, g.Body, g.MatchTerms, g.Position, g.Enabled, g.ID,
 	)
 	return err
 }

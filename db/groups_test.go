@@ -3,6 +3,7 @@ package db
 import (
 	"path/filepath"
 	"testing"
+	"time"
 )
 
 func TestParseBody(t *testing.T) {
@@ -94,6 +95,70 @@ func TestSeedAndQueryGroups(t *testing.T) {
 	if _, err := GroupBySlug(conn, "open-draw"); err != nil {
 		t.Errorf("enabled group not found: %v", err)
 	}
+}
+
+func TestUpcomingForGroup(t *testing.T) {
+	loc, err := time.LoadLocation("America/Los_Angeles")
+	if err != nil {
+		t.Skip("no tz data")
+	}
+	conn, err := Open(filepath.Join(t.TempDir(), "test.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+
+	// A group with terms, but no seeded event archive, so the only matches
+	// are the events this test creates.
+	if _, err := CreateGroup(conn, Group{Slug: "no-tape", Name: "No Tape", MatchTerms: "No Tape", Enabled: true}); err != nil {
+		t.Fatal(err)
+	}
+
+	future := time.Now().In(loc).Add(48 * time.Hour)
+	// An underscore title must still match the "No Tape" term, and a term
+	// matching the event type (not the title) must count too.
+	mk := func(title, etype string) {
+		if _, err := CreateEvent(conn, Event{Title: title, EventType: etype, StartsAt: future}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	mk("NO_TAPE", "Music")       // matches no-tape by normalized title
+	mk("Some Jam", "no_tape")    // matches no-tape by type
+	mk("Open Draw", "Drawing")   // matches open-draw
+	mk("Random Lecture", "Talk") // matches nothing
+	// A past event that matches should be excluded as not upcoming.
+	if _, err := CreateEvent(conn, Event{Title: "Old NO_TAPE", EventType: "Music", StartsAt: time.Now().Add(-72 * time.Hour)}); err != nil {
+		t.Fatal(err)
+	}
+
+	noTape, err := GroupBySlug(conn, "no-tape")
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := UpcomingForGroup(conn, noTape, 10)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 2 {
+		t.Fatalf("no-tape upcoming = %d, want 2 (%v)", len(got), titles(got))
+	}
+
+	// The limit is honoured.
+	limited, err := UpcomingForGroup(conn, noTape, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(limited) != 1 {
+		t.Errorf("limit 1 returned %d", len(limited))
+	}
+}
+
+func titles(evs []Event) []string {
+	var out []string
+	for _, e := range evs {
+		out = append(out, e.Title)
+	}
+	return out
 }
 
 func plainText(segs []Segment) string {
