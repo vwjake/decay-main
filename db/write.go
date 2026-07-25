@@ -78,8 +78,8 @@ func SetProductImage(conn *sql.DB, id int64, filename string) (string, error) {
 // UpdateProduct saves edits to a shop item.
 func UpdateProduct(conn *sql.DB, p Product) error {
 	_, err := conn.Exec(
-		`UPDATE products SET name = ?, price_cents = ?, placeholder = ?, stripe_url = ?, variants = ? WHERE id = ?`,
-		p.Name, p.PriceCents, p.Placeholder, p.StripeURL, p.Variants, p.ID,
+		`UPDATE products SET name = ?, price_cents = ?, placeholder = ?, stripe_url = ?, variants = ?, description = ?, sold_out = ?, position = ? WHERE id = ?`,
+		p.Name, p.PriceCents, p.Placeholder, p.StripeURL, p.Variants, p.Description, p.SoldOut, p.Position, p.ID,
 	)
 	return err
 }
@@ -227,8 +227,8 @@ func DeleteEvent(conn *sql.DB, id int64) error {
 
 func CreateProduct(conn *sql.DB, p Product) error {
 	_, err := conn.Exec(
-		`INSERT INTO products (name, price_cents, placeholder, stripe_url) VALUES (?, ?, ?, ?)`,
-		p.Name, p.PriceCents, p.Placeholder, p.StripeURL,
+		`INSERT INTO products (name, price_cents, placeholder, stripe_url, description, position) VALUES (?, ?, ?, ?, ?, ?)`,
+		p.Name, p.PriceCents, p.Placeholder, p.StripeURL, p.Description, p.Position,
 	)
 	return err
 }

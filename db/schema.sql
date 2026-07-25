@@ -138,5 +138,11 @@ CREATE TABLE IF NOT EXISTS products (
     image TEXT NOT NULL DEFAULT '',
     -- Sizes, colours, prints — shown as text, since the site doesn't
     -- take orders. shop.decay.events still handles the actual selling.
-    variants TEXT NOT NULL DEFAULT ''
+    variants TEXT NOT NULL DEFAULT '',
+    -- Optional blurb shown under the item on the shop page.
+    description TEXT NOT NULL DEFAULT '',
+    -- Marks an item unavailable; it stays listed with a badge.
+    sold_out INTEGER NOT NULL DEFAULT 0,
+    -- Orders the catalogue; lower comes first.
+    position INTEGER NOT NULL DEFAULT 0
 );

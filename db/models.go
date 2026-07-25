@@ -154,11 +154,30 @@ type Product struct {
 	StripeURL   string
 	Image       string
 	Variants    string
+	// Description is optional copy shown under the item on the shop page.
+	Description string
+	// SoldOut marks an item as unavailable — it stays on the page with a
+	// badge instead of disappearing.
+	SoldOut bool
+	// Position orders the catalogue; lower comes first.
+	Position int
 }
 
 // HasImage reports whether there's a photo to show instead of the
 // placeholder text.
 func (p Product) HasImage() bool { return p.Image != "" }
+
+// HasDescription reports whether there's blurb worth rendering.
+func (p Product) HasDescription() bool { return p.Description != "" }
+
+// BuyURL is where a listing sends someone to actually buy it. The site
+// displays the catalogue only; shop.decay.events takes the orders.
+func (p Product) BuyURL() string {
+	if p.StripeURL != "" {
+		return p.StripeURL
+	}
+	return "https://shop.decay.events"
+}
 
 // ImagePath is the web-sized copy, which is what pages should display.
 func (p Product) ImagePath() string {
@@ -366,9 +385,7 @@ func EventByID(conn *sql.DB, id int64) (Event, error) {
 // ProductByID fetches one shop item for editing.
 func ProductByID(conn *sql.DB, id int64) (Product, error) {
 	var p Product
-	err := conn.QueryRow(
-		`SELECT `+productColumns+` FROM products WHERE id = ?`, id,
-	).Scan(&p.ID, &p.Name, &p.PriceCents, &p.Placeholder, &p.StripeURL, &p.Image, &p.Variants)
+	err := scanProduct(conn.QueryRow(`SELECT `+productColumns+` FROM products WHERE id = ?`, id), &p)
 	return p, err
 }
 
@@ -537,10 +554,16 @@ func ListAllEvents(conn *sql.DB) ([]Event, error) {
 	return scanEvents(rows)
 }
 
-const productColumns = `id, name, price_cents, placeholder, stripe_url, image, variants`
+const productColumns = `id, name, price_cents, placeholder, stripe_url, image, variants, description, sold_out, position`
+
+func scanProduct(s interface {
+	Scan(...any) error
+}, p *Product) error {
+	return s.Scan(&p.ID, &p.Name, &p.PriceCents, &p.Placeholder, &p.StripeURL, &p.Image, &p.Variants, &p.Description, &p.SoldOut, &p.Position)
+}
 
 func ListProducts(conn *sql.DB) ([]Product, error) {
-	rows, err := conn.Query(`SELECT ` + productColumns + ` FROM products ORDER BY id ASC`)
+	rows, err := conn.Query(`SELECT ` + productColumns + ` FROM products ORDER BY position ASC, id ASC`)
 	if err != nil {
 		return nil, err
 	}
@@ -549,12 +572,28 @@ func ListProducts(conn *sql.DB) ([]Product, error) {
 	var products []Product
 	for rows.Next() {
 		var p Product
-		if err := rows.Scan(&p.ID, &p.Name, &p.PriceCents, &p.Placeholder, &p.StripeURL, &p.Image, &p.Variants); err != nil {
+		if err := scanProduct(rows, &p); err != nil {
 			return nil, err
 		}
 		products = append(products, p)
 	}
 	return products, rows.Err()
+}
+
+// AvailableProducts is the catalogue with sold-out items dropped, for
+// places that only want what can actually be bought.
+func AvailableProducts(conn *sql.DB) ([]Product, error) {
+	all, err := ListProducts(conn)
+	if err != nil {
+		return nil, err
+	}
+	var out []Product
+	for _, p := range all {
+		if !p.SoldOut {
+			out = append(out, p)
+		}
+	}
+	return out, nil
 }
 
 func scanPosts(rows *sql.Rows) ([]Post, error) {
