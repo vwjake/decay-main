@@ -11,7 +11,10 @@ import (
 var schema string
 
 func Open(path string) (*sql.DB, error) {
-	conn, err := sql.Open("sqlite", path)
+	// Enforce foreign keys, which SQLite leaves off by default — without
+	// this the schema's ON DELETE CASCADE / SET NULL clauses do nothing.
+	// The _pragma runs on every pooled connection, not just the first.
+	conn, err := sql.Open("sqlite", path+"?_pragma=foreign_keys(1)")
 	if err != nil {
 		return nil, err
 	}

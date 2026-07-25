@@ -98,6 +98,34 @@ CREATE TABLE IF NOT EXISTS people (
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Public requests to book the space for an event, reviewed by organizers
+-- in the admin queue. status moves new -> reviewed; archived hides it.
+CREATE TABLE IF NOT EXISTS booking_requests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL DEFAULT '',
+    phone TEXT NOT NULL DEFAULT '',
+    event_name TEXT NOT NULL DEFAULT '',
+    description TEXT NOT NULL DEFAULT '',
+    preferred_date TEXT NOT NULL DEFAULT '',
+    expected_attendance TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'new',
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Public offers to volunteer for an event, with contact details so
+-- organizers can follow up. Distinct from event_volunteers, which is the
+-- admin's record of who is actually covering a role.
+CREATE TABLE IF NOT EXISTS volunteer_signups (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    role TEXT NOT NULL DEFAULT '',
+    name TEXT NOT NULL,
+    contact TEXT NOT NULL DEFAULT '',
+    note TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 CREATE TABLE IF NOT EXISTS photos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     filename TEXT NOT NULL,
