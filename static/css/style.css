@@ -1411,3 +1411,18 @@ a {
   padding-top: 20px;
   border-top: 2px solid #111;
 }
+
+/* A group's tagged photos, set off like its schedule. */
+.group-photos {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 2px solid #111;
+}
+
+/* The admin photo tag dropdown sits between caption and save. */
+.admin-caption-form select {
+  border: 2px solid #111;
+  padding: 4px;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+}

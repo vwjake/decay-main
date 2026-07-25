@@ -102,6 +102,9 @@ CREATE TABLE IF NOT EXISTS photos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     filename TEXT NOT NULL,
     caption TEXT NOT NULL DEFAULT '',
+    -- Optional group tag; a tagged photo shows on that group's page.
+    -- SET NULL rather than cascade so deleting a group leaves the photo.
+    group_id INTEGER REFERENCES groups(id) ON DELETE SET NULL,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 

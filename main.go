@@ -194,7 +194,11 @@ func main() {
 		if err != nil {
 			return err
 		}
-		return views.GroupPage(group, upcoming).Render(c.Request().Context(), c.Response())
+		photos, err := db.PhotosForGroup(conn, group.ID)
+		if err != nil {
+			return err
+		}
+		return views.GroupPage(group, upcoming, photos).Render(c.Request().Context(), c.Response())
 	})
 
 	e.GET("/blog", func(c echo.Context) error {

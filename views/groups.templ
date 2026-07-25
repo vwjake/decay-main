@@ -28,8 +28,8 @@ templ Groups(groups []db.Group) {
 }
 
 // GroupPage is one program's detail page. upcoming is the group's own slice
-// of the calendar, soonest first.
-templ GroupPage(g db.Group, upcoming []db.Event) {
+// of the calendar, soonest first; photos are the shots tagged to it.
+templ GroupPage(g db.Group, upcoming []db.Event, photos []db.Photo) {
 	@Layout(g.Name + " · DECAY") {
 		<section class="event-detail group-detail">
 			<a href="/groups" class="event-back mono">&larr; All groups</a>
@@ -80,6 +80,23 @@ templ GroupPage(g db.Group, upcoming []db.Event) {
 							}
 						</ul>
 					}
+				</div>
+			}
+			if len(photos) > 0 {
+				<div class="group-photos">
+					<h2 class="group-section-title mono">Photos</h2>
+					<div class="gallery">
+						for _, photo := range photos {
+							<figure class="gallery-item">
+								<a href={ templ.URL(photo.Path()) } target="_blank" rel="noopener">
+									<img src={ photo.WebPath() } alt={ photo.Alt() } loading="lazy"/>
+								</a>
+								if photo.Caption != "" {
+									<figcaption class="gallery-caption mono">{ photo.Caption }</figcaption>
+								}
+							</figure>
+						}
+					</div>
 				</div>
 			}
 		</section>

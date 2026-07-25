@@ -18,17 +18,17 @@ import (
 func registerPhotoRoutes(g *echo.Group, conn *sql.DB, uploadsDir string) {
 	g.GET("/photos", listPhotos(conn))
 	g.POST("/photos", uploadPhoto(conn, uploadsDir))
-	g.POST("/photos/:id/caption", savePhotoCaption(conn))
+	g.POST("/photos/:id", savePhoto(conn))
 	g.POST("/photos/:id/delete", deletePhoto(conn, uploadsDir))
 }
 
-func savePhotoCaption(conn *sql.DB) echo.HandlerFunc {
+func savePhoto(conn *sql.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest)
 		}
-		if err := db.UpdatePhotoCaption(conn, id, c.FormValue("caption")); err != nil {
+		if err := db.UpdatePhoto(conn, id, c.FormValue("caption"), parseGroupID(c.FormValue("group_id"))); err != nil {
 			return err
 		}
 		return c.Redirect(http.StatusSeeOther, "/admin/photos")
@@ -37,12 +37,30 @@ func savePhotoCaption(conn *sql.DB) echo.HandlerFunc {
 
 func listPhotos(conn *sql.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		photos, err := db.ListPhotos(conn)
-		if err != nil {
-			return err
-		}
-		return views.AdminPhotos(photos, currentUser(c), "").Render(c.Request().Context(), c.Response())
+		return renderPhotos(c, conn, "")
 	}
+}
+
+func renderPhotos(c echo.Context, conn *sql.DB, msg string) error {
+	photos, err := db.ListPhotos(conn)
+	if err != nil {
+		return err
+	}
+	groups, err := db.ListGroups(conn)
+	if err != nil {
+		return err
+	}
+	return views.AdminPhotos(photos, groups, currentUser(c), msg).Render(c.Request().Context(), c.Response())
+}
+
+// parseGroupID reads the photo tag dropdown: an empty value is "no group"
+// (nil), anything else the chosen group's id.
+func parseGroupID(raw string) *int64 {
+	id, err := strconv.ParseInt(raw, 10, 64)
+	if err != nil {
+		return nil
+	}
+	return &id
 }
 
 func uploadPhoto(conn *sql.DB, uploadsDir string) echo.HandlerFunc {
@@ -69,7 +87,7 @@ func uploadPhoto(conn *sql.DB, uploadsDir string) echo.HandlerFunc {
 			return err
 		}
 
-		if err := db.CreatePhoto(conn, filename, c.FormValue("caption")); err != nil {
+		if err := db.CreatePhoto(conn, filename, c.FormValue("caption"), parseGroupID(c.FormValue("group_id"))); err != nil {
 			return err
 		}
 		return c.Redirect(http.StatusSeeOther, "/admin/photos")
@@ -94,9 +112,5 @@ func deletePhoto(conn *sql.DB, uploadsDir string) echo.HandlerFunc {
 }
 
 func rerenderPhotosError(c echo.Context, conn *sql.DB, msg string) error {
-	photos, err := db.ListPhotos(conn)
-	if err != nil {
-		return err
-	}
-	return views.AdminPhotos(photos, currentUser(c), msg).Render(c.Request().Context(), c.Response())
+	return renderPhotos(c, conn, msg)
 }

@@ -20,12 +20,13 @@ func TestGroupViewsRender(t *testing.T) {
 		t.Fatalf("Groups render: %v", err)
 	}
 	upcoming := []db.Event{{ID: 9, Title: "NO_TAPE", EventType: "Music", Slug: "no-tape-1"}}
-	// First group with a schedule, second with none.
-	if err := GroupPage(groups[0], upcoming).Render(context.Background(), io.Discard); err != nil {
+	photos := []db.Photo{{ID: 1, Filename: "a.jpg", Caption: "At the jam"}}
+	// First group with a schedule and photos, second with neither.
+	if err := GroupPage(groups[0], upcoming, photos).Render(context.Background(), io.Discard); err != nil {
 		t.Fatalf("GroupPage(with schedule) render: %v", err)
 	}
-	if err := GroupPage(groups[1], nil).Render(context.Background(), io.Discard); err != nil {
-		t.Fatalf("GroupPage(empty schedule) render: %v", err)
+	if err := GroupPage(groups[1], nil, nil).Render(context.Background(), io.Discard); err != nil {
+		t.Fatalf("GroupPage(empty) render: %v", err)
 	}
 }
 

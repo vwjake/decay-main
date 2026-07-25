@@ -252,7 +252,14 @@ type Photo struct {
 	ID       int64
 	Filename string
 	Caption  string
+	// GroupID optionally tags a photo to a group, so it shows on that
+	// group's page. Nil means untagged.
+	GroupID *int64
 }
+
+// InGroup reports whether the photo is tagged to the given group, for
+// pre-selecting the admin dropdown.
+func (p Photo) InGroup(id int64) bool { return p.GroupID != nil && *p.GroupID == id }
 
 // Path is the original, full-resolution upload.
 func (p Photo) Path() string { return "/uploads/" + PhotosSubdir + "/" + p.Filename }
@@ -642,20 +649,37 @@ func ListAllPosts(conn *sql.DB) ([]Post, error) {
 	return scanPosts(rows)
 }
 
-func ListPhotos(conn *sql.DB) ([]Photo, error) {
-	rows, err := conn.Query(`SELECT id, filename, caption FROM photos ORDER BY id DESC`)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
+func scanPhotos(rows *sql.Rows) ([]Photo, error) {
 	var photos []Photo
 	for rows.Next() {
 		var p Photo
-		if err := rows.Scan(&p.ID, &p.Filename, &p.Caption); err != nil {
+		var groupID sql.NullInt64
+		if err := rows.Scan(&p.ID, &p.Filename, &p.Caption, &groupID); err != nil {
 			return nil, err
+		}
+		if groupID.Valid {
+			p.GroupID = &groupID.Int64
 		}
 		photos = append(photos, p)
 	}
 	return photos, rows.Err()
+}
+
+func ListPhotos(conn *sql.DB) ([]Photo, error) {
+	rows, err := conn.Query(`SELECT id, filename, caption, group_id FROM photos ORDER BY id DESC`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	return scanPhotos(rows)
+}
+
+// PhotosForGroup returns the photos tagged to a group, newest first.
+func PhotosForGroup(conn *sql.DB, groupID int64) ([]Photo, error) {
+	rows, err := conn.Query(`SELECT id, filename, caption, group_id FROM photos WHERE group_id = ? ORDER BY id DESC`, groupID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	return scanPhotos(rows)
 }

@@ -6,7 +6,7 @@ import (
 	"decay-main/db"
 )
 
-templ AdminPhotos(photos []db.Photo, me db.User, errorMsg string) {
+templ AdminPhotos(photos []db.Photo, groups []db.Group, me db.User, errorMsg string) {
 	@AdminLayout("Photos · DECAY Admin", me) {
 		<p class="admin-heading">Photos</p>
 		if errorMsg != "" {
@@ -19,8 +19,9 @@ templ AdminPhotos(photos []db.Photo, me db.User, errorMsg string) {
 						<div class="merch-photo">
 							<img src={ p.WebPath() } alt={ p.Alt() }/>
 						</div>
-						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/photos/%d/caption", p.ID)) } class="admin-caption-form">
+						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/photos/%d", p.ID)) } class="admin-caption-form">
 							<input type="text" name="caption" value={ p.Caption } placeholder="Caption"/>
+							@groupSelect(groups, p.GroupID)
 							<button type="submit" class="admin-btn">Save</button>
 						</form>
 						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/photos/%d/delete", p.ID)) } onsubmit="return confirm('Delete this photo?')" style="margin-top:8px">
@@ -35,7 +36,19 @@ templ AdminPhotos(photos []db.Photo, me db.User, errorMsg string) {
 		<form method="post" action="/admin/photos" enctype="multipart/form-data" class="admin-form">
 			<label>Image (jpg, png, gif, webp)<input type="file" name="photo" accept="image/*" required/></label>
 			<label>Caption<input type="text" name="caption"/></label>
+			<label>Group (optional)@groupSelect(groups, nil)</label>
 			<button type="submit" class="admin-btn">Upload</button>
 		</form>
 	}
+}
+
+// groupSelect renders the group-tag dropdown, pre-selecting the photo's
+// current group. selected is nil for an untagged photo.
+templ groupSelect(groups []db.Group, selected *int64) {
+	<select name="group_id">
+		<option value="">No group</option>
+		for _, g := range groups {
+			<option value={ fmt.Sprint(g.ID) } selected?={ selected != nil && *selected == g.ID }>{ g.Name }</option>
+		}
+	</select>
 }

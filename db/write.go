@@ -100,9 +100,10 @@ func UnpublishPost(conn *sql.DB, id int64) error {
 	return err
 }
 
-// UpdatePhotoCaption saves a new caption for a gallery photo.
-func UpdatePhotoCaption(conn *sql.DB, id int64, caption string) error {
-	_, err := conn.Exec(`UPDATE photos SET caption = ? WHERE id = ?`, caption, id)
+// UpdatePhoto saves a gallery photo's caption and group tag. A nil groupID
+// clears the tag.
+func UpdatePhoto(conn *sql.DB, id int64, caption string, groupID *int64) error {
+	_, err := conn.Exec(`UPDATE photos SET caption = ?, group_id = ? WHERE id = ?`, caption, nullInt(groupID), id)
 	return err
 }
 
@@ -260,8 +261,8 @@ func DeletePost(conn *sql.DB, id int64) error {
 	return err
 }
 
-func CreatePhoto(conn *sql.DB, filename, caption string) error {
-	_, err := conn.Exec(`INSERT INTO photos (filename, caption) VALUES (?, ?)`, filename, caption)
+func CreatePhoto(conn *sql.DB, filename, caption string, groupID *int64) error {
+	_, err := conn.Exec(`INSERT INTO photos (filename, caption, group_id) VALUES (?, ?, ?)`, filename, caption, nullInt(groupID))
 	return err
 }
 
