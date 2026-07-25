@@ -190,7 +190,11 @@ func main() {
 		if err != nil {
 			return err
 		}
-		return views.GroupPage(group).Render(c.Request().Context(), c.Response())
+		upcoming, err := db.UpcomingForGroup(conn, group, 6)
+		if err != nil {
+			return err
+		}
+		return views.GroupPage(group, upcoming).Render(c.Request().Context(), c.Response())
 	})
 
 	e.GET("/blog", func(c echo.Context) error {

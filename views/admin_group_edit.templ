@@ -30,6 +30,11 @@ templ AdminGroupEdit(g db.Group, me db.User, errorMsg string) {
 				Start a section with <code># Heading</code>, list items with <code>- item</code>,
 				and write any other lines as paragraphs. Links (starting with http) become clickable.
 			</p>
+			<label>Schedule match terms (one per line)<textarea name="match_terms">{ g.MatchTerms }</textarea></label>
+			<p class="admin-sub mono">
+				Upcoming events whose title or type contains one of these terms show on this
+				group's page. Leave blank for no schedule.
+			</p>
 			<label>Photo description (alt text)<input type="text" name="hero_alt" value={ g.HeroAlt }/></label>
 			<label>Order<input type="number" name="position" value={ fmt.Sprint(g.Position) }/></label>
 			<label class="inline">

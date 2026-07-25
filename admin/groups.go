@@ -128,6 +128,7 @@ func saveGroup(conn *sql.DB) echo.HandlerFunc {
 		g.Pills = normalizeLines(c.FormValue("pills"))
 		g.HeroAlt = strings.TrimSpace(c.FormValue("hero_alt"))
 		g.Body = c.FormValue("body")
+		g.MatchTerms = normalizeLines(c.FormValue("match_terms"))
 		g.Position = position
 		g.Enabled = c.FormValue("enabled") != ""
 		if err := db.UpdateGroup(conn, g); err != nil {

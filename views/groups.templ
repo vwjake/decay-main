@@ -27,8 +27,9 @@ templ Groups(groups []db.Group) {
 	}
 }
 
-// GroupPage is one program's detail page.
-templ GroupPage(g db.Group) {
+// GroupPage is one program's detail page. upcoming is the group's own slice
+// of the calendar, soonest first.
+templ GroupPage(g db.Group, upcoming []db.Event) {
 	@Layout(g.Name + " · DECAY") {
 		<section class="event-detail group-detail">
 			<a href="/groups" class="event-back mono">&larr; All groups</a>
@@ -47,6 +48,19 @@ templ GroupPage(g db.Group) {
 			if g.Description != "" {
 				<p class="event-detail-body">{ g.Description }</p>
 			}
+			<div class="group-schedule">
+				<h2 class="group-section-title mono">Upcoming</h2>
+				if len(upcoming) > 0 {
+					<div class="event-list">
+						for _, ev := range upcoming {
+							@eventRow(ev)
+						}
+					</div>
+					<a href="/calendar" class="btn-outline mono">Full calendar</a>
+				} else {
+					<p class="admin-sub mono">Nothing on the calendar right now — check back soon.</p>
+				}
+			</div>
 			for _, block := range g.Sections() {
 				<div class="group-section">
 					if block.Heading != "" {
