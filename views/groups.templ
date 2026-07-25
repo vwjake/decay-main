@@ -1,0 +1,85 @@
+package views
+
+import "decay-main/db"
+
+// Groups is the public index of recurring programs.
+templ Groups(groups []db.Group) {
+	@Layout("Groups · DECAY") {
+		<section class="about">
+			<p class="about-statement">Groups at DECAY</p>
+			<p class="about-body">
+				Connect with recurring meetups that call DECAY home. Explore their pages to
+				learn what to bring, how to plug in, and what to expect when you show up.
+			</p>
+		</section>
+
+		<section class="events">
+			<div class="group-list">
+				for _, g := range groups {
+					<a class="group-card" href={ templ.URL(g.Path()) }>
+						<span class="group-card-name">{ g.Name }</span>
+						<span class="group-card-summary">{ g.Summary }</span>
+						<span class="group-card-more mono">Learn more &rarr;</span>
+					</a>
+				}
+			</div>
+		</section>
+	}
+}
+
+// GroupPage is one program's detail page.
+templ GroupPage(g db.Group) {
+	@Layout(g.Name + " · DECAY") {
+		<section class="event-detail group-detail">
+			<a href="/groups" class="event-back mono">&larr; All groups</a>
+			if g.HasHero() {
+				<img class="group-hero" src={ g.HeroPath() } alt={ g.HeroAlt }/>
+			}
+			<span class="section-label mono">Group at DECAY</span>
+			<h1 class="event-detail-title">{ g.Name }</h1>
+			if len(g.PillList()) > 0 {
+				<div class="group-pills mono">
+					for _, pill := range g.PillList() {
+						<span class="group-pill">{ pill }</span>
+					}
+				</div>
+			}
+			if g.Description != "" {
+				<p class="event-detail-body">{ g.Description }</p>
+			}
+			for _, block := range g.Sections() {
+				<div class="group-section">
+					if block.Heading != "" {
+						<h2 class="group-section-title mono">{ block.Heading }</h2>
+					}
+					for _, para := range block.Paragraphs {
+						<p class="event-detail-body">
+							@segments(para)
+						</p>
+					}
+					if len(block.Bullets) > 0 {
+						<ul class="group-bullets">
+							for _, item := range block.Bullets {
+								<li>
+									@segments(item)
+								</li>
+							}
+						</ul>
+					}
+				</div>
+			}
+		</section>
+	}
+}
+
+// segments renders a parsed line, turning link runs into anchors and
+// leaving plain runs as escaped text.
+templ segments(segs []db.Segment) {
+	for _, seg := range segs {
+		if seg.IsLink() {
+			<a href={ templ.URL(seg.URL) } target="_blank" rel="noopener">{ seg.Text }</a>
+		} else {
+			{ seg.Text }
+		}
+	}
+}

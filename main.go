@@ -164,6 +164,25 @@ func main() {
 		return views.EventDetail(ev, db.OpenRoles(volunteers)).Render(c.Request().Context(), c.Response())
 	})
 
+	e.GET("/groups", func(c echo.Context) error {
+		groups, err := db.EnabledGroups(conn)
+		if err != nil {
+			return err
+		}
+		return views.Groups(groups).Render(c.Request().Context(), c.Response())
+	})
+
+	e.GET("/groups/:slug", func(c echo.Context) error {
+		group, err := db.GroupBySlug(conn, c.Param("slug"))
+		if errors.Is(err, sql.ErrNoRows) {
+			return echo.NewHTTPError(http.StatusNotFound)
+		}
+		if err != nil {
+			return err
+		}
+		return views.GroupPage(group).Render(c.Request().Context(), c.Response())
+	})
+
 	e.GET("/blog", func(c echo.Context) error {
 		posts, err := db.ListPosts(conn)
 		if err != nil {
