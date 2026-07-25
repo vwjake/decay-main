@@ -64,6 +64,32 @@ CREATE TABLE IF NOT EXISTS photos (
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Post-event operational numbers, one row per event. Filled in after the
+-- event from the reports screen; no row simply means the numbers haven't
+-- been recorded yet. attendance and door_cents are nullable so "recorded
+-- as zero" reads differently from "never entered".
+CREATE TABLE IF NOT EXISTS event_reports (
+    event_id INTEGER PRIMARY KEY REFERENCES events(id) ON DELETE CASCADE,
+    attendance INTEGER,
+    door_cents INTEGER,
+    notes TEXT NOT NULL DEFAULT '',
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Donations, in cents. event_id ties a donation to an event (the jar at a
+-- show); NULL is a standalone donation — online, a mailed check — that
+-- still belongs in the quarter's totals. received_at is the date the money
+-- came in, which is what reports range on.
+CREATE TABLE IF NOT EXISTS donations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_id INTEGER REFERENCES events(id) ON DELETE SET NULL,
+    amount_cents INTEGER NOT NULL,
+    source TEXT NOT NULL DEFAULT '',
+    note TEXT NOT NULL DEFAULT '',
+    received_at TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,

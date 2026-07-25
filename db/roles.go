@@ -6,15 +6,16 @@ package db
 type Permission string
 
 const (
-	PermEvents Permission = "events"
-	PermPosts  Permission = "posts"
-	PermShop   Permission = "shop"
-	PermPhotos Permission = "photos"
-	PermUsers  Permission = "users"
+	PermEvents  Permission = "events"
+	PermPosts   Permission = "posts"
+	PermShop    Permission = "shop"
+	PermPhotos  Permission = "photos"
+	PermReports Permission = "reports"
+	PermUsers   Permission = "users"
 )
 
 // AllPermissions is every permission, in the order they're displayed.
-var AllPermissions = []Permission{PermEvents, PermPosts, PermShop, PermPhotos, PermUsers}
+var AllPermissions = []Permission{PermEvents, PermPosts, PermShop, PermPhotos, PermReports, PermUsers}
 
 // Label renders a permission for display.
 func (p Permission) Label() string {
@@ -27,6 +28,8 @@ func (p Permission) Label() string {
 		return "Shop"
 	case PermPhotos:
 		return "Photos"
+	case PermReports:
+		return "Reports"
 	case PermUsers:
 		return "Accounts"
 	}
