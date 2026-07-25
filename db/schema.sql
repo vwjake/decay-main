@@ -57,6 +57,29 @@ CREATE TABLE IF NOT EXISTS posts (
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Recurring meetups that call DECAY home (Open Draw, No Tape, etc.). Each
+-- has a public detail page. body holds the titled sections in a small
+-- line-based markup — "# Heading" starts a section, "- item" is a bullet,
+-- other lines are paragraphs — so admins edit it in one textarea. enabled
+-- hides a group from the public list without deleting it; position orders
+-- both the list and any nav.
+CREATE TABLE IF NOT EXISTS groups (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    slug TEXT NOT NULL,
+    name TEXT NOT NULL,
+    summary TEXT NOT NULL DEFAULT '',
+    description TEXT NOT NULL DEFAULT '',
+    pills TEXT NOT NULL DEFAULT '',
+    hero_image TEXT NOT NULL DEFAULT '',
+    hero_alt TEXT NOT NULL DEFAULT '',
+    body TEXT NOT NULL DEFAULT '',
+    position INTEGER NOT NULL DEFAULT 0,
+    enabled INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS groups_slug ON groups(slug);
+
 -- Board and staff profiles shown on the About page. position orders them
 -- (board first, then staff, however they're arranged); role is the title
 -- line under the name, and photo is a filename under uploads/people/.
