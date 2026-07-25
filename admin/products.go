@@ -104,11 +104,19 @@ func saveProduct(conn *sql.DB) echo.HandlerFunc {
 			placeholder = "product photo"
 		}
 
+		position, err := parsePosition(c.FormValue("position"))
+		if err != nil {
+			return rerender("Order has to be a whole number.")
+		}
+
 		p.Name = name
 		p.PriceCents = int(priceDollars*100 + 0.5)
 		p.Placeholder = placeholder
 		p.StripeURL = strings.TrimSpace(c.FormValue("stripe_url"))
 		p.Variants = strings.TrimSpace(c.FormValue("variants"))
+		p.Description = strings.TrimSpace(c.FormValue("description"))
+		p.SoldOut = c.FormValue("sold_out") != ""
+		p.Position = position
 		if err := db.UpdateProduct(conn, p); err != nil {
 			return err
 		}
@@ -153,12 +161,18 @@ func createProduct(conn *sql.DB) echo.HandlerFunc {
 		if placeholder == "" {
 			placeholder = "product photo"
 		}
+		position, err := parsePosition(c.FormValue("position"))
+		if err != nil {
+			return rerenderProductsError(c, conn, "Order has to be a whole number.")
+		}
 
 		p := db.Product{
 			Name:        name,
 			PriceCents:  int(priceDollars*100 + 0.5),
 			Placeholder: placeholder,
 			StripeURL:   c.FormValue("stripe_url"),
+			Description: strings.TrimSpace(c.FormValue("description")),
+			Position:    position,
 		}
 		if err := db.CreateProduct(conn, p); err != nil {
 			return err

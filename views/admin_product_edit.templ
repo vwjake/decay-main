@@ -19,9 +19,14 @@ templ AdminProductEdit(p db.Product, me db.User, errorMsg string) {
 				Price (dollars)
 				<input type="number" name="price" step="0.01" min="0" value={ fmt.Sprintf("%.2f", float64(p.PriceCents)/100) } required/>
 			</label>
+			<label>Description<textarea name="description">{ p.Description }</textarea></label>
 			<label>Variants (shown as text)<input type="text" name="variants" value={ p.Variants }/></label>
 			<label>Placeholder text (shown when there's no photo)<input type="text" name="placeholder" value={ p.Placeholder }/></label>
 			<label>Buy link<input type="text" name="stripe_url" value={ p.StripeURL } placeholder="https://shop.decay.events/..."/></label>
+			<label>Order<input type="number" name="position" value={ fmt.Sprint(p.Position) }/></label>
+			<label class="inline">
+				<input type="checkbox" name="sold_out" value="1" checked?={ p.SoldOut }/> Sold out
+			</label>
 			<button type="submit" class="admin-btn">Save item</button>
 		</form>
 
