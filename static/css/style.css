@@ -1426,3 +1426,83 @@ a {
   font-family: 'Space Mono', monospace;
   font-size: 12px;
 }
+
+/* Booking form honeypot: off-screen, so people never see it but bots fill it. */
+.hp-field {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Booking request queue -------------------------------------------------- */
+
+.booking-card {
+  border: 2px solid #111;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+
+.booking-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.booking-head strong {
+  font-size: 16px;
+}
+
+.booking-badge {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #111;
+  color: #fff;
+  padding: 2px 6px;
+}
+
+.booking-badge-muted {
+  background: #999;
+}
+
+.booking-when {
+  font-size: 11px;
+  color: #666;
+  margin-left: auto;
+}
+
+.booking-fields {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 2px 12px;
+  font-size: 13px;
+  margin: 0 0 10px;
+}
+
+.booking-fields dt {
+  color: #666;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.booking-fields dd {
+  margin: 0;
+}
+
+.booking-desc {
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-line;
+  margin: 0 0 12px;
+}
+
+.booking-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	// Event times are resolved against the venue's timezone, and Windows
@@ -166,6 +167,14 @@ func main() {
 		return views.EventDetail(ev, db.OpenRoles(volunteers)).Render(c.Request().Context(), c.Response())
 	})
 
+	e.GET("/book", func(c echo.Context) error {
+		return views.BookingForm(db.BookingRequest{}, c.QueryParam("sent") != "", "").Render(c.Request().Context(), c.Response())
+	})
+
+	e.POST("/book", func(c echo.Context) error {
+		return submitBooking(c, conn)
+	})
+
 	e.GET("/shop", func(c echo.Context) error {
 		products, err := db.ListProducts(conn)
 		if err != nil {
@@ -235,6 +244,36 @@ func main() {
 		port = "8080"
 	}
 	e.Logger.Fatal(e.Start(":" + port))
+}
+
+// submitBooking validates and stores a public booking request. A filled
+// honeypot field is treated as a bot and silently dropped.
+func submitBooking(c echo.Context, conn *sql.DB) error {
+	if strings.TrimSpace(c.FormValue("website")) != "" {
+		return c.Redirect(http.StatusSeeOther, "/book?sent=1")
+	}
+	b := db.BookingRequest{
+		Name:               strings.TrimSpace(c.FormValue("name")),
+		Email:              strings.TrimSpace(c.FormValue("email")),
+		Phone:              strings.TrimSpace(c.FormValue("phone")),
+		EventName:          strings.TrimSpace(c.FormValue("event_name")),
+		Description:        strings.TrimSpace(c.FormValue("description")),
+		PreferredDate:      strings.TrimSpace(c.FormValue("preferred_date")),
+		ExpectedAttendance: strings.TrimSpace(c.FormValue("expected_attendance")),
+	}
+	render := func(msg string) error {
+		return views.BookingForm(b, false, msg).Render(c.Request().Context(), c.Response())
+	}
+	if b.Name == "" || b.Description == "" {
+		return render("Please add your name and a bit about your event.")
+	}
+	if b.Email == "" && b.Phone == "" {
+		return render("Please leave an email or phone so we can reach you.")
+	}
+	if err := db.CreateBookingRequest(conn, b); err != nil {
+		return err
+	}
+	return c.Redirect(http.StatusSeeOther, "/book?sent=1")
 }
 
 // bootstrapAdmin creates the first master account from the environment

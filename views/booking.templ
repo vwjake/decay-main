@@ -1,0 +1,43 @@
+package views
+
+import "decay-main/db"
+
+// BookingForm is the public "request to use the space" page. On success it
+// re-renders as a thank-you; on a validation error it keeps what was typed.
+templ BookingForm(v db.BookingRequest, sent bool, errorMsg string) {
+	@Layout("Book the space · DECAY") {
+		<section class="about">
+			<p class="about-statement">Book the space</p>
+			<p class="about-body">
+				Want to put on a show, workshop, screening, or gathering at DECAY? Tell us
+				about it and we'll be in touch. Booking is by request — this starts the
+				conversation, it doesn't confirm a date.
+			</p>
+		</section>
+
+		<section class="events">
+			if sent {
+				<div class="admin-flash mono">
+					Thanks — your request is in. We'll reach out at the contact you left.
+				</div>
+				<a href="/" class="btn-outline mono">Back home</a>
+			} else {
+				if errorMsg != "" {
+					<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+				}
+				<form method="post" action="/book" class="admin-form">
+					<label>Your name<input type="text" name="name" value={ v.Name } required maxlength="200"/></label>
+					<label>Email<input type="email" name="email" value={ v.Email } maxlength="200"/></label>
+					<label>Phone<input type="text" name="phone" value={ v.Phone } maxlength="60"/></label>
+					<p class="admin-sub mono">Leave at least one way to reach you.</p>
+					<label>Event name<input type="text" name="event_name" value={ v.EventName } maxlength="200"/></label>
+					<label>Preferred date(s)<input type="text" name="preferred_date" value={ v.PreferredDate } placeholder="e.g. a Saturday in August" maxlength="200"/></label>
+					<label>Expected attendance<input type="text" name="expected_attendance" value={ v.ExpectedAttendance } placeholder="rough headcount" maxlength="60"/></label>
+					<label>Tell us about your event<textarea name="description" rows="6" required maxlength="5000">{ v.Description }</textarea></label>
+					<label class="hp-field" aria-hidden="true">Leave this blank<input type="text" name="website" tabindex="-1" autocomplete="off"/></label>
+					<button type="submit" class="admin-btn">Send request</button>
+				</form>
+			}
+		</section>
+	}
+}
