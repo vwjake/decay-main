@@ -6,10 +6,10 @@ package db
 type Permission string
 
 const (
-	PermEvents  Permission = "events"
-	PermPosts   Permission = "posts"
-	PermShop    Permission = "shop"
-	PermPhotos  Permission = "photos"
+	PermEvents   Permission = "events"
+	PermPosts    Permission = "posts"
+	PermShop     Permission = "shop"
+	PermPhotos   Permission = "photos"
 	PermPeople   Permission = "people"
 	PermGroups   Permission = "groups"
 	PermBookings Permission = "bookings"
