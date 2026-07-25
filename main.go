@@ -87,7 +87,9 @@ func main() {
 		if err != nil {
 			return err
 		}
-		products, err := db.ListProducts(conn)
+		// The home preview shows only what can be bought; the full shop
+		// page carries the sold-out items too.
+		products, err := db.AvailableProducts(conn)
 		if err != nil {
 			return err
 		}
@@ -162,6 +164,14 @@ func main() {
 			return err
 		}
 		return views.EventDetail(ev, db.OpenRoles(volunteers)).Render(c.Request().Context(), c.Response())
+	})
+
+	e.GET("/shop", func(c echo.Context) error {
+		products, err := db.ListProducts(conn)
+		if err != nil {
+			return err
+		}
+		return views.Shop(products).Render(c.Request().Context(), c.Response())
 	})
 
 	e.GET("/groups", func(c echo.Context) error {

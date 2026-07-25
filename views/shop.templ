@@ -1,0 +1,66 @@
+package views
+
+import "decay-main/db"
+
+// Shop is the public catalogue. The site displays merch only; each item
+// links out to shop.decay.events, which takes the actual orders.
+templ Shop(products []db.Product) {
+	@Layout("Shop · DECAY") {
+		<section class="about">
+			<p class="about-statement">Shop</p>
+			<p class="about-body">
+				Merch keeps the space running and funds studio residencies. Browse below,
+				then check out over at shop.decay.events — the site here is just the catalogue.
+			</p>
+		</section>
+
+		<section class="events">
+			if len(products) == 0 {
+				<p class="admin-sub mono">Nothing in the shop right now — check back soon.</p>
+			} else {
+				<div class="merch-grid">
+					for _, p := range products {
+						@merchCard(p)
+					}
+				</div>
+			}
+			<a href="https://shop.decay.events" class="btn-outline mono" target="_blank" rel="noopener">Check out at shop.decay.events</a>
+		</section>
+	}
+}
+
+// merchCard renders one catalogue item, shared by the home preview and the
+// shop page. A sold-out item shows a badge and doesn't link out, since
+// there's nothing to buy.
+templ merchCard(p db.Product) {
+	if p.SoldOut {
+		<div class="merch-item is-soldout">
+			@merchCardBody(p)
+		</div>
+	} else {
+		<a href={ templ.URL(p.BuyURL()) } class="merch-item" target="_blank" rel="noopener">
+			@merchCardBody(p)
+		</a>
+	}
+}
+
+templ merchCardBody(p db.Product) {
+	<div class={ "merch-photo", templ.KV("mono", !p.HasImage()) }>
+		if p.HasImage() {
+			<img src={ p.ImagePath() } alt={ p.Name } loading="lazy"/>
+		} else {
+			{ p.Placeholder }
+		}
+		if p.SoldOut {
+			<span class="merch-badge mono">Sold out</span>
+		}
+	</div>
+	<div class="merch-name">{ p.Name }</div>
+	<div class="merch-price mono">{ p.Price() }</div>
+	if p.Variants != "" {
+		<div class="merch-variants mono">{ p.Variants }</div>
+	}
+	if p.HasDescription() {
+		<div class="merch-desc">{ p.Description }</div>
+	}
+}
