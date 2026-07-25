@@ -137,6 +137,76 @@ func EventReportFor(conn *sql.DB, eventID int64) (EventReport, error) {
 	return r, nil
 }
 
+// EventReportsFor loads the reports for a set of events in one query,
+// keyed by event id. Events without a row are simply absent from the map.
+func EventReportsFor(conn *sql.DB, ids []int64) (map[int64]EventReport, error) {
+	out := map[int64]EventReport{}
+	if len(ids) == 0 {
+		return out, nil
+	}
+	query, args := inClause(`SELECT event_id, attendance, door_cents, notes FROM event_reports WHERE event_id IN (`, ids)
+	rows, err := conn.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		r := EventReport{Recorded: true}
+		var attendance, door sql.NullInt64
+		if err := rows.Scan(&r.EventID, &attendance, &door, &r.Notes); err != nil {
+			return nil, err
+		}
+		if attendance.Valid {
+			r.Attendance = &attendance.Int64
+		}
+		if door.Valid {
+			r.DoorCents = &door.Int64
+		}
+		out[r.EventID] = r
+	}
+	return out, rows.Err()
+}
+
+// DonationTotalsFor sums donations tied to each of the given events, keyed
+// by event id. Events with no donations are absent from the map.
+func DonationTotalsFor(conn *sql.DB, ids []int64) (map[int64]int64, error) {
+	out := map[int64]int64{}
+	if len(ids) == 0 {
+		return out, nil
+	}
+	query, args := inClause(`SELECT event_id, SUM(amount_cents) FROM donations WHERE event_id IN (`, ids)
+	rows, err := conn.Query(query+` GROUP BY event_id`, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var id, total int64
+		if err := rows.Scan(&id, &total); err != nil {
+			return nil, err
+		}
+		out[id] = total
+	}
+	return out, rows.Err()
+}
+
+// inClause finishes a "... IN (" prefix with the right number of
+// placeholders and returns the args to pass alongside it.
+func inClause(prefix string, ids []int64) (string, []any) {
+	args := make([]any, len(ids))
+	var b []byte
+	b = append(b, prefix...)
+	for i, id := range ids {
+		if i > 0 {
+			b = append(b, ',')
+		}
+		b = append(b, '?')
+		args[i] = id
+	}
+	b = append(b, ')')
+	return string(b), args
+}
+
 // SaveEventReport upserts an event's numbers. Nil attendance or door means
 // "leave blank", stored as SQL NULL so it stays distinct from a real zero.
 func SaveEventReport(conn *sql.DB, eventID int64, attendance, doorCents *int64, notes string) error {

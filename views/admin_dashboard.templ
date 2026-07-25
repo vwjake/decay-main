@@ -52,6 +52,9 @@ templ AdminDashboard(c db.Counts, me db.User) {
 				fmt.Sprintf("%d published · %d draft", c.PublishedPosts, c.Drafts))
 			@adminLink("/admin/products", "Shop", fmt.Sprintf("%d items", c.Products))
 			@adminLink("/admin/photos", "Photos", fmt.Sprintf("%d photos", c.Photos))
+			if me.Can(db.PermReports) {
+				@adminLink("/admin/reports", "Reports", "quarterly and custom stats")
+			}
 			if me.Can(db.PermUsers) {
 				@adminLink("/admin/users", "Accounts", "who can sign in here")
 			}

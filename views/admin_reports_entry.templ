@@ -1,0 +1,68 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/db"
+)
+
+// EntryRow is one past event on the data-entry screen: the event, whatever
+// numbers have been recorded for it, and how much it has taken in gifts.
+type EntryRow struct {
+	Event         db.Event
+	Report        db.EventReport
+	DonationCents int64
+}
+
+func (r EntryRow) Donations() string { return db.Dollars(r.DonationCents) }
+
+templ AdminReportsEntry(rows []EntryRow, page db.Page, me db.User, msg string) {
+	@AdminLayout("Enter numbers · DECAY Admin", me) {
+		<div class="admin-heading-row">
+			<p class="admin-heading">Enter numbers</p>
+			<a href="/admin/reports" class="admin-btn admin-btn-small">Back to reports</a>
+		</div>
+		if msg != "" {
+			<div class="admin-flash admin-flash-error mono">{ msg }</div>
+		}
+
+		<p class="admin-heading">Standalone donation</p>
+		<p class="admin-sub mono">For gifts that didn't come in at an event — online, a mailed cheque.</p>
+		<form method="post" action="/admin/reports/donations" class="admin-form">
+			<label>Amount<input type="text" name="amount" inputmode="decimal" placeholder="$0.00" required/></label>
+			<label>Date received<input type="date" name="received_at"/></label>
+			<label>Source<input type="text" name="source" placeholder="Who from (optional)"/></label>
+			<label>Note<input type="text" name="note" placeholder="Optional"/></label>
+			<button type="submit" class="admin-btn">Record donation</button>
+		</form>
+
+		<p class="admin-heading">Past events</p>
+		<p class="admin-sub mono">{ page.Range() }</p>
+
+		for _, r := range rows {
+			<div class="report-entry">
+				<div class="report-entry-head">
+					<span class="mono nowrap">{ r.Event.StartsAt.Format("Jan 2, 2006") }</span>
+					<strong>{ r.Event.Title }</strong>
+					<span class="mono report-entry-type">{ r.Event.EventType }</span>
+				</div>
+				<form method="post" action={ templ.SafeURL(fmt.Sprintf("/admin/reports/events/%d", r.Event.ID)) } class="report-entry-form mono">
+					<input type="hidden" name="page" value={ fmt.Sprint(page.Number) }/>
+					<label>Attendance<input type="number" name="attendance" min="0" value={ r.Report.AttendanceStr() }/></label>
+					<label>Door<input type="text" name="door" inputmode="decimal" placeholder="$" value={ r.Report.DoorStr() }/></label>
+					<label class="report-entry-notes">Notes<input type="text" name="notes" value={ r.Report.Notes }/></label>
+					<button type="submit" class="admin-btn admin-btn-small">Save</button>
+				</form>
+				<form method="post" action="/admin/reports/donations" class="report-entry-form mono">
+					<input type="hidden" name="page" value={ fmt.Sprint(page.Number) }/>
+					<input type="hidden" name="event_id" value={ fmt.Sprint(r.Event.ID) }/>
+					<span class="report-entry-donations">Donations here: { r.Donations() }</span>
+					<label>Add gift<input type="text" name="amount" inputmode="decimal" placeholder="$"/></label>
+					<label>Source<input type="text" name="source" placeholder="optional"/></label>
+					<button type="submit" class="admin-btn admin-btn-small">Add</button>
+				</form>
+			</div>
+		}
+		@adminPager(page)
+	}
+}

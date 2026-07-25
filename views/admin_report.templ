@@ -1,0 +1,120 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/db"
+)
+
+// ReportPage is everything the report screen renders: the chosen period,
+// the controls to change it, and the numbers themselves.
+type ReportPage struct {
+	Title     string
+	IsQuarter bool
+	Selected  db.Quarter
+	FromStr   string
+	ToStr     string
+	Quarters  []db.Quarter
+	Stats     db.Stats
+	Donations []db.Donation
+}
+
+templ AdminReport(p ReportPage, me db.User) {
+	@AdminLayout("Reports · DECAY Admin", me) {
+		<div class="admin-heading-row">
+			<p class="admin-heading">Reports</p>
+			<a href="/admin/reports/entry" class="admin-btn admin-btn-small">Enter numbers</a>
+		</div>
+
+		<nav class="report-periods mono">
+			for _, q := range p.Quarters {
+				if p.IsQuarter && q == p.Selected {
+					<span class="report-period is-current">{ q.Label() }</span>
+				} else {
+					<a class="report-period" href={ templ.URL("/admin/reports?quarter=" + q.String()) }>{ q.Label() }</a>
+				}
+			}
+		</nav>
+
+		<form method="get" action="/admin/reports" class="report-range mono">
+			<label>From <input type="date" name="from" value={ p.FromStr }/></label>
+			<label>To <input type="date" name="to" value={ p.ToStr }/></label>
+			<button type="submit" class="admin-btn admin-btn-small">Custom range</button>
+		</form>
+
+		<p class="admin-sub mono">{ p.Title }</p>
+
+		<table class="admin-table">
+			<tr><th>Metric</th><th>Value</th></tr>
+			@statRow("Events held", fmt.Sprint(p.Stats.Events))
+			@statRow("Total attendance", attendanceLine(p.Stats))
+			@statRow("Average attendance", p.Stats.AvgAttendance())
+			@statRow("Volunteer roles filled", fmt.Sprint(p.Stats.VolunteerRolesFilled))
+			@statRow("Door money", p.Stats.DoorMoney())
+			@statRow("Donations", donationLine(p.Stats))
+			@statRow("Total money in", p.Stats.TotalMoney())
+		</table>
+
+		if len(p.Stats.ByType) > 0 {
+			<p class="admin-heading">By event type</p>
+			<table class="admin-table">
+				<tr><th>Type</th><th>Events</th><th>Attendance</th></tr>
+				for _, t := range p.Stats.ByType {
+					<tr>
+						<td>{ t.Type }</td>
+						<td class="mono">{ fmt.Sprint(t.Events) }</td>
+						<td class="mono">{ fmt.Sprint(t.Attendance) }</td>
+					</tr>
+				}
+			</table>
+		}
+
+		<p class="admin-heading">Donations this period</p>
+		if len(p.Donations) == 0 {
+			<p class="admin-sub mono">None recorded.</p>
+		} else {
+			<table class="admin-table">
+				<tr><th>Date</th><th>Amount</th><th>Source</th><th>For</th><th>Note</th></tr>
+				for _, d := range p.Donations {
+					<tr>
+						<td class="mono nowrap">{ d.Date() }</td>
+						<td class="mono nowrap">{ d.Amount() }</td>
+						<td>{ orDash(d.Source) }</td>
+						<td>{ orDash(d.EventTitle) }</td>
+						<td>{ orDash(d.Note) }</td>
+					</tr>
+				}
+			</table>
+		}
+	}
+}
+
+templ statRow(label, value string) {
+	<tr>
+		<td>{ label }</td>
+		<td class="mono">{ value }</td>
+	</tr>
+}
+
+// attendanceLine notes how complete the attendance figure is, so a small
+// total isn't mistaken for a bad quarter when it's really unentered data.
+func attendanceLine(s db.Stats) string {
+	if s.Events == 0 {
+		return "0"
+	}
+	return fmt.Sprintf("%d (from %d of %d events)", s.Attendance, s.AttendanceEvents, s.Events)
+}
+
+func donationLine(s db.Stats) string {
+	if s.DonationCount == 0 {
+		return s.DonationMoney()
+	}
+	return fmt.Sprintf("%s (%s)", s.DonationMoney(), plural(s.DonationCount, "gift", "gifts"))
+}
+
+func orDash(s string) string {
+	if s == "" {
+		return "—"
+	}
+	return s
+}

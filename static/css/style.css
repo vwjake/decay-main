@@ -1105,3 +1105,118 @@ a {
   margin: 80px auto;
   padding: 0 20px;
 }
+
+/* Reports ------------------------------------------------------------- */
+
+/* A heading with an action button parked on the right of the same line. */
+.admin-heading-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Quarter jump links, wrapping onto a second row on narrow screens. */
+.report-periods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0 16px;
+}
+
+.report-period {
+  border: 2px solid #111;
+  padding: 4px 10px;
+  font-size: 12px;
+  text-decoration: none;
+  color: #111;
+}
+
+.report-period:hover {
+  background: #111;
+  color: #fff;
+}
+
+/* The quarter currently shown reads as pressed, not clickable. */
+.report-period.is-current {
+  background: #111;
+  color: #fff;
+}
+
+.report-range {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.report-range label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.report-range input {
+  border: 2px solid #111;
+  padding: 6px 8px;
+  font-family: 'Space Mono', monospace;
+}
+
+/* One past event on the entry screen: heading line, then two inline
+   forms that wrap their fields on narrow screens. */
+.report-entry {
+  border: 2px solid #111;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+.report-entry-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.report-entry-type {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.report-entry-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.report-entry-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+}
+
+.report-entry-form input {
+  border: 2px solid #111;
+  padding: 5px 7px;
+  font-family: 'Space Mono', monospace;
+  width: 90px;
+}
+
+/* Notes take whatever room is left on the line. */
+.report-entry-form .report-entry-notes {
+  flex: 1 1 200px;
+}
+
+.report-entry-form .report-entry-notes input {
+  width: 100%;
+}
+
+.report-entry-donations {
+  align-self: center;
+  font-size: 12px;
+}
