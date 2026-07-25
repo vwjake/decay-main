@@ -1,0 +1,59 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/db"
+)
+
+templ AdminGroupEdit(g db.Group, me db.User, errorMsg string) {
+	@AdminLayout(g.Name+" · DECAY Admin", me) {
+		<a href="/admin/groups" class="admin-back">&larr; All groups</a>
+		<div class="admin-heading-row">
+			<p class="admin-heading">{ g.Name }</p>
+			<a href={ templ.URL(g.Path()) } target="_blank" rel="noopener" class="admin-btn admin-btn-small">View public page</a>
+		</div>
+		if errorMsg != "" {
+			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+		}
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/groups/%d", g.ID)) } class="admin-form">
+			<label>Name<input type="text" name="name" value={ g.Name } required/></label>
+			<label>Address<input type="text" name="slug" value={ g.Slug } required/></label>
+			<label>Summary (list card)<textarea name="summary">{ g.Summary }</textarea></label>
+			<label>Description (intro paragraph)<textarea name="description">{ g.Description }</textarea></label>
+			<label>Pills (one short tag per line)<textarea name="pills">{ g.Pills }</textarea></label>
+			<label>
+				Sections
+				<textarea name="body" rows="14" class="admin-body-input">{ g.Body }</textarea>
+			</label>
+			<p class="admin-sub mono">
+				Start a section with <code># Heading</code>, list items with <code>- item</code>,
+				and write any other lines as paragraphs. Links (starting with http) become clickable.
+			</p>
+			<label>Photo description (alt text)<input type="text" name="hero_alt" value={ g.HeroAlt }/></label>
+			<label>Order<input type="number" name="position" value={ fmt.Sprint(g.Position) }/></label>
+			<label class="inline">
+				<input type="checkbox" name="enabled" value="1" checked?={ g.Enabled }/> Listed publicly
+			</label>
+			<button type="submit" class="admin-btn">Save group</button>
+		</form>
+
+		<p class="admin-heading">Photo</p>
+		if g.HasHero() {
+			<img class="admin-flyer-preview" src={ g.HeroPath() } alt={ g.HeroAlt }/>
+		} else {
+			<p class="admin-sub mono">No photo yet.</p>
+		}
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/groups/%d/hero", g.ID)) } enctype="multipart/form-data" class="admin-form">
+			<label>
+				if g.HasHero() {
+					Replace photo
+				} else {
+					Upload photo
+				}
+				<input type="file" name="hero" accept="image/*" required/>
+			</label>
+			<button type="submit" class="admin-btn">Save photo</button>
+		</form>
+	}
+}

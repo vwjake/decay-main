@@ -210,7 +210,13 @@ func main() {
 		return views.Photos(photos).Render(c.Request().Context(), c.Response())
 	})
 
-	e.Logger.Fatal(e.Start(":8080"))
+	// PORT lets the host pick the listen port; it defaults to 8080 for
+	// local development.
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	e.Logger.Fatal(e.Start(":" + port))
 }
 
 // bootstrapAdmin creates the first master account from the environment

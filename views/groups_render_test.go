@@ -25,3 +25,20 @@ func TestGroupViewsRender(t *testing.T) {
 		}
 	}
 }
+
+func TestAdminGroupViewsRender(t *testing.T) {
+	me := db.User{Username: "smoke", Role: db.RoleMaster}
+	groups := []db.Group{
+		{ID: 1, Slug: "open-draw", Name: "Open Draw", Enabled: true, Position: 0},
+		{ID: 2, Slug: "mutual-aid", Name: "Mutual Aid", Enabled: false, Position: 4},
+	}
+	if err := AdminGroups(groups, me, "").Render(context.Background(), io.Discard); err != nil {
+		t.Fatalf("AdminGroups render: %v", err)
+	}
+	// Edit page for both an enabled and a hidden group (checkbox state).
+	for _, g := range groups {
+		if err := AdminGroupEdit(g, me, "").Render(context.Background(), io.Discard); err != nil {
+			t.Fatalf("AdminGroupEdit(%s) render: %v", g.Slug, err)
+		}
+	}
+}

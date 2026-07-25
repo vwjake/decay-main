@@ -1,0 +1,61 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/db"
+)
+
+templ AdminGroups(groups []db.Group, me db.User, errorMsg string) {
+	@AdminLayout("Groups · DECAY Admin", me) {
+		<p class="admin-heading">Groups</p>
+		<p class="admin-sub mono">Recurring programs, shown on the public /groups page in the order below.</p>
+		if errorMsg != "" {
+			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+		}
+		<table class="admin-table">
+			<tr>
+				<th>Order</th>
+				<th>Name</th>
+				<th>Address</th>
+				<th>Listed</th>
+				<th></th>
+				<th></th>
+			</tr>
+			for _, g := range groups {
+				<tr>
+					<td class="mono">{ fmt.Sprint(g.Position) }</td>
+					<td>
+						<a href={ templ.URL(fmt.Sprintf("/admin/groups/%d", g.ID)) }>{ g.Name }</a>
+					</td>
+					<td class="mono">/groups/{ g.Slug }</td>
+					<td class="mono">
+						if g.Enabled {
+							yes
+						} else {
+							hidden
+						}
+					</td>
+					<td>
+						<a href={ templ.URL(g.Path()) } target="_blank" rel="noopener">View</a>
+					</td>
+					<td>
+						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/groups/%d/delete", g.ID)) } onsubmit="return confirm('Delete this group?')">
+							<button type="submit" class="admin-btn admin-btn-danger">Delete</button>
+						</form>
+					</td>
+				</tr>
+			}
+		</table>
+
+		<p class="admin-heading">Add group</p>
+		<form method="post" action="/admin/groups" class="admin-form">
+			<label>Name<input type="text" name="name" required/></label>
+			<label>Address (optional)<input type="text" name="slug" placeholder="made from the name if blank"/></label>
+			<label>Summary<textarea name="summary" placeholder="One or two lines for the list card."></textarea></label>
+			<label class="inline"><input type="checkbox" name="enabled" value="1" checked/> Listed publicly</label>
+			<p class="admin-sub mono">Add the description, sections, and photo after creating it.</p>
+			<button type="submit" class="admin-btn">Create</button>
+		</form>
+	}
+}
