@@ -1,0 +1,58 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/db"
+)
+
+templ AdminPeople(people []db.Person, me db.User, errorMsg string) {
+	@AdminLayout("People · DECAY Admin", me) {
+		<p class="admin-heading">People</p>
+		<p class="admin-sub mono">Board and staff profiles shown on the About page, in the order below.</p>
+		if errorMsg != "" {
+			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+		}
+		<table class="admin-table">
+			<tr>
+				<th>Order</th>
+				<th>Name</th>
+				<th>Role</th>
+				<th>Photo</th>
+				<th></th>
+			</tr>
+			for _, p := range people {
+				<tr>
+					<td class="mono">{ fmt.Sprint(p.Position) }</td>
+					<td>
+						<a href={ templ.URL(fmt.Sprintf("/admin/people/%d", p.ID)) }>{ p.Name }</a>
+					</td>
+					<td>{ orDash(p.Role) }</td>
+					<td class="mono">
+						if p.HasPhoto() {
+							yes
+						} else {
+							&mdash;
+						}
+					</td>
+					<td>
+						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/people/%d/delete", p.ID)) } onsubmit="return confirm('Remove this profile?')">
+							<button type="submit" class="admin-btn admin-btn-danger">Delete</button>
+						</form>
+					</td>
+				</tr>
+			}
+		</table>
+
+		<p class="admin-heading">Add person</p>
+		<form method="post" action="/admin/people" class="admin-form">
+			<label>Name<input type="text" name="name" required/></label>
+			<label>Pronouns (optional)<input type="text" name="pronouns" placeholder="they/them"/></label>
+			<label>Role<input type="text" name="role" placeholder="Board of Directors, Events Coordinator…"/></label>
+			<label>Bio<textarea name="bio"></textarea></label>
+			<label>Order<input type="number" name="position" value="0"/></label>
+			<p class="admin-sub mono">Add the photo after creating the profile.</p>
+			<button type="submit" class="admin-btn">Create</button>
+		</form>
+	}
+}

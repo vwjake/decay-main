@@ -57,6 +57,20 @@ CREATE TABLE IF NOT EXISTS posts (
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Board and staff profiles shown on the About page. position orders them
+-- (board first, then staff, however they're arranged); role is the title
+-- line under the name, and photo is a filename under uploads/people/.
+CREATE TABLE IF NOT EXISTS people (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    pronouns TEXT NOT NULL DEFAULT '',
+    role TEXT NOT NULL DEFAULT '',
+    bio TEXT NOT NULL DEFAULT '',
+    photo TEXT NOT NULL DEFAULT '',
+    position INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 CREATE TABLE IF NOT EXISTS photos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     filename TEXT NOT NULL,

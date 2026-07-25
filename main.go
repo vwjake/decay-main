@@ -95,7 +95,11 @@ func main() {
 	})
 
 	e.GET("/about", func(c echo.Context) error {
-		return views.About().Render(c.Request().Context(), c.Response())
+		people, err := db.ListPeople(conn)
+		if err != nil {
+			return err
+		}
+		return views.About(people).Render(c.Request().Context(), c.Response())
 	})
 
 	e.GET("/support", func(c echo.Context) error {

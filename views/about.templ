@@ -1,8 +1,15 @@
 package views
 
+import (
+	"strings"
+
+	"decay-main/db"
+)
+
 // About carries over the old site's about page: what DECAY is, what it's
-// for, and who runs it.
-templ About() {
+// for, and who runs it. The people are the board and staff profiles,
+// already in display order.
+templ About(people []db.Person) {
 	@Layout("About · DECAY") {
 		<section class="about">
 			<p class="about-statement">About DECAY</p>
@@ -51,18 +58,59 @@ templ About() {
 			</p>
 		</section>
 
+		if len(people) > 0 {
+			<section class="about">
+				<span class="section-label mono">Who we are</span>
+				<div class="team-grid">
+					for _, person := range people {
+						@teamCard(person)
+					}
+				</div>
+			</section>
+		}
+
 		<section class="events">
-			<span class="section-label mono">Board of directors</span>
-			<ul class="plain-list mono">
-				<li>Moon Fery</li>
-				<li>Abe Burt</li>
-				<li>Kacie Smarjesse</li>
-				<li>Liam Mooney</li>
-				<li>Ray Malmrose</li>
-				<li>Heather Hemann</li>
-			</ul>
 			<a href="/support" class="btn-outline mono">Support DECAY</a>
 			<a href="/policies" class="btn-outline mono">Safer space policy</a>
 		</section>
 	}
+}
+
+// teamCard renders one board or staff profile: portrait, name (with
+// pronouns when given), role, and bio.
+templ teamCard(p db.Person) {
+	<article class="team-card">
+		if p.HasPhoto() {
+			<img class="team-photo" src={ p.PhotoPath() } alt={ p.Name }/>
+		} else {
+			<div class="team-photo team-photo-empty mono" aria-hidden="true">{ initials(p.Name) }</div>
+		}
+		<div class="team-body">
+			<p class="team-name">
+				{ p.Name }
+				if p.HasPronouns() {
+					<span class="team-pronouns mono">{ p.Pronouns }</span>
+				}
+			</p>
+			if p.HasRole() {
+				<p class="team-role mono">{ p.Role }</p>
+			}
+			for _, para := range p.Paragraphs() {
+				<p class="team-bio">{ para }</p>
+			}
+		</div>
+	</article>
+}
+
+// initials gives a portrait placeholder something to show — the first
+// letters of the first two words of a name.
+func initials(name string) string {
+	var out []rune
+	for _, field := range strings.Fields(name) {
+		out = append(out, []rune(field)[0])
+		if len(out) == 2 {
+			break
+		}
+	}
+	return string(out)
 }

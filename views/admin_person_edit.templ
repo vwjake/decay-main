@@ -1,0 +1,43 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/db"
+)
+
+templ AdminPersonEdit(p db.Person, me db.User, errorMsg string) {
+	@AdminLayout(p.Name+" · DECAY Admin", me) {
+		<a href="/admin/people" class="admin-back">&larr; All people</a>
+		<p class="admin-heading">{ p.Name }</p>
+		if errorMsg != "" {
+			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+		}
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/people/%d", p.ID)) } class="admin-form">
+			<label>Name<input type="text" name="name" value={ p.Name } required/></label>
+			<label>Pronouns (optional)<input type="text" name="pronouns" value={ p.Pronouns } placeholder="they/them"/></label>
+			<label>Role<input type="text" name="role" value={ p.Role } placeholder="Board of Directors, Events Coordinator…"/></label>
+			<label>Bio<textarea name="bio">{ p.Bio }</textarea></label>
+			<label>Order<input type="number" name="position" value={ fmt.Sprint(p.Position) }/></label>
+			<button type="submit" class="admin-btn">Save profile</button>
+		</form>
+
+		<p class="admin-heading">Photo</p>
+		if p.HasPhoto() {
+			<img class="admin-flyer-preview" src={ p.PhotoPath() } alt={ p.Name }/>
+		} else {
+			<p class="admin-sub mono">No photo yet.</p>
+		}
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/people/%d/photo", p.ID)) } enctype="multipart/form-data" class="admin-form">
+			<label>
+				if p.HasPhoto() {
+					Replace photo
+				} else {
+					Upload photo
+				}
+				<input type="file" name="photo" accept="image/*" required/>
+			</label>
+			<button type="submit" class="admin-btn">Save photo</button>
+		</form>
+	}
+}

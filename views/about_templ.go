@@ -8,9 +8,16 @@ package views
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+import (
+	"strings"
+
+	"decay-main/db"
+)
+
 // About carries over the old site's about page: what DECAY is, what it's
-// for, and who runs it.
-func About() templ.Component {
+// for, and who runs it. The people are the board and staff profiles,
+// already in display order.
+func About(people []db.Person) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -43,7 +50,27 @@ func About() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"about\"><p class=\"about-statement\">About DECAY</p><p class=\"about-body\">DECAY is a community arts and technology space in Olympia, Washington, founded in October 2024 to support local artists, technologists, and organizers. We provide an accessible venue for performances, workshops, exhibitions, and experimental programming that connects creative practice with STEM learning. By offering affordable infrastructure and collaborative resources, DECAY complements Olympia's existing arts ecosystem and lowers barriers to participation. As a Washington State&ndash;certified nonprofit transitioning to independent 501(c)(3) status, we operate as a safer space grounded in harm reduction, accessibility, sustainability, and community care.</p></section><section class=\"events\"><span class=\"section-label mono\">Our goals</span><dl class=\"prose-list\"><dt>Support local artists</dt><dd>We offer a platform for local talent, focusing on the work of artists from diverse backgrounds and disciplines.</dd><dt>Engage the community</dt><dd>Our goal is to create personal connections and provide a supportive space for small gatherings, creative projects, and shared learning experiences.</dd><dt>Promote inclusivity</dt><dd>DECAY is committed to creating an environment where everyone feels welcome and valued. We expect participants in the space to follow our <a href=\"/policies\">Safer Space policy</a>.</dd><dt>Encourage creative exploration</dt><dd>We offer programs and resources to inspire and support artistic expression in all its forms.</dd><dt>Sustainability</dt><dd>As a triple bottom line business, we prioritize social, environmental, and economic sustainability in all our operations.</dd></dl></section><section class=\"about\"><span class=\"section-label mono\">Our story</span><p class=\"about-body\">Founded by a group of passionate artists and community organizers, DECAY was born out of a desire to create a space that truly belongs to the community. We now have our dedicated space at 402 Washington St NE in downtown Olympia, where we host weekly gatherings, workshops, and performances. Our journey is fueled by the support and enthusiasm of our community, and we look forward to growing together.</p></section><section class=\"events\"><span class=\"section-label mono\">Board of directors</span><ul class=\"plain-list mono\"><li>Moon Fery</li><li>Abe Burt</li><li>Kacie Smarjesse</li><li>Liam Mooney</li><li>Ray Malmrose</li><li>Heather Hemann</li></ul><a href=\"/support\" class=\"btn-outline mono\">Support DECAY</a> <a href=\"/policies\" class=\"btn-outline mono\">Safer space policy</a></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"about\"><p class=\"about-statement\">About DECAY</p><p class=\"about-body\">DECAY is a community arts and technology space in Olympia, Washington, founded in October 2024 to support local artists, technologists, and organizers. We provide an accessible venue for performances, workshops, exhibitions, and experimental programming that connects creative practice with STEM learning. By offering affordable infrastructure and collaborative resources, DECAY complements Olympia's existing arts ecosystem and lowers barriers to participation. As a Washington State&ndash;certified nonprofit transitioning to independent 501(c)(3) status, we operate as a safer space grounded in harm reduction, accessibility, sustainability, and community care.</p></section><section class=\"events\"><span class=\"section-label mono\">Our goals</span><dl class=\"prose-list\"><dt>Support local artists</dt><dd>We offer a platform for local talent, focusing on the work of artists from diverse backgrounds and disciplines.</dd><dt>Engage the community</dt><dd>Our goal is to create personal connections and provide a supportive space for small gatherings, creative projects, and shared learning experiences.</dd><dt>Promote inclusivity</dt><dd>DECAY is committed to creating an environment where everyone feels welcome and valued. We expect participants in the space to follow our <a href=\"/policies\">Safer Space policy</a>.</dd><dt>Encourage creative exploration</dt><dd>We offer programs and resources to inspire and support artistic expression in all its forms.</dd><dt>Sustainability</dt><dd>As a triple bottom line business, we prioritize social, environmental, and economic sustainability in all our operations.</dd></dl></section><section class=\"about\"><span class=\"section-label mono\">Our story</span><p class=\"about-body\">Founded by a group of passionate artists and community organizers, DECAY was born out of a desire to create a space that truly belongs to the community. We now have our dedicated space at 402 Washington St NE in downtown Olympia, where we host weekly gatherings, workshops, and performances. Our journey is fueled by the support and enthusiasm of our community, and we look forward to growing together.</p></section>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if len(people) > 0 {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<section class=\"about\"><span class=\"section-label mono\">Who we are</span><div class=\"team-grid\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				for _, person := range people {
+					templ_7745c5c3_Err = teamCard(person).Render(ctx, templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div></section>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " <section class=\"events\"><a href=\"/support\" class=\"btn-outline mono\">Support DECAY</a> <a href=\"/policies\" class=\"btn-outline mono\">Safer space policy</a></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -55,6 +82,182 @@ func About() templ.Component {
 		}
 		return nil
 	})
+}
+
+// teamCard renders one board or staff profile: portrait, name (with
+// pronouns when given), role, and bio.
+func teamCard(p db.Person) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var3 == nil {
+			templ_7745c5c3_Var3 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<article class=\"team-card\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if p.HasPhoto() {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<img class=\"team-photo\" src=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.PhotoPath())
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/about.templ`, Line: 84, Col: 46}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" alt=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.Name)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/about.templ`, Line: 84, Col: 61}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"team-photo team-photo-empty mono\" aria-hidden=\"true\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var6 string
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(initials(p.Name))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/about.templ`, Line: 86, Col: 86}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"team-body\"><p class=\"team-name\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var7 string
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(p.Name)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/about.templ`, Line: 90, Col: 12}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, " ")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if p.HasPronouns() {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<span class=\"team-pronouns mono\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var8 string
+			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(p.Pronouns)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/about.templ`, Line: 92, Col: 50}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</span>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</p>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if p.HasRole() {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<p class=\"team-role mono\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var9 string
+			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(p.Role)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/about.templ`, Line: 96, Col: 38}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</p>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		for _, para := range p.Paragraphs() {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<p class=\"team-bio\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var10 string
+			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(para)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/about.templ`, Line: 99, Col: 30}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</p>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</div></article>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+// initials gives a portrait placeholder something to show — the first
+// letters of the first two words of a name.
+func initials(name string) string {
+	var out []rune
+	for _, field := range strings.Fields(name) {
+		out = append(out, []rune(field)[0])
+		if len(out) == 2 {
+			break
+		}
+	}
+	return string(out)
 }
 
 var _ = templruntime.GeneratedTemplate

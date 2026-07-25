@@ -86,6 +86,27 @@ func Seed(conn *sql.DB) error {
 		}
 	}
 
+	// The board members the old About page hard-coded, so switching that
+	// list to real profiles doesn't blank the page. Bios and photos are
+	// filled in from the admin panel; role and order are seeded here.
+	if err := conn.QueryRow(`SELECT count(*) FROM people`).Scan(&count); err != nil {
+		return err
+	}
+	if count == 0 {
+		board := []string{
+			"Moon Fery", "Abe Burt", "Kacie Smarjesse",
+			"Liam Mooney", "Ray Malmrose", "Heather Hemann",
+		}
+		for i, name := range board {
+			if _, err := conn.Exec(
+				`INSERT INTO people (name, role, position) VALUES (?, 'Board of Directors', ?)`,
+				name, i,
+			); err != nil {
+				return err
+			}
+		}
+	}
+
 	if err := conn.QueryRow(`SELECT count(*) FROM products`).Scan(&count); err != nil {
 		return err
 	}
