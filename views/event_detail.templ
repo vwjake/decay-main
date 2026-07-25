@@ -2,10 +2,19 @@ package views
 
 import "decay-main/db"
 
+// SignupBox controls the volunteer signup area on an event page: whether to
+// offer it (upcoming events only), whether a submission just succeeded, and
+// any validation message to show.
+type SignupBox struct {
+	Show  bool
+	Done  bool
+	Error string
+}
+
 // EventDetail shows one event. openRoles is the volunteer jobs still
 // needing someone — who has already signed up is deliberately not shown
 // here, since that's the organisers' business rather than the public's.
-templ EventDetail(ev db.Event, openRoles []db.EventVolunteer) {
+templ EventDetail(ev db.Event, openRoles []db.EventVolunteer, signup SignupBox) {
 	@Layout(ev.Title + " · DECAY") {
 		<section class="event-detail">
 			<a href="/events" class="event-back mono">&larr; All events</a>
@@ -23,7 +32,37 @@ templ EventDetail(ev db.Event, openRoles []db.EventVolunteer) {
 			for _, para := range ev.Paragraphs() {
 				<p class="event-detail-body">{ para }</p>
 			}
-			if len(openRoles) > 0 {
+			if signup.Show {
+				<div class="event-volunteers">
+					<span class="section-label mono">Volunteer for this event</span>
+					if len(openRoles) > 0 {
+						<p class="volunteer-note mono">Roles still open: { roleNames(openRoles) }.</p>
+					}
+					if signup.Done {
+						<div class="admin-flash mono">Thanks for signing up — we'll be in touch before the event.</div>
+					} else {
+						if signup.Error != "" {
+							<div class="admin-flash admin-flash-error mono">{ signup.Error }</div>
+						}
+						<form method="post" action={ templ.SafeURL(ev.Path() + "/volunteer") } class="admin-form">
+							<label>Your name<input type="text" name="name" required maxlength="200"/></label>
+							<label>Email or phone<input type="text" name="contact" required maxlength="200"/></label>
+							<label>
+								Role
+								<select name="role">
+									<option value="">Wherever needed</option>
+									for _, r := range openRoles {
+										<option value={ r.Role }>{ r.Label() }</option>
+									}
+								</select>
+							</label>
+							<label>Anything to add?<textarea name="note" maxlength="1000"></textarea></label>
+							<label class="hp-field" aria-hidden="true">Leave this blank<input type="text" name="website" tabindex="-1" autocomplete="off"/></label>
+							<button type="submit" class="admin-btn">Sign up</button>
+						</form>
+					}
+				</div>
+			} else if len(openRoles) > 0 {
 				<div class="event-volunteers">
 					<span class="section-label mono">Volunteers needed</span>
 					<ul class="volunteer-list mono">
@@ -39,4 +78,16 @@ templ EventDetail(ev db.Event, openRoles []db.EventVolunteer) {
 			}
 		</section>
 	}
+}
+
+// roleNames joins open role labels for the "roles still open" line.
+func roleNames(roles []db.EventVolunteer) string {
+	var s string
+	for i, r := range roles {
+		if i > 0 {
+			s += ", "
+		}
+		s += r.Label()
+	}
+	return s
 }

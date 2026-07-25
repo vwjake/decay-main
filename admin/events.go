@@ -42,6 +42,21 @@ func registerEventRoutes(g *echo.Group, conn *sql.DB, uploadsDir string) {
 	g.POST("/events/:id", saveEvent(conn))
 	g.POST("/events/:id/flyer", uploadFlyer(conn, uploadsDir))
 	g.POST("/events/:id/volunteers", saveVolunteers(conn))
+	g.POST("/events/:id/signups/:signupID/delete", deleteSignup(conn))
+}
+
+// deleteSignup removes a volunteer offer once it's been handled.
+func deleteSignup(conn *sql.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		signupID, err := strconv.ParseInt(c.Param("signupID"), 10, 64)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest)
+		}
+		if err := db.DeleteVolunteerSignup(conn, signupID); err != nil {
+			return err
+		}
+		return c.Redirect(http.StatusSeeOther, "/admin/events/"+c.Param("id"))
+	}
 }
 
 func listEvents(conn *sql.DB) echo.HandlerFunc {
@@ -66,11 +81,11 @@ func renderEvents(c echo.Context, conn *sql.DB, msg string) error {
 // managed — the two things that don't fit in the create form.
 func editEvent(conn *sql.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		ev, volunteers, err := loadEvent(conn, c.Param("id"))
+		ev, volunteers, signups, err := loadEvent(conn, c.Param("id"))
 		if err != nil {
 			return err
 		}
-		return views.AdminEventEdit(ev, volunteers, currentUser(c), "").Render(c.Request().Context(), c.Response())
+		return views.AdminEventEdit(ev, volunteers, signups, currentUser(c), "").Render(c.Request().Context(), c.Response())
 	}
 }
 
@@ -79,13 +94,13 @@ func editEvent(conn *sql.DB) echo.HandlerFunc {
 // update to the event they already have rather than as a new one.
 func saveEvent(conn *sql.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		ev, volunteers, err := loadEvent(conn, c.Param("id"))
+		ev, volunteers, signups, err := loadEvent(conn, c.Param("id"))
 		if err != nil {
 			return err
 		}
 
 		rerender := func(msg string) error {
-			return views.AdminEventEdit(ev, volunteers, currentUser(c), msg).Render(c.Request().Context(), c.Response())
+			return views.AdminEventEdit(ev, volunteers, signups, currentUser(c), msg).Render(c.Request().Context(), c.Response())
 		}
 
 		title := strings.TrimSpace(c.FormValue("title"))
@@ -149,13 +164,13 @@ func saveEvent(conn *sql.DB) echo.HandlerFunc {
 
 func uploadFlyer(conn *sql.DB, uploadsDir string) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		ev, volunteers, err := loadEvent(conn, c.Param("id"))
+		ev, volunteers, signups, err := loadEvent(conn, c.Param("id"))
 		if err != nil {
 			return err
 		}
 
 		rerender := func(msg string) error {
-			return views.AdminEventEdit(ev, volunteers, currentUser(c), msg).Render(c.Request().Context(), c.Response())
+			return views.AdminEventEdit(ev, volunteers, signups, currentUser(c), msg).Render(c.Request().Context(), c.Response())
 		}
 
 		fileHeader, err := c.FormFile("flyer")
@@ -223,23 +238,27 @@ func saveVolunteers(conn *sql.DB) echo.HandlerFunc {
 	}
 }
 
-func loadEvent(conn *sql.DB, rawID string) (db.Event, []db.EventVolunteer, error) {
+func loadEvent(conn *sql.DB, rawID string) (db.Event, []db.EventVolunteer, []db.VolunteerSignup, error) {
 	id, err := strconv.ParseInt(rawID, 10, 64)
 	if err != nil {
-		return db.Event{}, nil, echo.NewHTTPError(http.StatusBadRequest)
+		return db.Event{}, nil, nil, echo.NewHTTPError(http.StatusBadRequest)
 	}
 	ev, err := db.EventByID(conn, id)
 	if errors.Is(err, sql.ErrNoRows) {
-		return db.Event{}, nil, echo.NewHTTPError(http.StatusNotFound)
+		return db.Event{}, nil, nil, echo.NewHTTPError(http.StatusNotFound)
 	}
 	if err != nil {
-		return db.Event{}, nil, err
+		return db.Event{}, nil, nil, err
 	}
 	volunteers, err := db.VolunteersFor(conn, id)
 	if err != nil {
-		return db.Event{}, nil, err
+		return db.Event{}, nil, nil, err
 	}
-	return ev, volunteers, nil
+	signups, err := db.SignupsForEvent(conn, id)
+	if err != nil {
+		return db.Event{}, nil, nil, err
+	}
+	return ev, volunteers, signups, nil
 }
 
 func createEvent(conn *sql.DB) echo.HandlerFunc {

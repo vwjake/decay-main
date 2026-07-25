@@ -164,7 +164,15 @@ func main() {
 		if err != nil {
 			return err
 		}
-		return views.EventDetail(ev, db.OpenRoles(volunteers)).Render(c.Request().Context(), c.Response())
+		signup := views.SignupBox{
+			Show: ev.StartsAt.After(time.Now()),
+			Done: c.QueryParam("signed") != "",
+		}
+		return views.EventDetail(ev, db.OpenRoles(volunteers), signup).Render(c.Request().Context(), c.Response())
+	})
+
+	e.POST("/events/:slug/volunteer", func(c echo.Context) error {
+		return submitSignup(c, conn)
 	})
 
 	e.GET("/book", func(c echo.Context) error {
@@ -274,6 +282,62 @@ func submitBooking(c echo.Context, conn *sql.DB) error {
 		return err
 	}
 	return c.Redirect(http.StatusSeeOther, "/book?sent=1")
+}
+
+// submitSignup validates and stores a public volunteer offer for an event.
+// A filled honeypot field is treated as a bot and silently dropped.
+func submitSignup(c echo.Context, conn *sql.DB) error {
+	ev, err := db.EventBySlug(conn, c.Param("slug"))
+	if errors.Is(err, sql.ErrNoRows) {
+		return echo.NewHTTPError(http.StatusNotFound)
+	}
+	if err != nil {
+		return err
+	}
+
+	if strings.TrimSpace(c.FormValue("website")) != "" {
+		return c.Redirect(http.StatusSeeOther, ev.Path()+"?signed=1")
+	}
+
+	volunteers, err := db.VolunteersFor(conn, ev.ID)
+	if err != nil {
+		return err
+	}
+	openRoles := db.OpenRoles(volunteers)
+
+	name := strings.TrimSpace(c.FormValue("name"))
+	contact := strings.TrimSpace(c.FormValue("contact"))
+	if name == "" || contact == "" {
+		signup := views.SignupBox{Show: true, Error: "Please leave your name and a way to reach you."}
+		return views.EventDetail(ev, openRoles, signup).Render(c.Request().Context(), c.Response())
+	}
+
+	// Only accept a role the event actually has open; anything else falls
+	// back to "wherever needed".
+	role := c.FormValue("role")
+	if role != "" && !roleIsOpen(openRoles, role) {
+		role = ""
+	}
+
+	if err := db.CreateVolunteerSignup(conn, db.VolunteerSignup{
+		EventID: ev.ID,
+		Role:    role,
+		Name:    name,
+		Contact: contact,
+		Note:    strings.TrimSpace(c.FormValue("note")),
+	}); err != nil {
+		return err
+	}
+	return c.Redirect(http.StatusSeeOther, ev.Path()+"?signed=1")
+}
+
+func roleIsOpen(openRoles []db.EventVolunteer, role string) bool {
+	for _, r := range openRoles {
+		if r.Role == role {
+			return true
+		}
+	}
+	return false
 }
 
 // bootstrapAdmin creates the first master account from the environment

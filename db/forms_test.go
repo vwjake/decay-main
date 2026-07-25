@@ -101,7 +101,15 @@ func TestVolunteerSignups(t *testing.T) {
 		t.Errorf("CountSignupsForUpcoming = %d, want 2", n)
 	}
 
-	// Deleting the event cascades its signups away.
+	// Clearing a single signup (the admin "Clear" action) removes just it.
+	if err := DeleteVolunteerSignup(conn, got[0].ID); err != nil {
+		t.Fatal(err)
+	}
+	if after, _ := SignupsForEvent(conn, upcomingID); len(after) != 1 {
+		t.Errorf("after clearing one, %d remain, want 1", len(after))
+	}
+
+	// Deleting the event cascades its remaining signups away.
 	if err := DeleteEvent(conn, upcomingID); err != nil {
 		t.Fatal(err)
 	}
