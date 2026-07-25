@@ -94,7 +94,11 @@ func main() {
 		if err != nil {
 			return err
 		}
-		return views.Home(events, products).Render(c.Request().Context(), c.Response())
+		videos, err := db.ListVideos(conn)
+		if err != nil {
+			return err
+		}
+		return views.Home(events, products, videos).Render(c.Request().Context(), c.Response())
 	})
 
 	e.GET("/about", func(c echo.Context) error {

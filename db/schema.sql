@@ -162,6 +162,17 @@ CREATE TABLE IF NOT EXISTS donations (
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Embedded videos shown in the home page's media section. Only the
+-- YouTube id is stored; the embed URL is built from it. position orders
+-- the list.
+CREATE TABLE IF NOT EXISTS media_videos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    youtube_id TEXT NOT NULL,
+    title TEXT NOT NULL DEFAULT '',
+    position INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,

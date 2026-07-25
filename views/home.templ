@@ -2,7 +2,16 @@ package views
 
 import "decay-main/db"
 
-templ Home(events []db.Event, products []db.Product) {
+// videoTitle gives the embed's iframe a non-empty accessible name even when
+// no caption was set.
+func videoTitle(v db.Video) string {
+	if v.Title != "" {
+		return v.Title
+	}
+	return "DECAY video"
+}
+
+templ Home(events []db.Event, products []db.Product, videos []db.Video) {
 	@Layout("DECAY") {
 		<section id="top" class="hero">
 			<div class="hero-box">
@@ -40,6 +49,30 @@ templ Home(events []db.Event, products []db.Product) {
 		<section id="media" class="media">
 			<span class="section-label mono">Media</span>
 			<p class="merch-intro">Sets and sessions recorded at the space.</p>
+			if len(videos) > 0 {
+				<div class="media-list">
+					for _, v := range videos {
+						<div class="media-video">
+							<div class="media-video-frame">
+								<iframe
+									src={ templ.URL(v.EmbedURL()) }
+									title={ videoTitle(v) }
+									loading="lazy"
+									referrerpolicy="strict-origin-when-cross-origin"
+									allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+									allowfullscreen
+								></iframe>
+							</div>
+							if v.Title != "" {
+								<div class="media-video-caption mono">
+									<span>{ v.Title }</span>
+									<a href={ templ.URL(v.WatchURL()) } target="_blank" rel="noopener">YouTube &rarr;</a>
+								</div>
+							}
+						</div>
+					}
+				</div>
+			}
 			<a href="https://www.youtube.com/@no_tape/videos" class="btn-outline mono" target="_blank" rel="noopener">
 				No Tape on YouTube
 			</a>

@@ -70,6 +70,9 @@ templ AdminDashboard(c db.Counts, me db.User) {
 			if me.Can(db.PermGroups) {
 				@adminLink("/admin/groups", "Groups", "recurring programs")
 			}
+			if me.Can(db.PermMedia) {
+				@adminLink("/admin/media", "Media", "embedded videos")
+			}
 			if me.Can(db.PermBookings) {
 				@adminLink("/admin/bookings", "Bookings", "requests to use the space")
 			}

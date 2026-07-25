@@ -699,6 +699,14 @@ a {
   font-size: 12px;
 }
 
+/* The embedded player fills the 16:9 frame. */
+.media-video-frame iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
 .media-video-caption {
   padding: 12px 14px;
   font-size: 11px;
@@ -1505,4 +1513,13 @@ a {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+/* Admin media: compact edit form under each video thumbnail. */
+.admin-media-form {
+  gap: 6px;
+}
+
+.admin-media-form label {
+  font-size: 11px;
 }

@@ -23,7 +23,7 @@ func TestShopViewRenders(t *testing.T) {
 		t.Fatalf("Shop(nil) render: %v", err)
 	}
 	// Home reuses merchCard, so render it with the same mix.
-	if err := Home(nil, products).Render(context.Background(), io.Discard); err != nil {
+	if err := Home(nil, products, nil).Render(context.Background(), io.Discard); err != nil {
 		t.Fatalf("Home render: %v", err)
 	}
 }
