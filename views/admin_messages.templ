@@ -1,0 +1,70 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/db"
+)
+
+templ AdminMessages(messages []db.ContactMessage, showingArchived bool, me db.User, msg string) {
+	@AdminLayout("Messages · DECAY Admin", me) {
+		<div class="admin-heading-row">
+			<p class="admin-heading">Contact messages</p>
+			if showingArchived {
+				<a href="/admin/messages" class="admin-btn admin-btn-small">Hide archived</a>
+			} else {
+				<a href="/admin/messages?archived=1" class="admin-btn admin-btn-small">Show archived</a>
+			}
+		</div>
+		if msg != "" {
+			<div class="admin-flash mono">{ msg }</div>
+		}
+		if len(messages) == 0 {
+			<p class="admin-sub mono">No messages right now.</p>
+		} else {
+			for _, m := range messages {
+				<div class="booking-card">
+					<div class="booking-head">
+						<strong>{ m.SubjectOr() }</strong>
+						if m.IsNew() {
+							<span class="booking-badge mono">New</span>
+						}
+						if m.IsArchived() {
+							<span class="booking-badge booking-badge-muted mono">Archived</span>
+						}
+						<span class="mono booking-when">{ m.When() }</span>
+					</div>
+					<dl class="booking-fields mono">
+						<dt>From</dt>
+						<dd>{ m.Name }</dd>
+						if m.Email != "" {
+							<dt>Email</dt>
+							<dd><a href={ templ.URL("mailto:" + m.Email) }>{ m.Email }</a></dd>
+						}
+					</dl>
+					<p class="booking-desc">{ m.Message }</p>
+					<div class="booking-actions">
+						if m.IsNew() {
+							@messageAction(m.ID, db.ContactReviewed, "Mark reviewed", "admin-btn-small")
+						}
+						if !m.IsArchived() {
+							@messageAction(m.ID, db.ContactArchived, "Archive", "admin-btn-small")
+						} else {
+							@messageAction(m.ID, db.ContactNew, "Restore", "admin-btn-small")
+						}
+						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/messages/%d/delete", m.ID)) } onsubmit="return confirm('Delete this message for good?')">
+							<button type="submit" class="admin-btn admin-btn-small admin-btn-danger">Delete</button>
+						</form>
+					</div>
+				</div>
+			}
+		}
+	}
+}
+
+templ messageAction(id int64, status, label, cls string) {
+	<form method="post" action={ templ.URL(fmt.Sprintf("/admin/messages/%d/status", id)) }>
+		<input type="hidden" name="status" value={ status }/>
+		<button type="submit" class={ "admin-btn", cls }>{ label }</button>
+	</form>
+}

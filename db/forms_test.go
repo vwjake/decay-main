@@ -50,6 +50,63 @@ func TestBookingRequests(t *testing.T) {
 	}
 }
 
+func TestContactMessages(t *testing.T) {
+	conn, err := Open(filepath.Join(t.TempDir(), "test.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+
+	if err := CreateContactMessage(conn, ContactMessage{Name: "Ada", Email: "ada@x.com", Subject: "Hi", Message: "hello there"}); err != nil {
+		t.Fatal(err)
+	}
+	// A blank subject falls back to a stand-in rather than showing empty.
+	if err := CreateContactMessage(conn, ContactMessage{Name: "Bo", Email: "bo@x.com", Message: "no subject here"}); err != nil {
+		t.Fatal(err)
+	}
+
+	n, err := CountNewMessages(conn)
+	if err != nil || n != 2 {
+		t.Fatalf("CountNewMessages = %d (%v), want 2", n, err)
+	}
+
+	list, err := ListContactMessages(conn, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(list) != 2 || !list[0].IsNew() {
+		t.Fatalf("list = %+v", list)
+	}
+	// Newest first: Bo was created last.
+	if list[0].Name != "Bo" || list[0].SubjectOr() != "General inquiry" {
+		t.Errorf("first message = %+v, want Bo with fallback subject", list[0])
+	}
+
+	// Archiving drops it from the default list and the new count.
+	if err := SetContactStatus(conn, list[0].ID, ContactArchived); err != nil {
+		t.Fatal(err)
+	}
+	active, _ := ListContactMessages(conn, false)
+	if len(active) != 1 {
+		t.Errorf("after archive, active list = %d, want 1", len(active))
+	}
+	withArchived, _ := ListContactMessages(conn, true)
+	if len(withArchived) != 2 {
+		t.Errorf("with archived = %d, want 2", len(withArchived))
+	}
+	if n, _ := CountNewMessages(conn); n != 1 {
+		t.Errorf("new count after archive = %d, want 1", n)
+	}
+
+	// Delete removes it for good.
+	if err := DeleteContactMessage(conn, list[0].ID); err != nil {
+		t.Fatal(err)
+	}
+	if all, _ := ListContactMessages(conn, true); len(all) != 1 {
+		t.Errorf("after delete, %d remain, want 1", len(all))
+	}
+}
+
 func TestVolunteerSignups(t *testing.T) {
 	conn, err := Open(filepath.Join(t.TempDir(), "test.db"))
 	if err != nil {

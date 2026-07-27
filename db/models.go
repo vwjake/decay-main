@@ -414,6 +414,7 @@ type Counts struct {
 	Products       int
 	Photos         int
 	NewBookings    int
+	NewMessages    int
 	NewSignups     int
 	NextEvent      *Event
 }
@@ -455,6 +456,7 @@ func Summary(conn *sql.DB) (Counts, error) {
 		{&c.Products, `SELECT count(*) FROM products`},
 		{&c.Photos, `SELECT count(*) FROM photos`},
 		{&c.NewBookings, `SELECT count(*) FROM booking_requests WHERE status = 'new'`},
+		{&c.NewMessages, `SELECT count(*) FROM contact_messages WHERE status = 'new'`},
 	} {
 		if err := conn.QueryRow(q.query).Scan(q.dest); err != nil {
 			return c, err

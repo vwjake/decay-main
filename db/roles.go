@@ -14,13 +14,14 @@ const (
 	PermGroups   Permission = "groups"
 	PermMedia    Permission = "media"
 	PermBookings Permission = "bookings"
+	PermMessages Permission = "messages"
 	PermReports  Permission = "reports"
 	PermStaff    Permission = "staff"
 	PermUsers    Permission = "users"
 )
 
 // AllPermissions is every permission, in the order they're displayed.
-var AllPermissions = []Permission{PermEvents, PermPosts, PermShop, PermPhotos, PermPeople, PermGroups, PermMedia, PermBookings, PermReports, PermStaff, PermUsers}
+var AllPermissions = []Permission{PermEvents, PermPosts, PermShop, PermPhotos, PermPeople, PermGroups, PermMedia, PermBookings, PermMessages, PermReports, PermStaff, PermUsers}
 
 // Label renders a permission for display.
 func (p Permission) Label() string {
@@ -41,6 +42,8 @@ func (p Permission) Label() string {
 		return "Media"
 	case PermBookings:
 		return "Bookings"
+	case PermMessages:
+		return "Messages"
 	case PermReports:
 		return "Reports"
 	case PermStaff:

@@ -1,0 +1,39 @@
+package views
+
+import "decay-main/db"
+
+// ContactForm is the public contact page. On success it re-renders as a
+// thank-you; on a validation error it keeps what was typed.
+templ ContactForm(v db.ContactMessage, sent bool, errorMsg string) {
+	@Layout("Contact · DECAY") {
+		<section class="about">
+			<p class="about-statement">Get in touch</p>
+			<p class="about-body">
+				Got a question or want to get involved? Whether you're an artist, a local,
+				or just curious about our events, reach out. Looking to put on an event
+				here instead? Use the <a href="/book">booking form</a>.
+			</p>
+		</section>
+
+		<section class="events">
+			if sent {
+				<div class="admin-flash mono">
+					Thanks — your message is in. We'll get back to you at the email you left.
+				</div>
+				<a href="/" class="btn-outline mono">Back home</a>
+			} else {
+				if errorMsg != "" {
+					<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+				}
+				<form method="post" action="/contact" class="admin-form">
+					<label>Your name<input type="text" name="name" value={ v.Name } required maxlength="200"/></label>
+					<label>Your email<input type="email" name="email" value={ v.Email } required maxlength="200"/></label>
+					<label>Subject<input type="text" name="subject" value={ v.Subject } placeholder="What's this about?" maxlength="200"/></label>
+					<label>Message<textarea name="message" rows="6" required maxlength="5000">{ v.Message }</textarea></label>
+					<label class="hp-field" aria-hidden="true">Leave this blank<input type="text" name="website" tabindex="-1" autocomplete="off"/></label>
+					<button type="submit" class="admin-btn">Send message</button>
+				</form>
+			}
+		</section>
+	}
+}

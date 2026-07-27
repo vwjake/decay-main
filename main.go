@@ -9,6 +9,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	netmail "net/mail"
 	"os"
 	"strings"
 	"time"
@@ -20,6 +21,7 @@ import (
 	"decay-main/admin"
 	"decay-main/db"
 	"decay-main/ics"
+	"decay-main/mail"
 	"decay-main/views"
 
 	"github.com/joho/godotenv"
@@ -71,6 +73,15 @@ func main() {
 	siteURL := os.Getenv("SITE_URL")
 	if siteURL == "" {
 		siteURL = "http://localhost:8080"
+	}
+
+	// Notification mail for the contact form. Disabled (a no-op) unless SMTP
+	// is configured; messages are saved to the admin queue regardless.
+	mailer := mail.FromEnv()
+	if mailer.Enabled() {
+		log.Printf("contact-form notifications will be emailed to %s", mailer.To())
+	} else {
+		log.Println("SMTP not configured — contact messages are saved to /admin/messages only, no email sent. Set SMTP_HOST to enable notifications.")
 	}
 
 	e := echo.New()
@@ -207,6 +218,14 @@ func main() {
 		return submitBooking(c, conn)
 	})
 
+	e.GET("/contact", func(c echo.Context) error {
+		return views.ContactForm(db.ContactMessage{}, c.QueryParam("sent") != "", "").Render(c.Request().Context(), c.Response())
+	})
+
+	e.POST("/contact", func(c echo.Context) error {
+		return submitContact(c, conn, mailer)
+	})
+
 	e.GET("/shop", func(c echo.Context) error {
 		products, err := db.ListProducts(conn)
 		if err != nil {
@@ -306,6 +325,61 @@ func submitBooking(c echo.Context, conn *sql.DB) error {
 		return err
 	}
 	return c.Redirect(http.StatusSeeOther, "/book?sent=1")
+}
+
+// submitContact validates and stores a public contact message, then fires a
+// best-effort email notification. A filled honeypot field is treated as a bot
+// and silently dropped. The database row is the record; a mail failure is
+// logged but never shown to the sender, whose message is already saved.
+func submitContact(c echo.Context, conn *sql.DB, mailer *mail.Mailer) error {
+	if strings.TrimSpace(c.FormValue("website")) != "" {
+		return c.Redirect(http.StatusSeeOther, "/contact?sent=1")
+	}
+	m := db.ContactMessage{
+		Name:    strings.TrimSpace(c.FormValue("name")),
+		Email:   strings.TrimSpace(c.FormValue("email")),
+		Subject: strings.TrimSpace(c.FormValue("subject")),
+		Message: strings.TrimSpace(c.FormValue("message")),
+	}
+	render := func(msg string) error {
+		return views.ContactForm(m, false, msg).Render(c.Request().Context(), c.Response())
+	}
+	if m.Name == "" || m.Message == "" {
+		return render("Please add your name and a message.")
+	}
+	if !validEmail(m.Email) {
+		return render("Please enter a valid email so we can reply.")
+	}
+	if err := db.CreateContactMessage(conn, m); err != nil {
+		return err
+	}
+	notifyContact(mailer, m)
+	return c.Redirect(http.StatusSeeOther, "/contact?sent=1")
+}
+
+// notifyContact emails the saved message to the DECAY inbox off the request's
+// path, so a slow or failing mail server never delays the sender's thank-you
+// page. The message is already saved, so a dropped email loses nothing.
+func notifyContact(mailer *mail.Mailer, m db.ContactMessage) {
+	if !mailer.Enabled() {
+		return
+	}
+	subject := "Contact form: " + m.SubjectOr()
+	body := fmt.Sprintf("Name: %s\nEmail: %s\n\n%s", m.Name, m.Email, m.Message)
+	go func() {
+		if err := mailer.Notify(subject, body, m.Email); err != nil {
+			log.Printf("contact-form email to %s failed (message is saved in /admin/messages): %v", mailer.To(), err)
+		}
+	}()
+}
+
+// validEmail reports whether addr parses as a single email address.
+func validEmail(addr string) bool {
+	if addr == "" {
+		return false
+	}
+	_, err := netmail.ParseAddress(addr)
+	return err == nil
 }
 
 // submitSignup validates and stores a public volunteer offer for an event.

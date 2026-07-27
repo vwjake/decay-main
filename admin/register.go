@@ -60,6 +60,9 @@ func Register(e *echo.Echo, conn *sql.DB, sessionSecret []byte, uploadsDir strin
 	bookings := g.Group("", requirePermission(db.PermBookings))
 	registerBookingRoutes(bookings, conn)
 
+	messages := g.Group("", requirePermission(db.PermMessages))
+	registerMessageRoutes(messages, conn)
+
 	reports := g.Group("", requirePermission(db.PermReports))
 	registerReportRoutes(reports, conn)
 

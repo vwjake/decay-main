@@ -26,13 +26,19 @@ templ AdminDashboard(c db.Counts, me db.User) {
 			<p class="admin-sub mono">Nothing on the calendar yet.</p>
 		}
 
-		if c.NewBookings > 0 || c.NewSignups > 0 || c.OpenRoles > 0 || c.Drafts > 0 {
+		if c.NewBookings > 0 || c.NewMessages > 0 || c.NewSignups > 0 || c.OpenRoles > 0 || c.Drafts > 0 {
 			<p class="admin-heading">Needs attention</p>
 			<div class="event-list">
 				if c.NewBookings > 0 && me.Can(db.PermBookings) {
 					<a href="/admin/bookings" class="event-item">
 						<div class="event-title">{ plural(c.NewBookings, "new booking request", "new booking requests") }</div>
 						<div class="event-date mono">{ fmt.Sprint(c.NewBookings) }</div>
+					</a>
+				}
+				if c.NewMessages > 0 && me.Can(db.PermMessages) {
+					<a href="/admin/messages" class="event-item">
+						<div class="event-title">{ plural(c.NewMessages, "new message", "new messages") }</div>
+						<div class="event-date mono">{ fmt.Sprint(c.NewMessages) }</div>
 					</a>
 				}
 				if c.NewSignups > 0 && me.Can(db.PermEvents) {
@@ -75,6 +81,9 @@ templ AdminDashboard(c db.Counts, me db.User) {
 			}
 			if me.Can(db.PermBookings) {
 				@adminLink("/admin/bookings", "Bookings", "requests to use the space")
+			}
+			if me.Can(db.PermMessages) {
+				@adminLink("/admin/messages", "Messages", "contact form inbox")
 			}
 			if me.Can(db.PermReports) {
 				@adminLink("/admin/reports", "Reports", "quarterly and custom stats")

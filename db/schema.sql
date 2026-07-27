@@ -124,6 +124,21 @@ CREATE TABLE IF NOT EXISTS booking_requests (
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Messages from the public contact form, worked through in the admin queue
+-- the same way booking requests are. status moves new -> reviewed; archived
+-- hides it. The message is always saved here; email notification (if SMTP is
+-- configured) is a best-effort extra on top, so nothing is lost when mail is
+-- down or unconfigured.
+CREATE TABLE IF NOT EXISTS contact_messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL DEFAULT '',
+    subject TEXT NOT NULL DEFAULT '',
+    message TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'new',
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 -- Public offers to volunteer for an event, with contact details so
 -- organizers can follow up. Distinct from event_volunteers, which is the
 -- admin's record of who is actually covering a role.
