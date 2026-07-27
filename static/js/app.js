@@ -38,7 +38,77 @@ document.addEventListener('DOMContentLoaded', () => {
       if (bodyEditor) insertAtCursor(bodyEditor, btn.dataset.insertMd);
     });
   });
+
+  setupGallery();
 });
+
+// setupGallery turns the /photos grid into a clickable lightbox: a photo
+// opens full-size over a dimmed page, with prev/next, keyboard arrows, and
+// Esc to close. Progressive enhancement — without JS each photo is still a
+// plain link to its full-size file.
+function setupGallery() {
+  const gallery = document.querySelector('.gallery');
+  if (!gallery) return;
+  const links = Array.from(gallery.querySelectorAll('.gallery-item a'));
+  if (links.length === 0) return;
+
+  const items = links.map((a) => {
+    const caption = a.closest('.gallery-item').querySelector('.gallery-caption');
+    return { href: a.getAttribute('href'), caption: caption ? caption.textContent : '' };
+  });
+
+  const box = document.createElement('div');
+  box.className = 'lightbox';
+  box.setAttribute('role', 'dialog');
+  box.setAttribute('aria-modal', 'true');
+  box.hidden = true;
+  box.innerHTML =
+    '<button class="lightbox-close" type="button" aria-label="Close">×</button>' +
+    '<button class="lightbox-nav lightbox-prev" type="button" aria-label="Previous photo">‹</button>' +
+    '<figure class="lightbox-figure">' +
+    '<img class="lightbox-img" alt=""/>' +
+    '<figcaption class="lightbox-caption mono"></figcaption>' +
+    '</figure>' +
+    '<button class="lightbox-nav lightbox-next" type="button" aria-label="Next photo">›</button>';
+  document.body.appendChild(box);
+
+  const img = box.querySelector('.lightbox-img');
+  const caption = box.querySelector('.lightbox-caption');
+  const nav = box.querySelectorAll('.lightbox-nav');
+  // A single photo needs no next/previous controls.
+  if (items.length < 2) nav.forEach((btn) => { btn.hidden = true; });
+
+  let current = 0;
+  const show = (i) => {
+    current = (i + items.length) % items.length;
+    img.src = items[current].href;
+    caption.textContent = items[current].caption;
+    caption.hidden = !items[current].caption;
+  };
+  const open = (i) => {
+    show(i);
+    box.hidden = false;
+    document.body.classList.add('lightbox-open');
+  };
+  const close = () => {
+    box.hidden = true;
+    img.removeAttribute('src');
+    document.body.classList.remove('lightbox-open');
+  };
+
+  links.forEach((a, i) => a.addEventListener('click', (e) => { e.preventDefault(); open(i); }));
+  box.querySelector('.lightbox-close').addEventListener('click', close);
+  box.querySelector('.lightbox-prev').addEventListener('click', () => show(current - 1));
+  box.querySelector('.lightbox-next').addEventListener('click', () => show(current + 1));
+  // A click on the backdrop (but not the image or a control) closes it.
+  box.addEventListener('click', (e) => { if (e.target === box) close(); });
+  document.addEventListener('keydown', (e) => {
+    if (box.hidden) return;
+    if (e.key === 'Escape') close();
+    else if (e.key === 'ArrowLeft') show(current - 1);
+    else if (e.key === 'ArrowRight') show(current + 1);
+  });
+}
 
 // embedLink asks for a YouTube or Bandcamp URL, has the server resolve it
 // to an embeddable link (a Bandcamp page needs a lookup), and inserts that
