@@ -6,6 +6,7 @@
 package mail
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net"
 	"net/smtp"
@@ -17,11 +18,12 @@ import (
 // Mailer sends plain-text notifications to a fixed inbox (the DECAY address).
 // The zero value is a disabled mailer whose Notify does nothing.
 type Mailer struct {
-	addr string // host:port; empty means disabled
-	host string // host alone, for auth
-	auth smtp.Auth
-	from string
-	to   string
+	addr        string // host:port; empty means disabled
+	host        string // host alone, for auth and TLS
+	auth        smtp.Auth
+	from        string
+	to          string
+	implicitTLS bool // port 465: wrap the whole connection in TLS
 }
 
 // FromEnv builds a Mailer from the environment:
@@ -44,10 +46,11 @@ func FromEnv() *Mailer {
 		port = "587"
 	}
 	m := &Mailer{
-		host: host,
-		addr: net.JoinHostPort(host, port),
-		from: envOr("MAIL_FROM", "noreply@decay.events"),
-		to:   envOr("CONTACT_TO", "info@decayolympia.org"),
+		host:        host,
+		addr:        net.JoinHostPort(host, port),
+		from:        envOr("MAIL_FROM", "noreply@decay.events"),
+		to:          envOr("CONTACT_TO", "info@decayolympia.org"),
+		implicitTLS: port == "465",
 	}
 	if user := strings.TrimSpace(os.Getenv("SMTP_USER")); user != "" {
 		m.auth = smtp.PlainAuth("", user, os.Getenv("SMTP_PASS"), host)
@@ -81,7 +84,52 @@ func (m *Mailer) Notify(subject, body, replyTo string) error {
 		return nil
 	}
 	msg := buildMessage(m.from, m.to, replyTo, subject, body)
-	return smtp.SendMail(m.addr, m.auth, m.from, []string{m.to}, msg)
+	return m.send(msg)
+}
+
+// send delivers the assembled message. Port 587 (and 25) use STARTTLS, which
+// net/smtp's SendMail negotiates for us. Port 465 is implicit TLS — the
+// connection is TLS from the first byte — which SendMail can't do, so that
+// case is dialed directly. Hover, the mail host, offers both.
+func (m *Mailer) send(msg []byte) error {
+	if !m.implicitTLS {
+		return smtp.SendMail(m.addr, m.auth, m.from, []string{m.to}, msg)
+	}
+
+	conn, err := tls.Dial("tcp", m.addr, &tls.Config{ServerName: m.host})
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	c, err := smtp.NewClient(conn, m.host)
+	if err != nil {
+		return err
+	}
+	defer c.Close()
+
+	if m.auth != nil {
+		if err := c.Auth(m.auth); err != nil {
+			return err
+		}
+	}
+	if err := c.Mail(m.from); err != nil {
+		return err
+	}
+	if err := c.Rcpt(m.to); err != nil {
+		return err
+	}
+	w, err := c.Data()
+	if err != nil {
+		return err
+	}
+	if _, err := w.Write(msg); err != nil {
+		return err
+	}
+	if err := w.Close(); err != nil {
+		return err
+	}
+	return c.Quit()
 }
 
 // buildMessage assembles an RFC 5322 message. Header values are stripped of

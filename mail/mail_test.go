@@ -35,6 +35,22 @@ func TestFromEnvDefaults(t *testing.T) {
 	if m.To() != "info@decayolympia.org" {
 		t.Errorf("to = %q, want default", m.To())
 	}
+	// Port 587 uses STARTTLS, not implicit TLS.
+	if m.implicitTLS {
+		t.Error("port 587 should not use implicit TLS")
+	}
+}
+
+func TestFromEnvImplicitTLSOn465(t *testing.T) {
+	t.Setenv("SMTP_HOST", "mail.hover.com")
+	t.Setenv("SMTP_PORT", "465")
+	m := FromEnv()
+	if !m.implicitTLS {
+		t.Error("port 465 should use implicit TLS")
+	}
+	if m.addr != "mail.hover.com:465" {
+		t.Errorf("addr = %q", m.addr)
+	}
 }
 
 func TestBuildMessageHeaders(t *testing.T) {
