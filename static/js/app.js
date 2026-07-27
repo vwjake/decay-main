@@ -26,7 +26,31 @@ document.addEventListener('DOMContentLoaded', () => {
       else if (key === 'i') { e.preventDefault(); applyMarkdown(textarea, 'italic'); }
     });
   });
+
+  // "Insert" buttons (uploaded images, resolved embeds) drop a ready-made
+  // Markdown snippet into the body at the cursor. There's one body editor
+  // per page, so they all target it.
+  const bodyEditor = document.querySelector('.md-editor textarea');
+  document.querySelectorAll('[data-insert-md]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (bodyEditor) insertAtCursor(bodyEditor, btn.dataset.insertMd);
+    });
+  });
 });
+
+// insertAtCursor drops text into the textarea at the caret (or over the
+// selection), on its own line, and leaves the caret after it.
+function insertAtCursor(textarea, text) {
+  const start = textarea.selectionStart;
+  const value = textarea.value;
+  // Give block-level snippets (images, embeds) their own paragraph.
+  const before = start > 0 && value[start - 1] !== '\n' ? '\n\n' : '';
+  const snippet = before + text;
+  textarea.setRangeText(snippet, start, textarea.selectionEnd, 'end');
+  textarea.focus();
+  textarea.dispatchEvent(new Event('input', { bubbles: true }));
+}
 
 // applyMarkdown mutates the textarea's current selection in place, keeping
 // the browser's native undo history via setRangeText.

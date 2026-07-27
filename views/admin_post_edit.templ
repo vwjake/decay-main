@@ -6,7 +6,7 @@ import (
 	"decay-main/db"
 )
 
-templ AdminPostEdit(post db.Post, me db.User, errorMsg string) {
+templ AdminPostEdit(post db.Post, postImages []db.PostImage, me db.User, errorMsg string) {
 	@AdminLayout(post.Title+" · DECAY Admin", me) {
 		<a href="/admin/posts" class="admin-back">&larr; All posts</a>
 		<p class="admin-heading">{ post.Title }</p>
@@ -30,6 +30,28 @@ templ AdminPostEdit(post db.Post, me db.User, errorMsg string) {
 				@markdownEditor("body", post.Body, 18)
 			</label>
 			<button type="submit" class="admin-btn">Save post</button>
+		</form>
+
+		<p class="admin-subheading">Images</p>
+		<p class="admin-sub mono">Upload an image, then click <strong>Insert</strong> to drop it into the body where your cursor is. Fill in the alt text between the brackets.</p>
+		if len(postImages) > 0 {
+			<div class="post-image-strip">
+				for _, img := range postImages {
+					<figure class="post-image">
+						<img src={ img.WebPath() } alt="" loading="lazy"/>
+						<figcaption>
+							<button type="button" class="admin-btn admin-btn-small" data-insert-md={ img.Markdown() }>Insert</button>
+							<form method="post" action={ templ.URL(fmt.Sprintf("/admin/posts/%d/images/%d/delete", post.ID, img.ID)) } onsubmit="return confirm('Delete this image?')" style="display:inline">
+								<button type="submit" class="admin-btn admin-btn-small admin-btn-danger">Delete</button>
+							</form>
+						</figcaption>
+					</figure>
+				}
+			</div>
+		}
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/posts/%d/images", post.ID)) } enctype="multipart/form-data" class="admin-form">
+			<label>Add an image<input type="file" name="image" accept="image/*" required/></label>
+			<button type="submit" class="admin-btn">Upload image</button>
 		</form>
 
 		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/posts/%d/%s", post.ID, publishAction(post))) } class="admin-form">

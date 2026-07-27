@@ -57,6 +57,17 @@ CREATE TABLE IF NOT EXISTS posts (
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Images uploaded for a blog post. The author drops them into the post's
+-- Markdown body by URL; this table just tracks the files so the edit page
+-- can list them and so they're removed when the post is deleted. Files live
+-- under uploads/blog/ with a web-sized copy under uploads/blog/web/.
+CREATE TABLE IF NOT EXISTS post_images (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+    filename TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 -- Recurring meetups that call DECAY home (Open Draw, No Tape, etc.). Each
 -- has a public detail page. body holds the titled sections in a small
 -- line-based markup — "# Heading" starts a section, "- item" is a bullet,

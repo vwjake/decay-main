@@ -31,8 +31,9 @@ func TestPostAdminViewsRender(t *testing.T) {
 		t.Error("new-post form is missing the Markdown toolbar")
 	}
 
+	imgs := []db.PostImage{{ID: 5, PostID: 1, Filename: "1700000000000000000.png"}}
 	var edit strings.Builder
-	if err := AdminPostEdit(posts[0], me, "").Render(context.Background(), &edit); err != nil {
+	if err := AdminPostEdit(posts[0], imgs, me, "").Render(context.Background(), &edit); err != nil {
 		t.Fatalf("AdminPostEdit render: %v", err)
 	}
 	if !strings.Contains(edit.String(), `data-md="bold"`) {
@@ -42,8 +43,13 @@ func TestPostAdminViewsRender(t *testing.T) {
 	if !strings.Contains(edit.String(), "# Hi") {
 		t.Error("edit form didn't render the post body into the textarea")
 	}
+	// An uploaded image offers an insert snippet pointing at its web copy.
+	if !strings.Contains(edit.String(), "/uploads/blog/web/1700000000000000000.jpg") {
+		t.Error("edit form didn't render the uploaded image insert snippet")
+	}
 
-	if err := AdminPostEdit(posts[0], me, "Oops.").Render(context.Background(), io.Discard); err != nil {
+	// Renders with no images and with an error message.
+	if err := AdminPostEdit(posts[0], nil, me, "Oops.").Render(context.Background(), io.Discard); err != nil {
 		t.Fatalf("AdminPostEdit error-state render: %v", err)
 	}
 }
