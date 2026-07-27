@@ -94,7 +94,7 @@ func Seed(conn *sql.DB) error {
 	}
 	if count == 0 {
 		board := []string{
-			"Moon Fery", "Abe Burt", "Kacie Smarjesse",
+			"Moon Fery", "Abe Burt",
 			"Liam Mooney", "Ray Malmrose", "Heather Hemann",
 		}
 		for i, name := range board {

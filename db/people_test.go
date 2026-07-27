@@ -18,12 +18,12 @@ func TestPeopleOrdering(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Seeding fills in the six board members at positions 0–5.
+	// Seeding fills in the five board members at positions 0–4.
 	seeded, err := ListPeople(conn)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(seeded) != 6 || seeded[0].Name != "Moon Fery" {
+	if len(seeded) != 5 || seeded[0].Name != "Moon Fery" {
 		t.Fatalf("seed = %d people, first %q", len(seeded), firstName(seeded))
 	}
 
@@ -59,8 +59,8 @@ func TestPeopleOrdering(t *testing.T) {
 		t.Fatal(err)
 	}
 	people, _ = ListPeople(conn)
-	if len(people) != 6 {
-		t.Errorf("after delete = %d people, want 6", len(people))
+	if len(people) != 5 {
+		t.Errorf("after delete = %d people, want 5", len(people))
 	}
 }
 

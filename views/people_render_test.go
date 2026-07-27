@@ -39,7 +39,7 @@ func TestInitials(t *testing.T) {
 	cases := map[string]string{
 		"Moon Fery":      "MF",
 		"Abe":            "A",
-		"Kacie A. Smith": "KA",
+		"Robin A. Diaz":  "RA",
 		"":               "",
 	}
 	for in, want := range cases {
