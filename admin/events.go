@@ -42,6 +42,7 @@ func registerEventRoutes(g *echo.Group, conn *sql.DB, uploadsDir string) {
 	g.POST("/events/:id", saveEvent(conn))
 	g.POST("/events/:id/flyer", uploadFlyer(conn, uploadsDir))
 	g.POST("/events/:id/volunteers", saveVolunteers(conn))
+	g.POST("/events/:id/repeat", repeatEvent(conn))
 	g.POST("/events/:id/signups/:signupID/delete", deleteSignup(conn))
 }
 
@@ -309,6 +310,38 @@ func createEvent(conn *sql.DB) echo.HandlerFunc {
 			if err := db.SetVolunteerRoles(conn, id, roles); err != nil {
 				return err
 			}
+		}
+		return c.Redirect(http.StatusSeeOther, "/admin/events")
+	}
+}
+
+// repeatEvent stamps out copies of an event on a schedule — a lightweight
+// stand-in for calendar recurrence. Each copy is an ordinary, independently
+// editable event, so there's no recurrence rule to maintain.
+func repeatEvent(conn *sql.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		ev, volunteers, signups, err := loadEvent(conn, c.Param("id"))
+		if err != nil {
+			return err
+		}
+		rerender := func(msg string) error {
+			return views.AdminEventEdit(ev, volunteers, signups, currentUser(c), msg).Render(c.Request().Context(), c.Response())
+		}
+
+		freq := c.FormValue("frequency")
+		if !db.ValidRepeatFrequency(freq) {
+			return rerender("Pick how often it repeats.")
+		}
+		count, err := strconv.Atoi(strings.TrimSpace(c.FormValue("count")))
+		if err != nil || count < 1 {
+			return rerender("How many copies? Enter a whole number of 1 or more.")
+		}
+		if count > 52 {
+			count = 52
+		}
+
+		if _, err := db.RepeatEvent(conn, ev.ID, freq, count, pacific); err != nil {
+			return err
 		}
 		return c.Redirect(http.StatusSeeOther, "/admin/events")
 	}

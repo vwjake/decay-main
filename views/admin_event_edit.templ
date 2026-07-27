@@ -104,6 +104,26 @@ templ AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, signups []db.V
 			<button type="submit" class="admin-btn">Save volunteers</button>
 		</form>
 
+		<p class="admin-heading">Repeat</p>
+		<p class="admin-sub mono">
+			Stamp out copies of this event on a schedule. Each copy is its own
+			event — same details, flyer, and volunteer roles, on its own date and
+			with its own calendar identity — that you can edit or delete
+			separately afterward. Signups and reports aren't copied.
+		</p>
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/events/%d/repeat", ev.ID)) } class="admin-form">
+			<label>
+				How often
+				<select name="frequency">
+					for _, f := range db.RepeatFrequencies {
+						<option value={ f.Value }>{ f.Label }</option>
+					}
+				</select>
+			</label>
+			<label>How many copies<input type="number" name="count" value="4" min="1" max="52"/></label>
+			<button type="submit" class="admin-btn">Create copies</button>
+		</form>
+
 		<p class="admin-heading">Volunteer signups</p>
 		if len(signups) == 0 {
 			<p class="admin-sub mono">No one has signed up through the site yet.</p>
