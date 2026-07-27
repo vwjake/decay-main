@@ -1523,3 +1523,112 @@ a {
 .admin-media-form label {
   font-size: 11px;
 }
+
+/* Blog post body: rendered Markdown ------------------------------------ */
+/* Posts are authored in Markdown, so a post body carries real structure —
+   headings, lists, quotes, code — rather than the flat paragraphs the
+   event/about pages use. */
+.post-body {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #333;
+  margin: 20px 0 0;
+}
+
+.post-body > :first-child {
+  margin-top: 0;
+}
+
+.post-body p {
+  margin: 0 0 16px;
+}
+
+.post-body h2,
+.post-body h3,
+.post-body h4 {
+  font-family: "Archivo", sans-serif;
+  color: #111;
+  line-height: 1.2;
+  margin: 28px 0 10px;
+}
+
+.post-body h2 { font-size: 22px; }
+.post-body h3 { font-size: 18px; }
+.post-body h4 { font-size: 15px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+.post-body a {
+  color: #111;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.post-body ul,
+.post-body ol {
+  margin: 0 0 16px;
+  padding-left: 20px;
+}
+
+.post-body li {
+  margin-bottom: 6px;
+}
+
+.post-body blockquote {
+  margin: 18px 0;
+  padding: 12px 16px;
+  border-left: 4px solid #111;
+  background: #f4f4f2;
+  font-style: italic;
+}
+
+.post-body blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.post-body img {
+  max-width: 100%;
+  height: auto;
+  border: 2px solid #111;
+}
+
+.post-body hr {
+  border: none;
+  border-top: 2px solid #111;
+  margin: 28px 0;
+}
+
+.post-body code {
+  font-family: "Space Mono", monospace;
+  font-size: 0.9em;
+  background: #f4f4f2;
+  padding: 1px 5px;
+  border: 1px solid #ddd;
+}
+
+.post-body pre {
+  background: #111;
+  color: #f4f4f2;
+  padding: 14px 16px;
+  overflow-x: auto;
+  margin: 0 0 16px;
+}
+
+.post-body pre code {
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 0;
+}
+
+.post-body table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0 0 16px;
+  font-size: 14px;
+}
+
+.post-body th,
+.post-body td {
+  border: 2px solid #111;
+  padding: 6px 10px;
+  text-align: left;
+}

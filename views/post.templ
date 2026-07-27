@@ -1,6 +1,9 @@
 package views
 
-import "decay-main/db"
+import (
+	"decay-main/db"
+	"decay-main/markdown"
+)
 
 templ PostPage(post db.Post) {
 	@Layout(post.Title + " · DECAY") {
@@ -10,9 +13,9 @@ templ PostPage(post db.Post) {
 			if post.Date() != "" {
 				<p class="event-detail-when mono">{ post.Date() }</p>
 			}
-			for _, para := range post.Paragraphs() {
-				<p class="event-detail-body">{ para }</p>
-			}
+			<div class="post-body">
+				@templ.Raw(markdown.ToHTML(post.Body))
+			</div>
 		</section>
 	}
 }

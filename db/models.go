@@ -210,18 +210,6 @@ func (p Post) Date() string {
 	return p.PublishedAt.Format("January 2, 2006")
 }
 
-// Paragraphs splits a post body into blocks on blank lines, so a template
-// can render it without handing raw HTML to the browser.
-func (p Post) Paragraphs() []string {
-	var out []string
-	for _, block := range strings.Split(strings.ReplaceAll(p.Body, "\r\n", "\n"), "\n\n") {
-		if block = strings.TrimSpace(block); block != "" {
-			out = append(out, block)
-		}
-	}
-	return out
-}
-
 // PostBySlug fetches a single published post. Drafts stay unreachable
 // from the public site, so an unpublished slug is reported as missing.
 func PostBySlug(conn *sql.DB, slug string) (Post, error) {

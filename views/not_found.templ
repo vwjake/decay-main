@@ -1,0 +1,26 @@
+package views
+
+// NotFound is the branded page for a URL that doesn't resolve, replacing
+// Echo's plain default. It keeps the visitor inside the site with a few
+// links back to the parts that do exist.
+templ NotFound() {
+	@Layout("Not found · DECAY") {
+		<section class="about">
+			<p class="about-statement mono">404</p>
+			<p class="about-statement">This page has decayed.</p>
+			<p class="about-body">
+				The page you were after isn't here — it may have moved, or the
+				link that brought you was already crumbling. Everything below
+				still stands.
+			</p>
+			<nav class="footer-links mono">
+				<a href="/">Home</a>
+				<a href="/events">Events</a>
+				<a href="/calendar">Calendar</a>
+				<a href="/groups">Groups</a>
+				<a href="/blog">Blog</a>
+				<a href="/shop">Shop</a>
+			</nav>
+		</section>
+	}
+}

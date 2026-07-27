@@ -77,6 +77,24 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
+	// A not-found URL gets a branded page instead of Echo's plain text;
+	// every other error falls through to Echo's default handling.
+	e.HTTPErrorHandler = func(err error, c echo.Context) {
+		code := http.StatusInternalServerError
+		var he *echo.HTTPError
+		if errors.As(err, &he) {
+			code = he.Code
+		}
+		if code == http.StatusNotFound && !c.Response().Committed {
+			c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTMLCharsetUTF8)
+			c.Response().Status = http.StatusNotFound
+			if renderErr := views.NotFound().Render(c.Request().Context(), c.Response()); renderErr == nil {
+				return
+			}
+		}
+		e.DefaultHTTPErrorHandler(err, c)
+	}
+
 	static, _ := fs.Sub(staticFS, "static")
 	e.StaticFS("/static", static)
 	e.Static("/uploads", uploadsDir)
