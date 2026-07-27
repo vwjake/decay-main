@@ -226,6 +226,14 @@ func main() {
 		return submitContact(c, conn, mailer)
 	})
 
+	e.GET("/bios", func(c echo.Context) error {
+		bios, err := db.PublicCommunityBios(conn)
+		if err != nil {
+			return err
+		}
+		return views.Bios(bios).Render(c.Request().Context(), c.Response())
+	})
+
 	e.GET("/get-involved", func(c echo.Context) error {
 		forms, err := db.EnabledExternalForms(conn)
 		if err != nil {

@@ -199,6 +199,22 @@ CREATE TABLE IF NOT EXISTS media_videos (
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Community member bios shown on the public /bios page. Entered by admins —
+-- there's no public submission form — and broader than the board/staff People
+-- table (DJs, artists, regulars). public=0 keeps a bio on file (e.g. collected
+-- for a grant application) without showing it on the site. position orders the
+-- list; no photo, unlike People.
+CREATE TABLE IF NOT EXISTS community_bios (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    pronouns TEXT NOT NULL DEFAULT '',
+    role TEXT NOT NULL DEFAULT '',
+    bio TEXT NOT NULL DEFAULT '',
+    public INTEGER NOT NULL DEFAULT 1,
+    position INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 -- Links to off-site forms (Nextcloud Forms surveys and the like) shown on the
 -- public Get Involved page and managed at /admin/forms. The site doesn't host
 -- these — it points at them, the same way it links out to the shop and the

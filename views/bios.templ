@@ -1,0 +1,53 @@
+package views
+
+import "decay-main/db"
+
+// Bios is the public page of community member profiles — the wider circle
+// around DECAY, kept apart from the board & staff grid on the About page.
+templ Bios(bios []db.CommunityBio) {
+	@Layout("Community · DECAY") {
+		<section class="about">
+			<p class="about-statement">Our community</p>
+			<p class="about-body">
+				The people who make DECAY what it is — artists, performers, organizers, and
+				regulars. Want to be listed here? <a href="/contact">Get in touch</a>.
+			</p>
+		</section>
+
+		if len(bios) > 0 {
+			<section class="about">
+				<div class="team-grid">
+					for _, b := range bios {
+						@bioCard(b)
+					}
+				</div>
+			</section>
+		} else {
+			<section class="events">
+				<p class="admin-sub mono">No bios listed yet — check back soon.</p>
+			</section>
+		}
+	}
+}
+
+// bioCard mirrors the About page's team card, minus the photo: an initials
+// placeholder, name (with pronouns when given), role, and bio.
+templ bioCard(b db.CommunityBio) {
+	<article class="team-card">
+		<div class="team-photo team-photo-empty mono" aria-hidden="true">{ initials(b.Name) }</div>
+		<div class="team-body">
+			<p class="team-name">
+				{ b.Name }
+				if b.HasPronouns() {
+					<span class="team-pronouns mono">{ b.Pronouns }</span>
+				}
+			</p>
+			if b.HasRole() {
+				<p class="team-role mono">{ b.Role }</p>
+			}
+			for _, para := range b.Paragraphs() {
+				<p class="team-bio">{ para }</p>
+			}
+		</div>
+	</article>
+}

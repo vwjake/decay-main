@@ -72,6 +72,7 @@ templ AdminDashboard(c db.Counts, me db.User) {
 			@adminLink("/admin/photos", "Photos", fmt.Sprintf("%d photos", c.Photos))
 			if me.Can(db.PermPeople) {
 				@adminLink("/admin/people", "People", "board & staff profiles")
+				@adminLink("/admin/bios", "Bios", "community member profiles")
 			}
 			if me.Can(db.PermGroups) {
 				@adminLink("/admin/groups", "Groups", "recurring programs")
