@@ -226,6 +226,14 @@ func main() {
 		return submitContact(c, conn, mailer)
 	})
 
+	e.GET("/get-involved", func(c echo.Context) error {
+		forms, err := db.EnabledExternalForms(conn)
+		if err != nil {
+			return err
+		}
+		return views.GetInvolved(forms).Render(c.Request().Context(), c.Response())
+	})
+
 	e.GET("/shop", func(c echo.Context) error {
 		products, err := db.ListProducts(conn)
 		if err != nil {

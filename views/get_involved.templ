@@ -1,0 +1,40 @@
+package views
+
+import "decay-main/db"
+
+// GetInvolved lists the ways to plug into DECAY — the admin-managed form
+// links (surveys and the like) plus a couple of standing calls to action.
+templ GetInvolved(forms []db.ExternalForm) {
+	@Layout("Get Involved · DECAY") {
+		<section class="about">
+			<p class="about-statement">Get involved</p>
+			<p class="about-body">
+				DECAY runs on the people who show up. Fill out a survey, sign up to volunteer
+				at an event, propose something of your own — every bit helps shape the space.
+			</p>
+		</section>
+
+		<section class="events">
+			if len(forms) > 0 {
+				for _, f := range forms {
+					<a href={ templ.URL(f.URL) } target="_blank" rel="noopener" class="event-item">
+						<div>
+							<div class="event-title">{ f.Title }</div>
+							if f.Description != "" {
+								<div class="event-meta mono">{ f.Description }</div>
+							}
+						</div>
+						<div class="event-date mono">Open &rarr;</div>
+					</a>
+				}
+			}
+
+			<p class="about-body" style="margin-top:2rem">
+				Want to volunteer at a specific event? Open its page from the
+				<a href="/events">events list</a> and sign up there. Hoping to host something?
+				Send a <a href="/book">booking request</a>. Just have a question?
+				<a href="/contact">Get in touch</a>.
+			</p>
+		</section>
+	}
+}

@@ -199,6 +199,20 @@ CREATE TABLE IF NOT EXISTS media_videos (
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Links to off-site forms (Nextcloud Forms surveys and the like) shown on the
+-- public Get Involved page and managed at /admin/forms. The site doesn't host
+-- these — it points at them, the same way it links out to the shop and the
+-- newsletter. position orders them; enabled hides one without deleting.
+CREATE TABLE IF NOT EXISTS external_forms (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL DEFAULT '',
+    url TEXT NOT NULL,
+    position INTEGER NOT NULL DEFAULT 0,
+    enabled INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,

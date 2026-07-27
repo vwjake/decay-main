@@ -85,6 +85,9 @@ templ AdminDashboard(c db.Counts, me db.User) {
 			if me.Can(db.PermMessages) {
 				@adminLink("/admin/messages", "Messages", "contact form inbox")
 			}
+			if me.Can(db.PermForms) {
+				@adminLink("/admin/forms", "Forms", "Get Involved page links")
+			}
 			if me.Can(db.PermReports) {
 				@adminLink("/admin/reports", "Reports", "quarterly and custom stats")
 			}

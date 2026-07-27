@@ -206,7 +206,7 @@ func Header() templ.Component {
 			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<header class=\"site-header\"><a href=\"/\"><img src=\"/static/img/logo.png\" alt=\"DECAY\"></a><nav class=\"site-nav mono\"><a href=\"/events\">Events</a> <a href=\"/calendar\">Calendar</a> <a href=\"/groups\">Groups</a> <a href=\"/about\">About</a> <a href=\"/blog\">Blog</a> <a href=\"/photos\">Photos</a> <a href=\"/shop\">Shop</a> <a href=\"/support\">Support</a> <a href=\"/contact\">Contact</a></nav></header>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<header class=\"site-header\"><a href=\"/\"><img src=\"/static/img/logo.png\" alt=\"DECAY\"></a><nav class=\"site-nav mono\"><a href=\"/events\">Events</a> <a href=\"/calendar\">Calendar</a> <a href=\"/groups\">Groups</a> <a href=\"/about\">About</a> <a href=\"/blog\">Blog</a> <a href=\"/photos\">Photos</a> <a href=\"/shop\">Shop</a> <a href=\"/support\">Support</a> <a href=\"/get-involved\">Get Involved</a> <a href=\"/contact\">Contact</a></nav></header>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -235,7 +235,7 @@ func Footer() templ.Component {
 			templ_7745c5c3_Var10 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<footer class=\"site-footer\"><img src=\"/static/img/logo.png\" alt=\"DECAY\"> <span class=\"mono\">Washington nonprofit &middot; est. 2024</span> <span class=\"mono\">402 Washington St NE, Olympia WA</span><nav class=\"footer-links mono\"><a href=\"/about\">About</a> <a href=\"/support\">Support</a> <a href=\"/contact\">Contact</a> <a href=\"/book\">Book the space</a> <a href=\"/policies\">Safer space</a> <a href=\"/events.ics\">Calendar feed</a></nav><span class=\"mono copyright\">&copy; 2026 DECAY Olympia. All rights reserved.</span></footer>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<footer class=\"site-footer\"><img src=\"/static/img/logo.png\" alt=\"DECAY\"> <span class=\"mono\">Washington nonprofit &middot; est. 2024</span> <span class=\"mono\">402 Washington St NE, Olympia WA</span><nav class=\"footer-links mono\"><a href=\"/about\">About</a> <a href=\"/support\">Support</a> <a href=\"/get-involved\">Get Involved</a> <a href=\"/contact\">Contact</a> <a href=\"/book\">Book the space</a> <a href=\"/policies\">Safer space</a> <a href=\"/events.ics\">Calendar feed</a></nav><span class=\"mono copyright\">&copy; 2026 DECAY Olympia. All rights reserved.</span></footer>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
