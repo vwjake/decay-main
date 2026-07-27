@@ -1,10 +1,10 @@
-// Package meetings reads DECAY's internal calendar. Where the public site
-// publishes an .ics feed that Nextcloud subscribes to (see package ics),
-// this goes the other way: the admin panel subscribes to a separate,
+// Package staff reads DECAY's internal staff calendar. Where the public
+// site publishes an .ics feed that Nextcloud subscribes to (see package
+// ics), this goes the other way: the admin panel subscribes to a separate,
 // internal Nextcloud calendar — board and organising meetings — and shows
 // it. It's the same one-way, credential-free arrangement in reverse. We
 // only ever read a shared read-only .ics URL; nothing is written back.
-package meetings
+package staff
 
 import (
 	"sort"

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"decay-main/db"
-	"decay-main/meetings"
+	"decay-main/staff"
 	"decay-main/views"
 
 	"github.com/gorilla/sessions"
@@ -15,9 +15,9 @@ import (
 )
 
 // Register wires up session middleware and every /admin route on e. venue
-// is the timezone dates are read in, and meetingsURL is the shared .ics
-// feed of the internal calendar (empty disables the meetings page).
-func Register(e *echo.Echo, conn *sql.DB, sessionSecret []byte, uploadsDir string, venue *time.Location, meetingsURL string) {
+// is the timezone dates are read in, and staffURL is the shared .ics feed
+// of the internal staff calendar (empty disables the staff page).
+func Register(e *echo.Echo, conn *sql.DB, sessionSecret []byte, uploadsDir string, venue *time.Location, staffURL string) {
 	store := sessions.NewCookieStore(sessionSecret)
 	store.Options = &sessions.Options{
 		Path:     "/",
@@ -63,9 +63,9 @@ func Register(e *echo.Echo, conn *sql.DB, sessionSecret []byte, uploadsDir strin
 	reports := g.Group("", requirePermission(db.PermReports))
 	registerReportRoutes(reports, conn)
 
-	meetingsClient := meetings.NewClient(meetingsURL, venue)
-	meetingsGroup := g.Group("", requirePermission(db.PermMeetings))
-	registerMeetingRoutes(meetingsGroup, meetingsClient, venue)
+	staffClient := staff.NewClient(staffURL, venue)
+	staffGroup := g.Group("", requirePermission(db.PermStaff))
+	registerStaffRoutes(staffGroup, staffClient, venue)
 
 	registerUserRoutes(g, conn)
 }

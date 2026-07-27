@@ -4,30 +4,30 @@ import (
 	"time"
 
 	"decay-main/db"
-	"decay-main/meetings"
+	"decay-main/staff"
 )
 
-// MeetingsPage is everything the internal-meetings screen renders. When the
-// calendar URL isn't configured, Configured is false and the page explains
-// how to turn it on instead of showing an empty grid.
-type MeetingsPage struct {
+// StaffPage is everything the internal staff-calendar screen renders. When
+// the calendar URL isn't configured, Configured is false and the page
+// explains how to turn it on instead of showing an empty grid.
+type StaffPage struct {
 	Configured bool
 	Error      string
-	Month      meetings.Month
-	Upcoming   []meetings.Meeting
+	Month      staff.Month
+	Upcoming   []staff.Meeting
 	Venue      *time.Location
 }
 
-templ AdminMeetings(p MeetingsPage, me db.User) {
-	@AdminLayout("Meetings · DECAY Admin", me) {
-		<p class="admin-heading">Meetings</p>
-		<p class="admin-sub mono">DECAY's internal calendar — board and organising meetings, read live from Nextcloud. Read-only here; edit it in Nextcloud.</p>
+templ AdminStaff(p StaffPage, me db.User) {
+	@AdminLayout("Staff · DECAY Admin", me) {
+		<p class="admin-heading">Staff calendar</p>
+		<p class="admin-sub mono">DECAY's internal staff calendar — board and organising meetings, read live from Nextcloud. Read-only here; edit it in Nextcloud.</p>
 
 		if !p.Configured {
 			<div class="admin-flash mono">
-				No internal calendar is connected yet. Set <code>MEETINGS_ICS_URL</code> to the
+				No staff calendar is connected yet. Set <code>STAFF_ICS_URL</code> to the
 				share link of DECAY's internal Nextcloud calendar (its read-only <code>.ics</code>
-				export URL) and restart, and meetings will show up here.
+				export URL) and restart, and it will show up here.
 			</div>
 		} else {
 			if p.Error != "" {
@@ -35,9 +35,9 @@ templ AdminMeetings(p MeetingsPage, me db.User) {
 			}
 
 			<nav class="pager mono">
-				<a href={ templ.URL("/admin/meetings?month=" + p.Month.Prev) } class="pager-link">&larr; Prev</a>
+				<a href={ templ.URL("/admin/staff?month=" + p.Month.Prev) } class="pager-link">&larr; Prev</a>
 				<span class="pager-status">{ p.Month.Label() }</span>
-				<a href={ templ.URL("/admin/meetings?month=" + p.Month.Next) } class="pager-link">Next &rarr;</a>
+				<a href={ templ.URL("/admin/staff?month=" + p.Month.Next) } class="pager-link">Next &rarr;</a>
 			</nav>
 
 			<div class="calendar-scroll">
@@ -75,7 +75,7 @@ templ AdminMeetings(p MeetingsPage, me db.User) {
 
 			<h2 class="admin-subheading">Upcoming</h2>
 			if len(p.Upcoming) == 0 {
-				<p class="subscribe-note mono">Nothing coming up on the internal calendar.</p>
+				<p class="subscribe-note mono">Nothing coming up on the staff calendar.</p>
 			} else {
 				<ul class="meeting-list">
 					for _, m := range p.Upcoming {

@@ -12,21 +12,21 @@ import (
 	"time"
 
 	"decay-main/db"
-	"decay-main/meetings"
+	"decay-main/staff"
 )
 
-// MeetingsPage is everything the internal-meetings screen renders. When the
-// calendar URL isn't configured, Configured is false and the page explains
-// how to turn it on instead of showing an empty grid.
-type MeetingsPage struct {
+// StaffPage is everything the internal staff-calendar screen renders. When
+// the calendar URL isn't configured, Configured is false and the page
+// explains how to turn it on instead of showing an empty grid.
+type StaffPage struct {
 	Configured bool
 	Error      string
-	Month      meetings.Month
-	Upcoming   []meetings.Meeting
+	Month      staff.Month
+	Upcoming   []staff.Meeting
 	Venue      *time.Location
 }
 
-func AdminMeetings(p MeetingsPage, me db.User) templ.Component {
+func AdminStaff(p StaffPage, me db.User) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -59,12 +59,12 @@ func AdminMeetings(p MeetingsPage, me db.User) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<p class=\"admin-heading\">Meetings</p><p class=\"admin-sub mono\">DECAY's internal calendar — board and organising meetings, read live from Nextcloud. Read-only here; edit it in Nextcloud.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<p class=\"admin-heading\">Staff calendar</p><p class=\"admin-sub mono\">DECAY's internal staff calendar — board and organising meetings, read live from Nextcloud. Read-only here; edit it in Nextcloud.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if !p.Configured {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"admin-flash mono\">No internal calendar is connected yet. Set <code>MEETINGS_ICS_URL</code> to the share link of DECAY's internal Nextcloud calendar (its read-only <code>.ics</code> export URL) and restart, and meetings will show up here.</div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"admin-flash mono\">No staff calendar is connected yet. Set <code>STAFF_ICS_URL</code> to the share link of DECAY's internal Nextcloud calendar (its read-only <code>.ics</code> export URL) and restart, and it will show up here.</div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -77,7 +77,7 @@ func AdminMeetings(p MeetingsPage, me db.User) templ.Component {
 					var templ_7745c5c3_Var3 string
 					templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(p.Error)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_meetings.templ`, Line: 34, Col: 61}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_staff.templ`, Line: 34, Col: 61}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 					if templ_7745c5c3_Err != nil {
@@ -93,9 +93,9 @@ func AdminMeetings(p MeetingsPage, me db.User) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var4 templ.SafeURL
-				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/admin/meetings?month=" + p.Month.Prev))
+				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/admin/staff?month=" + p.Month.Prev))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_meetings.templ`, Line: 38, Col: 64}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_staff.templ`, Line: 38, Col: 61}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
@@ -108,7 +108,7 @@ func AdminMeetings(p MeetingsPage, me db.User) templ.Component {
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(p.Month.Label())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_meetings.templ`, Line: 39, Col: 48}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_staff.templ`, Line: 39, Col: 48}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -119,9 +119,9 @@ func AdminMeetings(p MeetingsPage, me db.User) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var6 templ.SafeURL
-				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/admin/meetings?month=" + p.Month.Next))
+				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/admin/staff?month=" + p.Month.Next))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_meetings.templ`, Line: 40, Col: 64}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_staff.templ`, Line: 40, Col: 61}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
@@ -139,7 +139,7 @@ func AdminMeetings(p MeetingsPage, me db.User) templ.Component {
 					var templ_7745c5c3_Var7 string
 					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(day)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_meetings.templ`, Line: 48, Col: 30}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_staff.templ`, Line: 48, Col: 30}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 					if templ_7745c5c3_Err != nil {
@@ -173,7 +173,7 @@ func AdminMeetings(p MeetingsPage, me db.User) templ.Component {
 							var templ_7745c5c3_Var9 string
 							templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var8).String())
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_meetings.templ`, Line: 1, Col: 0}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_staff.templ`, Line: 1, Col: 0}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 							if templ_7745c5c3_Err != nil {
@@ -186,7 +186,7 @@ func AdminMeetings(p MeetingsPage, me db.User) templ.Component {
 							var templ_7745c5c3_Var10 string
 							templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(day.Number())
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_meetings.templ`, Line: 58, Col: 53}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_staff.templ`, Line: 58, Col: 53}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 							if templ_7745c5c3_Err != nil {
@@ -204,7 +204,7 @@ func AdminMeetings(p MeetingsPage, me db.User) templ.Component {
 								var templ_7745c5c3_Var11 string
 								templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(m.Title())
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_meetings.templ`, Line: 60, Col: 65}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_staff.templ`, Line: 60, Col: 65}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 								if templ_7745c5c3_Err != nil {
@@ -217,7 +217,7 @@ func AdminMeetings(p MeetingsPage, me db.User) templ.Component {
 								var templ_7745c5c3_Var12 string
 								templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(m.StartClock())
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_meetings.templ`, Line: 61, Col: 63}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_staff.templ`, Line: 61, Col: 63}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 								if templ_7745c5c3_Err != nil {
@@ -230,7 +230,7 @@ func AdminMeetings(p MeetingsPage, me db.User) templ.Component {
 								var templ_7745c5c3_Var13 string
 								templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(db.ShortTitle(m.Title()))
 								if templ_7745c5c3_Err != nil {
-									return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_meetings.templ`, Line: 62, Col: 69}
+									return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_staff.templ`, Line: 62, Col: 69}
 								}
 								_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 								if templ_7745c5c3_Err != nil {
@@ -262,7 +262,7 @@ func AdminMeetings(p MeetingsPage, me db.User) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				if len(p.Upcoming) == 0 {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<p class=\"subscribe-note mono\">Nothing coming up on the internal calendar.</p>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<p class=\"subscribe-note mono\">Nothing coming up on the staff calendar.</p>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -279,7 +279,7 @@ func AdminMeetings(p MeetingsPage, me db.User) templ.Component {
 						var templ_7745c5c3_Var14 string
 						templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(m.DayLabel(p.Venue))
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_meetings.templ`, Line: 84, Col: 56}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_staff.templ`, Line: 84, Col: 56}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 						if templ_7745c5c3_Err != nil {
@@ -292,7 +292,7 @@ func AdminMeetings(p MeetingsPage, me db.User) templ.Component {
 						var templ_7745c5c3_Var15 string
 						templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(m.TimeRange(p.Venue))
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_meetings.templ`, Line: 85, Col: 57}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_staff.templ`, Line: 85, Col: 57}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 						if templ_7745c5c3_Err != nil {
@@ -305,7 +305,7 @@ func AdminMeetings(p MeetingsPage, me db.User) templ.Component {
 						var templ_7745c5c3_Var16 string
 						templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(m.Title())
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_meetings.templ`, Line: 88, Col: 47}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_staff.templ`, Line: 88, Col: 47}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 						if templ_7745c5c3_Err != nil {
@@ -323,7 +323,7 @@ func AdminMeetings(p MeetingsPage, me db.User) templ.Component {
 							var templ_7745c5c3_Var17 string
 							templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(m.Location)
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_meetings.templ`, Line: 90, Col: 52}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_staff.templ`, Line: 90, Col: 52}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 							if templ_7745c5c3_Err != nil {
@@ -342,7 +342,7 @@ func AdminMeetings(p MeetingsPage, me db.User) templ.Component {
 							var templ_7745c5c3_Var18 string
 							templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(m.Description)
 							if templ_7745c5c3_Err != nil {
-								return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_meetings.templ`, Line: 93, Col: 51}
+								return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_staff.templ`, Line: 93, Col: 51}
 							}
 							_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 							if templ_7745c5c3_Err != nil {
@@ -366,7 +366,7 @@ func AdminMeetings(p MeetingsPage, me db.User) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = AdminLayout("Meetings · DECAY Admin", me).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = AdminLayout("Staff · DECAY Admin", me).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

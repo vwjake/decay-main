@@ -105,8 +105,8 @@ func AdminLayout(title string, me db.User) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		if me.Can(db.PermMeetings) {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<a href=\"/admin/meetings\">Meetings</a> ")
+		if me.Can(db.PermStaff) {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<a href=\"/admin/staff\">Staff</a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
