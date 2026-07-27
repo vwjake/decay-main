@@ -1,0 +1,23 @@
+package views
+
+import "strconv"
+
+// markdownEditor renders a Markdown textarea with a small formatting
+// toolbar. Each button carries a data-md action that app.js wires to this
+// textarea; with JavaScript off the plain textarea still works, so the
+// toolbar is a convenience, not a dependency. Used for the blog body, which
+// is rendered as Markdown on the public post page.
+templ markdownEditor(name, value string, rows int) {
+	<div class="md-editor">
+		<div class="md-toolbar mono" role="toolbar" aria-label="Markdown formatting">
+			<button type="button" class="md-btn" data-md="bold" title="Bold (Ctrl+B)"><strong>B</strong></button>
+			<button type="button" class="md-btn" data-md="italic" title="Italic (Ctrl+I)"><em>I</em></button>
+			<button type="button" class="md-btn" data-md="heading" title="Heading">H</button>
+			<button type="button" class="md-btn" data-md="link" title="Link">Link</button>
+			<button type="button" class="md-btn" data-md="ul" title="Bulleted list">List</button>
+			<button type="button" class="md-btn" data-md="quote" title="Quote">Quote</button>
+			<button type="button" class="md-btn" data-md="code" title="Code">Code</button>
+		</div>
+		<textarea name={ name } rows={ strconv.Itoa(rows) } required>{ value }</textarea>
+	</div>
+}

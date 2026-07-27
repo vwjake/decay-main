@@ -1729,3 +1729,42 @@ a {
   color: #333;
   white-space: pre-line;
 }
+
+/* Markdown editor toolbar (admin blog) -------------------------------- */
+.md-editor {
+  display: flex;
+  flex-direction: column;
+}
+
+.md-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px;
+  border: 2px solid #111;
+  border-bottom: none;
+  background: #f4f4f2;
+}
+
+.md-btn {
+  border: 1px solid #111;
+  background: #fff;
+  color: #111;
+  min-width: 30px;
+  padding: 4px 8px;
+  font-family: "Space Mono", monospace;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.md-btn:hover {
+  background: #111;
+  color: #fff;
+}
+
+/* The textarea butts directly against the toolbar, so they read as one
+   control; the toolbar owns the top border. */
+.md-editor textarea {
+  margin: 0;
+}

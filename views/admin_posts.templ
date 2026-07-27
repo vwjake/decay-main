@@ -31,6 +31,7 @@ templ AdminPosts(posts []db.Post, me db.User, errorMsg string) {
 						}
 					</td>
 					<td>
+						<a href={ templ.URL(fmt.Sprintf("/admin/posts/%d", p.ID)) } class="admin-btn">Edit</a>
 						if p.Published() {
 							<form method="post" action={ templ.URL(fmt.Sprintf("/admin/posts/%d/unpublish", p.ID)) } style="display:inline">
 								<button type="submit" class="admin-btn">Unpublish</button>
@@ -52,7 +53,10 @@ templ AdminPosts(posts []db.Post, me db.User, errorMsg string) {
 		<form method="post" action="/admin/posts" class="admin-form">
 			<label>Title<input type="text" name="title" required/></label>
 			<label>Slug<input type="text" name="slug" placeholder="my-post-title" required/></label>
-			<label>Body (Markdown)<textarea name="body" required></textarea></label>
+			<label>
+				Body (Markdown)
+				@markdownEditor("body", "", 10)
+			</label>
 			<label class="inline mono"><input type="checkbox" name="publish"/> Publish immediately</label>
 			<button type="submit" class="admin-btn">Save</button>
 		</form>

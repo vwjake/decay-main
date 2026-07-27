@@ -25,7 +25,10 @@ templ AdminPostEdit(post db.Post, me db.User, errorMsg string) {
 		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/posts/%d", post.ID)) } class="admin-form">
 			<label>Title<input type="text" name="title" value={ post.Title } required/></label>
 			<label>Web address<input type="text" name="slug" value={ post.Slug } required/></label>
-			<label>Body<textarea name="body" rows="18" required>{ post.Body }</textarea></label>
+			<label>
+				Body (Markdown)
+				@markdownEditor("body", post.Body, 18)
+			</label>
 			<button type="submit" class="admin-btn">Save post</button>
 		</form>
 
