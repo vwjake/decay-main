@@ -1,0 +1,102 @@
+package views
+
+import (
+	"time"
+
+	"decay-main/db"
+	"decay-main/meetings"
+)
+
+// MeetingsPage is everything the internal-meetings screen renders. When the
+// calendar URL isn't configured, Configured is false and the page explains
+// how to turn it on instead of showing an empty grid.
+type MeetingsPage struct {
+	Configured bool
+	Error      string
+	Month      meetings.Month
+	Upcoming   []meetings.Meeting
+	Venue      *time.Location
+}
+
+templ AdminMeetings(p MeetingsPage, me db.User) {
+	@AdminLayout("Meetings · DECAY Admin", me) {
+		<p class="admin-heading">Meetings</p>
+		<p class="admin-sub mono">DECAY's internal calendar — board and organising meetings, read live from Nextcloud. Read-only here; edit it in Nextcloud.</p>
+
+		if !p.Configured {
+			<div class="admin-flash mono">
+				No internal calendar is connected yet. Set <code>MEETINGS_ICS_URL</code> to the
+				share link of DECAY's internal Nextcloud calendar (its read-only <code>.ics</code>
+				export URL) and restart, and meetings will show up here.
+			</div>
+		} else {
+			if p.Error != "" {
+				<div class="admin-flash admin-flash-error mono">{ p.Error }</div>
+			}
+
+			<nav class="pager mono">
+				<a href={ templ.URL("/admin/meetings?month=" + p.Month.Prev) } class="pager-link">&larr; Prev</a>
+				<span class="pager-status">{ p.Month.Label() }</span>
+				<a href={ templ.URL("/admin/meetings?month=" + p.Month.Next) } class="pager-link">Next &rarr;</a>
+			</nav>
+
+			<div class="calendar-scroll">
+				<table class="calendar">
+					<thead>
+						<tr>
+							for _, day := range db.Weekdays {
+								<th class="mono">{ day }</th>
+							}
+						</tr>
+					</thead>
+					<tbody>
+						for _, week := range p.Month.Weeks {
+							<tr>
+								for _, day := range week {
+									if day.InMonth {
+										<td class={ "cal-day", templ.KV("is-today", day.Today) }>
+											<span class="cal-date mono">{ day.Number() }</span>
+											for _, m := range day.Meetings {
+												<span class="cal-event cal-meeting" title={ m.Title() }>
+													<span class="cal-event-time mono">{ m.StartClock() }</span>
+													<span class="cal-event-title">{ db.ShortTitle(m.Title()) }</span>
+												</span>
+											}
+										</td>
+									} else {
+										<td class="cal-day is-outside"></td>
+									}
+								}
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+
+			<h2 class="admin-subheading">Upcoming</h2>
+			if len(p.Upcoming) == 0 {
+				<p class="subscribe-note mono">Nothing coming up on the internal calendar.</p>
+			} else {
+				<ul class="meeting-list">
+					for _, m := range p.Upcoming {
+						<li class="meeting-row">
+							<span class="meeting-when mono">
+								<span class="meeting-date">{ m.DayLabel(p.Venue) }</span>
+								<span class="meeting-time">{ m.TimeRange(p.Venue) }</span>
+							</span>
+							<span class="meeting-body">
+								<span class="meeting-title">{ m.Title() }</span>
+								if m.Location != "" {
+									<span class="meeting-loc mono">{ m.Location }</span>
+								}
+								if m.Description != "" {
+									<span class="meeting-desc">{ m.Description }</span>
+								}
+							</span>
+						</li>
+					}
+				</ul>
+			}
+		}
+	}
+}

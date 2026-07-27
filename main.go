@@ -99,7 +99,9 @@ func main() {
 	e.StaticFS("/static", static)
 	e.Static("/uploads", uploadsDir)
 
-	admin.Register(e, conn, sessionSecret(), uploadsDir)
+	// The internal meetings calendar is read from a separate Nextcloud
+	// share; an unset URL simply leaves that admin page dormant.
+	admin.Register(e, conn, sessionSecret(), uploadsDir, venue, os.Getenv("MEETINGS_ICS_URL"))
 
 	e.GET("/", func(c echo.Context) error {
 		events, err := db.ListUpcomingEvents(conn, 4)

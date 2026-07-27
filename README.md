@@ -115,6 +115,19 @@ on the site — would need a real two-way CalDAV sync with conflict rules,
 and iCalendar can't carry the fields a DECAY event needs. That's
 deliberately not built.
 
+### Internal meetings
+
+The public feed above is the site publishing *out* to Nextcloud. The
+`/admin/meetings` page does the reverse for DECAY's own business: it
+subscribes *in* to a separate, internal Nextcloud calendar (board and
+organising meetings) and shows it on a month grid with an upcoming list.
+It's the same arrangement — one-way, no stored credentials — just
+inverted: point `MEETINGS_ICS_URL` at that calendar's read-only `.ics`
+share link and it's read live (cached a few minutes) on each view.
+Nothing is ever written back, and leaving the variable unset simply hides
+the page. Meetings stay edited in Nextcloud; this is only a window onto
+them, gated on a `meetings` permission.
+
 ## Pages
 
 `/about`, `/support`, and `/policies` are static copy carried over from
@@ -201,6 +214,8 @@ once events are managed there, stop re-importing.
 - `cmd/importevents/` — one-way converter from the old site's event JSON
 - `cmd/importshop/` — one-way converter from the shop.decay.events export
 - `ics/` — renders events as a subscribable iCalendar feed
+- `meetings/` — reads DECAY's internal Nextcloud calendar for `/admin/meetings`
+- `markdown/` — renders blog post Markdown to HTML
 - `images/` — makes web-sized copies of uploaded flyers
 - `views/` — templ page templates (`.templ` source + generated `_templ.go`)
 - `admin/` — session auth, permission checks, and CRUD handlers for `/admin/*`

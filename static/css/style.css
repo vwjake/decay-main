@@ -1646,3 +1646,86 @@ a {
   padding: 6px 10px;
   text-align: left;
 }
+
+/* Internal meetings calendar (admin) ---------------------------------- */
+/* Meetings come from the read-only Nextcloud feed, so their cells aren't
+   links — drop the events grid's hover-invert, which would imply a click,
+   and mark them with an accent stripe instead. */
+.cal-meeting {
+  cursor: default;
+  border-left: 3px solid #111;
+}
+
+.cal-meeting:hover {
+  background: #f4f4f2;
+  color: inherit;
+}
+
+.cal-meeting:hover .cal-event-time {
+  color: #666;
+}
+
+.admin-subheading {
+  font-family: "Archivo", sans-serif;
+  font-size: 18px;
+  margin: 28px 0 10px;
+}
+
+.meeting-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.meeting-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  padding: 12px 0;
+  border-top: 2px solid #111;
+}
+
+.meeting-row:last-child {
+  border-bottom: 2px solid #111;
+}
+
+.meeting-when {
+  flex: 0 0 140px;
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+}
+
+.meeting-date {
+  font-weight: 700;
+  color: #111;
+}
+
+.meeting-time {
+  color: #666;
+}
+
+.meeting-body {
+  flex: 1 1 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.meeting-title {
+  font-weight: 700;
+}
+
+.meeting-loc {
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.meeting-desc {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+  white-space: pre-line;
+}

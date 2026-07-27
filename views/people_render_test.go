@@ -37,10 +37,10 @@ func TestPeopleViewsRender(t *testing.T) {
 // TestInitials covers the portrait placeholder text.
 func TestInitials(t *testing.T) {
 	cases := map[string]string{
-		"Moon Fery":      "MF",
-		"Abe":            "A",
-		"Robin A. Diaz":  "RA",
-		"":               "",
+		"Moon Fery":     "MF",
+		"Abe":           "A",
+		"Robin A. Diaz": "RA",
+		"":              "",
 	}
 	for in, want := range cases {
 		if got := initials(in); got != want {
