@@ -36,14 +36,14 @@ func markdownEditor(name, value string, rows int) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"md-editor\"><div class=\"md-toolbar mono\" role=\"toolbar\" aria-label=\"Markdown formatting\"><button type=\"button\" class=\"md-btn\" data-md=\"bold\" title=\"Bold (Ctrl+B)\"><strong>B</strong></button> <button type=\"button\" class=\"md-btn\" data-md=\"italic\" title=\"Italic (Ctrl+I)\"><em>I</em></button> <button type=\"button\" class=\"md-btn\" data-md=\"heading\" title=\"Heading\">H</button> <button type=\"button\" class=\"md-btn\" data-md=\"link\" title=\"Link\">Link</button> <button type=\"button\" class=\"md-btn\" data-md=\"ul\" title=\"Bulleted list\">List</button> <button type=\"button\" class=\"md-btn\" data-md=\"quote\" title=\"Quote\">Quote</button> <button type=\"button\" class=\"md-btn\" data-md=\"code\" title=\"Code\">Code</button></div><textarea name=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"md-editor\"><div class=\"md-toolbar mono\" role=\"toolbar\" aria-label=\"Markdown formatting\"><button type=\"button\" class=\"md-btn\" data-md=\"bold\" title=\"Bold (Ctrl+B)\"><strong>B</strong></button> <button type=\"button\" class=\"md-btn\" data-md=\"italic\" title=\"Italic (Ctrl+I)\"><em>I</em></button> <button type=\"button\" class=\"md-btn\" data-md=\"heading\" title=\"Heading\">H</button> <button type=\"button\" class=\"md-btn\" data-md=\"link\" title=\"Link\">Link</button> <button type=\"button\" class=\"md-btn\" data-md=\"ul\" title=\"Bulleted list\">List</button> <button type=\"button\" class=\"md-btn\" data-md=\"quote\" title=\"Quote\">Quote</button> <button type=\"button\" class=\"md-btn\" data-md=\"code\" title=\"Code\">Code</button> <button type=\"button\" class=\"md-btn\" data-md=\"embed\" title=\"Embed a YouTube or Bandcamp link\">Embed</button></div><textarea name=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.ResolveAttributeValue(name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/markdown_editor.templ`, Line: 21, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/markdown_editor.templ`, Line: 22, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2)
 		if templ_7745c5c3_Err != nil {
@@ -56,7 +56,7 @@ func markdownEditor(name, value string, rows int) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(strconv.Itoa(rows))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/markdown_editor.templ`, Line: 21, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/markdown_editor.templ`, Line: 22, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
 		if templ_7745c5c3_Err != nil {
@@ -69,7 +69,7 @@ func markdownEditor(name, value string, rows int) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/markdown_editor.templ`, Line: 21, Col: 70}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/markdown_editor.templ`, Line: 22, Col: 70}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {

@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"decay-main/db"
+	"decay-main/embed"
 	"decay-main/images"
 	"decay-main/views"
 
@@ -35,6 +36,21 @@ func registerPostRoutes(g *echo.Group, conn *sql.DB, uploadsDir string) {
 	g.POST("/posts/:id/delete", deletePost(conn, uploadsDir))
 	g.POST("/posts/:id/images", uploadPostImage(conn, uploadsDir))
 	g.POST("/posts/:id/images/:imageID/delete", deletePostImage(conn, uploadsDir))
+	g.POST("/posts/embed", resolveEmbed())
+}
+
+// resolveEmbed turns a pasted YouTube or Bandcamp link into the line the
+// editor should insert (see package embed). It's the one place a Bandcamp
+// page is fetched, so it stays off the render path. Errors come back in the
+// JSON body for the toolbar to show, not as an HTTP error.
+func resolveEmbed() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		insert, err := embed.Resolve(c.FormValue("url"))
+		if err != nil {
+			return c.JSON(http.StatusOK, map[string]string{"error": err.Error()})
+		}
+		return c.JSON(http.StatusOK, map[string]string{"insert": insert})
+	}
 }
 
 func editPost(conn *sql.DB) echo.HandlerFunc {

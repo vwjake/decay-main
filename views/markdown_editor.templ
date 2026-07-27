@@ -17,6 +17,7 @@ templ markdownEditor(name, value string, rows int) {
 			<button type="button" class="md-btn" data-md="ul" title="Bulleted list">List</button>
 			<button type="button" class="md-btn" data-md="quote" title="Quote">Quote</button>
 			<button type="button" class="md-btn" data-md="code" title="Code">Code</button>
+			<button type="button" class="md-btn" data-md="embed" title="Embed a YouTube or Bandcamp link">Embed</button>
 		</div>
 		<textarea name={ name } rows={ strconv.Itoa(rows) } required>{ value }</textarea>
 	</div>

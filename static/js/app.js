@@ -14,7 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
     editor.querySelectorAll('[data-md]').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
-        applyMarkdown(textarea, btn.dataset.md);
+        if (btn.dataset.md === 'embed') embedLink(textarea);
+        else applyMarkdown(textarea, btn.dataset.md);
       });
     });
 
@@ -38,6 +39,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+// embedLink asks for a YouTube or Bandcamp URL, has the server resolve it
+// to an embeddable link (a Bandcamp page needs a lookup), and inserts that
+// on its own line — the Markdown renderer turns such a line into a player.
+async function embedLink(textarea) {
+  const url = window.prompt('Paste a YouTube or Bandcamp link to embed:');
+  if (!url) return;
+  try {
+    const res = await fetch('/admin/posts/embed', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'url=' + encodeURIComponent(url.trim()),
+    });
+    const data = await res.json();
+    if (data.error) { window.alert(data.error); return; }
+    insertAtCursor(textarea, data.insert);
+  } catch (e) {
+    window.alert('Could not reach the server to resolve that link.');
+  }
+}
 
 // insertAtCursor drops text into the textarea at the caret (or over the
 // selection), on its own line, and leaves the caret after it.

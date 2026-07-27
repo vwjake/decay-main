@@ -1799,3 +1799,32 @@ a {
   padding: 6px;
   justify-content: space-between;
 }
+
+/* Blog embeds (YouTube / Bandcamp) ------------------------------------ */
+.embed {
+  margin: 20px 0;
+  border: 2px solid #111;
+}
+
+/* Responsive 16:9 video that keeps its ratio at any width. */
+.embed-video {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+}
+
+.embed-video iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Bandcamp's player is a fixed-height strip; let it span the column. */
+.embed-audio {
+  display: block;
+  width: 100%;
+  height: 120px;
+}

@@ -41,3 +41,28 @@ func TestToHTMLAutolinksBareURL(t *testing.T) {
 		t.Errorf("bare URL was not autolinked: %s", out)
 	}
 }
+
+// TestToHTMLEmbedsMediaOnItsOwnLine covers the embed transformer: a media
+// URL alone on a line becomes a player, while the same URL in a sentence
+// stays an ordinary link.
+func TestToHTMLEmbedsMediaOnItsOwnLine(t *testing.T) {
+	yt := ToHTML("Watch this:\n\nhttps://youtu.be/dQw4w9WgXcQ\n")
+	if !strings.Contains(yt, `class="embed embed-video"`) ||
+		!strings.Contains(yt, "youtube-nocookie.com/embed/dQw4w9WgXcQ") {
+		t.Errorf("bare YouTube line didn't become a video embed: %s", yt)
+	}
+
+	bc := ToHTML("https://bandcamp.com/EmbeddedPlayer/album=42/size=large/\n")
+	if !strings.Contains(bc, `class="embed embed-audio"`) {
+		t.Errorf("Bandcamp player line didn't become an audio embed: %s", bc)
+	}
+
+	// In a sentence, it must remain a plain link, not an embed.
+	inline := ToHTML("See https://youtu.be/dQw4w9WgXcQ now.")
+	if strings.Contains(inline, "class=\"embed") {
+		t.Errorf("a URL mid-sentence should not be embedded: %s", inline)
+	}
+	if !strings.Contains(inline, `href="https://youtu.be/dQw4w9WgXcQ"`) {
+		t.Errorf("mid-sentence URL should stay a link: %s", inline)
+	}
+}
