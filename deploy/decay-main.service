@@ -1,0 +1,34 @@
+[Unit]
+Description=DECAY main website (Go)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=decay
+Group=decay
+WorkingDirectory=/opt/decay-main
+
+# Production config lives here, not in a .env file. Copy deploy/decay-main.env.example
+# to /etc/decay-main.env, fill it in, and `chmod 600` it (it holds SESSION_SECRET
+# and SMTP_PASS). godotenv also loads a .env if present, but systemd is the source
+# of truth in production.
+EnvironmentFile=/etc/decay-main.env
+
+ExecStart=/opt/decay-main/decay-main
+Restart=on-failure
+RestartSec=2
+
+# The app listens on plain HTTP; Caddy terminates TLS and proxies to it. Keep it
+# on loopback so nothing reaches the app except through the proxy.
+Environment=PORT=8080
+
+# Hardening — the app only needs to read its own dir and write uploads/ + the DB.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/opt/decay-main
+
+[Install]
+WantedBy=multi-user.target

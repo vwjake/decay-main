@@ -110,9 +110,15 @@ func main() {
 	e.StaticFS("/static", static)
 	e.Static("/uploads", uploadsDir)
 
+	// Admin session cookies are marked Secure whenever the site is served
+	// over HTTPS (i.e. in production behind the TLS proxy), so the cookie
+	// never leaves over plain HTTP. Local dev on http://localhost keeps it
+	// off, or the browser would drop the cookie and login would never stick.
+	secureCookies := strings.HasPrefix(siteURL, "https://")
+
 	// The internal staff calendar is read from a separate Nextcloud
 	// share; an unset URL simply leaves that admin page dormant.
-	admin.Register(e, conn, sessionSecret(), uploadsDir, venue, os.Getenv("STAFF_ICS_URL"))
+	admin.Register(e, conn, sessionSecret(), uploadsDir, venue, os.Getenv("STAFF_ICS_URL"), secureCookies)
 
 	e.GET("/", func(c echo.Context) error {
 		events, err := db.ListUpcomingEvents(conn, 4)

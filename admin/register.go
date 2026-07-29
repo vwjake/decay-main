@@ -17,12 +17,14 @@ import (
 // Register wires up session middleware and every /admin route on e. venue
 // is the timezone dates are read in, and staffURL is the shared .ics feed
 // of the internal staff calendar (empty disables the staff page).
-func Register(e *echo.Echo, conn *sql.DB, sessionSecret []byte, uploadsDir string, venue *time.Location, staffURL string) {
+// secureCookies marks the session cookie Secure (HTTPS-only) in production.
+func Register(e *echo.Echo, conn *sql.DB, sessionSecret []byte, uploadsDir string, venue *time.Location, staffURL string, secureCookies bool) {
 	store := sessions.NewCookieStore(sessionSecret)
 	store.Options = &sessions.Options{
 		Path:     "/",
 		MaxAge:   8 * 60 * 60,
 		HttpOnly: true,
+		Secure:   secureCookies,
 		SameSite: http.SameSiteLaxMode,
 	}
 	e.Use(session.Middleware(store))

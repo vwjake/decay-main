@@ -1,0 +1,21 @@
+# Caddy terminates TLS for decay.events and proxies to the Go app on loopback.
+# Caddy fetches and renews the Let's Encrypt certificate automatically — no
+# certbot, no cron. Put this at /etc/caddy/Caddyfile and `systemctl reload caddy`.
+
+decay.events, www.decay.events {
+	# Redirect the www host to the bare domain so links/cookies have one origin.
+	@www host www.decay.events
+	redir @www https://decay.events{uri} permanent
+
+	encode gzip zstd
+
+	# The app already sets its own headers; add the transport-security ones the
+	# proxy is the right place for.
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
+
+	reverse_proxy 127.0.0.1:8080
+}
