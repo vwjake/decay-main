@@ -1,7 +1,7 @@
 package views
 
 templ Layout(title string) {
-	@layoutWith(title, "page") {
+	@layoutWith(title, "page", Meta{}) {
 		{ children... }
 	}
 }
@@ -10,18 +10,27 @@ templ Layout(title string) {
 // seven readable columns, which the site's usual narrow measure can't
 // give it.
 templ WideLayout(title string) {
-	@layoutWith(title, "page page-wide") {
+	@layoutWith(title, "page page-wide", Meta{}) {
 		{ children... }
 	}
 }
 
-templ layoutWith(title, pageClass string) {
+// LayoutWithMeta is Layout plus per-page Open Graph / Twitter preview tags,
+// for pages worth sharing (events, posts) where a rich link preview matters.
+templ LayoutWithMeta(title string, meta Meta) {
+	@layoutWith(title, "page", meta) {
+		{ children... }
+	}
+}
+
+templ layoutWith(title, pageClass string, meta Meta) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
 			<meta charset="utf-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1"/>
 			<title>{ title }</title>
+			@ogTags(title, meta)
 			<link rel="preconnect" href="https://fonts.googleapis.com"/>
 			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
 			<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
@@ -43,6 +52,27 @@ templ layoutWith(title, pageClass string) {
 			<script src="/static/js/app.js"></script>
 		</body>
 	</html>
+}
+
+// ogTags renders the Open Graph and Twitter card meta for a page. Link-preview
+// scrapers (Discord, Slack, iMessage, X, Facebook) read these to build the
+// preview card; they don't run JavaScript, which is exactly why the tags have
+// to be present in the server-rendered HTML rather than added client-side.
+templ ogTags(title string, meta Meta) {
+	<meta name="description" content={ ogDescription(meta) }/>
+	<meta property="og:site_name" content={ siteName }/>
+	<meta property="og:title" content={ title }/>
+	<meta property="og:description" content={ ogDescription(meta) }/>
+	<meta property="og:type" content={ ogType(meta) }/>
+	if meta.URL != "" {
+		<meta property="og:url" content={ meta.URL }/>
+	}
+	if meta.Image != "" {
+		<meta property="og:image" content={ meta.Image }/>
+		<meta name="twitter:card" content="summary_large_image"/>
+	} else {
+		<meta name="twitter:card" content="summary"/>
+	}
 }
 
 templ Header() {

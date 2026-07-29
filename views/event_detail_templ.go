@@ -22,7 +22,7 @@ type SignupBox struct {
 // EventDetail shows one event. openRoles is the volunteer jobs still
 // needing someone — who has already signed up is deliberately not shown
 // here, since that's the organisers' business rather than the public's.
-func EventDetail(ev db.Event, openRoles []db.EventVolunteer, signup SignupBox) templ.Component {
+func EventDetail(ev db.Event, openRoles []db.EventVolunteer, signup SignupBox, meta Meta) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -355,7 +355,7 @@ func EventDetail(ev db.Event, openRoles []db.EventVolunteer, signup SignupBox) t
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = Layout(ev.Title+" · DECAY").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = LayoutWithMeta(ev.Title+" · DECAY", meta).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

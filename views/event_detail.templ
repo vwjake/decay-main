@@ -14,8 +14,8 @@ type SignupBox struct {
 // EventDetail shows one event. openRoles is the volunteer jobs still
 // needing someone — who has already signed up is deliberately not shown
 // here, since that's the organisers' business rather than the public's.
-templ EventDetail(ev db.Event, openRoles []db.EventVolunteer, signup SignupBox) {
-	@Layout(ev.Title + " · DECAY") {
+templ EventDetail(ev db.Event, openRoles []db.EventVolunteer, signup SignupBox, meta Meta) {
+	@LayoutWithMeta(ev.Title+" · DECAY", meta) {
 		<section class="event-detail">
 			<a href="/events" class="event-back mono">&larr; All events</a>
 			<span class="section-label mono">{ ev.EventType }</span>

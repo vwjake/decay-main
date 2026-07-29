@@ -161,6 +161,9 @@ func main() {
 		}
 		events, page := db.Paginate(events, db.PageNumber(c.QueryParam("page")), db.PerPagePublic)
 		page.Path = "/events"
+		if wantsJSON(c) {
+			return c.JSON(http.StatusOK, db.EventsResponse(siteURL, events))
+		}
 		return views.Events(db.GroupByMonth(events), page).Render(c.Request().Context(), c.Response())
 	})
 
@@ -205,15 +208,19 @@ func main() {
 		if err != nil {
 			return err
 		}
+		openRoles := db.OpenRoles(volunteers)
+		if wantsJSON(c) {
+			return c.JSON(http.StatusOK, ev.Response(siteURL, openRoles))
+		}
 		signup := views.SignupBox{
 			Show: ev.StartsAt.After(time.Now()),
 			Done: c.QueryParam("signed") != "",
 		}
-		return views.EventDetail(ev, db.OpenRoles(volunteers), signup).Render(c.Request().Context(), c.Response())
+		return views.EventDetail(ev, openRoles, signup, views.EventMeta(ev, siteURL)).Render(c.Request().Context(), c.Response())
 	})
 
 	e.POST("/events/:slug/volunteer", func(c echo.Context) error {
-		return submitSignup(c, conn)
+		return submitSignup(c, conn, siteURL)
 	})
 
 	e.GET("/book", func(c echo.Context) error {
@@ -319,6 +326,16 @@ func main() {
 	e.Logger.Fatal(e.Start(":" + port))
 }
 
+// wantsJSON reports whether the client asked for a JSON representation of a
+// page that can serve both. The rule is explicit opt-in: only an Accept header
+// naming application/json gets JSON. Ordinary browser navigation
+// (Accept: text/html,...), htmx requests (Accept: */*), and link-preview
+// scrapers all fall through to the HTML page, so previews and progressive
+// enhancement keep working. Admin endpoints are JSON-only and don't use this.
+func wantsJSON(c echo.Context) bool {
+	return strings.Contains(c.Request().Header.Get(echo.HeaderAccept), "application/json")
+}
+
 // submitBooking validates and stores a public booking request. A filled
 // honeypot field is treated as a bot and silently dropped.
 func submitBooking(c echo.Context, conn *sql.DB) error {
@@ -406,7 +423,7 @@ func validEmail(addr string) bool {
 
 // submitSignup validates and stores a public volunteer offer for an event.
 // A filled honeypot field is treated as a bot and silently dropped.
-func submitSignup(c echo.Context, conn *sql.DB) error {
+func submitSignup(c echo.Context, conn *sql.DB, siteURL string) error {
 	ev, err := db.EventBySlug(conn, c.Param("slug"))
 	if errors.Is(err, sql.ErrNoRows) {
 		return echo.NewHTTPError(http.StatusNotFound)
@@ -429,7 +446,7 @@ func submitSignup(c echo.Context, conn *sql.DB) error {
 	contact := strings.TrimSpace(c.FormValue("contact"))
 	if name == "" || contact == "" {
 		signup := views.SignupBox{Show: true, Error: "Please leave your name and a way to reach you."}
-		return views.EventDetail(ev, openRoles, signup).Render(c.Request().Context(), c.Response())
+		return views.EventDetail(ev, openRoles, signup, views.EventMeta(ev, siteURL)).Render(c.Request().Context(), c.Response())
 	}
 
 	// Only accept a role the event actually has open; anything else falls

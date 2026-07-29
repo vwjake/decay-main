@@ -19,13 +19,14 @@ func TestEventDetailSignupStates(t *testing.T) {
 		{Show: true, Done: true},                     // thank-you
 		{Show: false},                                // past event, no form
 	}
+	meta := EventMeta(ev, "https://decay.events")
 	for i, s := range states {
-		if err := EventDetail(ev, openRoles, s).Render(context.Background(), io.Discard); err != nil {
+		if err := EventDetail(ev, openRoles, s, meta).Render(context.Background(), io.Discard); err != nil {
 			t.Fatalf("EventDetail state %d: %v", i, err)
 		}
 	}
 	// Past event with open roles still shows the informational list.
-	if err := EventDetail(ev, openRoles, SignupBox{Show: false}).Render(context.Background(), io.Discard); err != nil {
+	if err := EventDetail(ev, openRoles, SignupBox{Show: false}, meta).Render(context.Background(), io.Discard); err != nil {
 		t.Fatalf("EventDetail past: %v", err)
 	}
 }
