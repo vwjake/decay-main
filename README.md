@@ -16,9 +16,11 @@ go run main.go
 
 Then visit http://localhost:8080.
 
-The admin panel lives at `/admin/login` and manages events, shop
-products, blog posts, and photos — all stored in `decay.db` (SQLite,
-created and seeded automatically on first run).
+The admin panel lives at `/admin/login`. It manages events, shop
+products, blog posts, photos, board/staff people, groups, media, and
+site forms, and it collects booking requests, volunteer sign-ups, and
+contact messages — all stored in `decay.db` (SQLite, created and seeded
+automatically on first run).
 
 ## Accounts
 
@@ -34,10 +36,11 @@ the admin panel is the only place to change it, so refusing to boot would
 lock everyone out of fixing it.)
 
 Access is by permission, not by role name — `events`, `posts`, `shop`,
-`photos`, and `users`. Roles map to sets of those in `db/roles.go`, and
-handlers check the permission, so adding a narrower role later means
-adding an entry there and changing no handlers. **`master` is the only
-role so far** and grants everything.
+`photos`, `people`, `groups`, `media`, `bookings`, `messages`, `forms`,
+`reports`, `staff`, and `users`. Roles map to sets of those in
+`db/roles.go`, and handlers check the permission, so adding a narrower
+role later means adding an entry there and changing no handlers.
+**`master` is the only role so far** and grants everything.
 
 Two things the panel refuses, because both would lock everyone out
 permanently: deleting the account you're signed in as, and removing the
@@ -115,18 +118,18 @@ on the site — would need a real two-way CalDAV sync with conflict rules,
 and iCalendar can't carry the fields a DECAY event needs. That's
 deliberately not built.
 
-### Internal meetings
+### Staff calendar
 
 The public feed above is the site publishing *out* to Nextcloud. The
-`/admin/meetings` page does the reverse for DECAY's own business: it
+`/admin/staff` page does the reverse for DECAY's own business: it
 subscribes *in* to a separate, internal Nextcloud calendar (board and
 organising meetings) and shows it on a month grid with an upcoming list.
 It's the same arrangement — one-way, no stored credentials — just
-inverted: point `MEETINGS_ICS_URL` at that calendar's read-only `.ics`
+inverted: point `STAFF_ICS_URL` at that calendar's read-only `.ics`
 share link and it's read live (cached a few minutes) on each view.
 Nothing is ever written back, and leaving the variable unset simply hides
 the page. Meetings stay edited in Nextcloud; this is only a window onto
-them, gated on a `meetings` permission.
+them, gated on a `staff` permission.
 
 ## Pages
 
@@ -181,10 +184,12 @@ cleanup, promote. A row existing means the job is needed; an empty
   volunteered is recorded through the admin panel, into `decay.db`, which
   isn't committed.
 
-There's no public sign-up form yet — the page tells people to ask on
-Discord or at the door. Adding one means deciding how to handle contact
-details and spam, which is worth doing on purpose rather than by
-default.
+Upcoming event pages carry a public **sign-up form** — name, a way to
+reach them, an optional role, and a note. Offers land in a separate
+`volunteer_signups` table and surface on the admin event page, never on
+the public one. This is the one place volunteer contact details are
+collected on purpose, and they're kept apart from `event_volunteers`,
+which still holds names only; a honeypot field drops bots.
 
 ## Event data
 
@@ -214,8 +219,10 @@ once events are managed there, stop re-importing.
 - `cmd/importevents/` — one-way converter from the old site's event JSON
 - `cmd/importshop/` — one-way converter from the shop.decay.events export
 - `ics/` — renders events as a subscribable iCalendar feed
-- `meetings/` — reads DECAY's internal Nextcloud calendar for `/admin/meetings`
+- `staff/` — reads DECAY's internal Nextcloud calendar for `/admin/staff`
 - `markdown/` — renders blog post Markdown to HTML
+- `embed/` — resolves YouTube/Bandcamp links in posts into players
+- `mail/` — best-effort SMTP notification for contact-form messages
 - `images/` — makes web-sized copies of uploaded flyers
 - `views/` — templ page templates (`.templ` source + generated `_templ.go`)
 - `admin/` — session auth, permission checks, and CRUD handlers for `/admin/*`
