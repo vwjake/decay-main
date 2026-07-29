@@ -295,6 +295,9 @@ func main() {
 		if err != nil {
 			return err
 		}
+		if wantsJSON(c) {
+			return c.JSON(http.StatusOK, db.PostsResponse(siteURL, posts))
+		}
 		return views.Blog(posts).Render(c.Request().Context(), c.Response())
 	})
 
@@ -306,7 +309,10 @@ func main() {
 		if err != nil {
 			return err
 		}
-		return views.PostPage(post).Render(c.Request().Context(), c.Response())
+		if wantsJSON(c) {
+			return c.JSON(http.StatusOK, post.Response(siteURL))
+		}
+		return views.PostPage(post, views.PostMeta(post, siteURL)).Render(c.Request().Context(), c.Response())
 	})
 
 	e.GET("/photos", func(c echo.Context) error {

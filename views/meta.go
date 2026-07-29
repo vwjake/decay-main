@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"decay-main/db"
+	"decay-main/markdown"
 )
 
 // siteName and defaultDescription are the site-wide fallbacks used for the
@@ -37,6 +38,18 @@ func EventMeta(ev db.Event, baseURL string) Meta {
 		m.Image = baseURL + ev.FlyerWebPath()
 	}
 	return m
+}
+
+// PostMeta builds the preview metadata for a blog post's page. baseURL is the
+// site's absolute origin, prefixed onto the canonical path. The description is
+// the post's body reduced to plain text, so markup doesn't leak into the
+// preview card.
+func PostMeta(post db.Post, baseURL string) Meta {
+	return Meta{
+		Description: truncate(markdown.PlainText(post.Body), 200),
+		URL:         baseURL + post.Path(),
+		Type:        "article",
+	}
 }
 
 // ogDescription returns the description to advertise, falling back to the

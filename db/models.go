@@ -202,6 +202,9 @@ type Post struct {
 
 func (p Post) Published() bool { return p.PublishedAt != nil }
 
+// Path is the post's public URL.
+func (p Post) Path() string { return "/blog/" + p.Slug }
+
 // Date renders a post's publication date for display.
 func (p Post) Date() string {
 	if p.PublishedAt == nil {

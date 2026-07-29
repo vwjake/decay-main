@@ -5,8 +5,8 @@ import (
 	"decay-main/markdown"
 )
 
-templ PostPage(post db.Post) {
-	@Layout(post.Title + " · DECAY") {
+templ PostPage(post db.Post, meta Meta) {
+	@LayoutWithMeta(post.Title+" · DECAY", meta) {
 		<section class="event-detail">
 			<a href="/blog" class="event-back mono">&larr; All posts</a>
 			<h1 class="event-detail-title">{ post.Title }</h1>
