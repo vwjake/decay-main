@@ -69,7 +69,9 @@ func listEvents(conn *sql.DB) echo.HandlerFunc {
 // renderEvents draws one page of the event table, keeping the ?page= the
 // request arrived on so a validation error doesn't bounce back to page 1.
 func renderEvents(c echo.Context, conn *sql.DB, msg string) error {
-	events, err := db.ListEventsAdmin(conn)
+	// Upcoming only, soonest first — same starting point as the homepage.
+	// Past events live on the calendar and (soon) behind a filter here.
+	events, err := db.UpcomingEvents(conn)
 	if err != nil {
 		return err
 	}

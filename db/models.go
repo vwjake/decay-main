@@ -563,33 +563,6 @@ func ListAllEvents(conn *sql.DB) ([]Event, error) {
 	return scanEvents(rows)
 }
 
-// ListEventsAdmin returns every event ordered for the admin table: upcoming
-// events first and soonest first, so the list starts at the current date the
-// way the public homepage does, followed by past events most recent first
-// (still reachable, just below the ones that need attention). The split is on
-// real time.Time instants rather than in SQL, matching UpcomingEvents.
-func ListEventsAdmin(conn *sql.DB) ([]Event, error) {
-	all, err := ListAllEvents(conn) // starts_at DESC: furthest future first
-	if err != nil {
-		return nil, err
-	}
-	now := time.Now()
-	var upcoming, past []Event
-	for _, ev := range all {
-		if ev.StartsAt.Before(now) {
-			past = append(past, ev)
-		} else {
-			upcoming = append(upcoming, ev)
-		}
-	}
-	// upcoming came off a DESC list, so reverse it to soonest first; past is
-	// already most-recent first.
-	for i, j := 0, len(upcoming)-1; i < j; i, j = i+1, j-1 {
-		upcoming[i], upcoming[j] = upcoming[j], upcoming[i]
-	}
-	return append(upcoming, past...), nil
-}
-
 const productColumns = `id, name, price_cents, placeholder, stripe_url, image, variants, description, sold_out, position`
 
 func scanProduct(s interface {
