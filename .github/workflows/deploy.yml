@@ -3,6 +3,9 @@ name: Deploy to staging
 on:
   push:
     branches: [master]
+  # Lets the deploy be triggered by hand from the Actions tab, without a
+  # push — useful for redeploying or confirming the pipeline works.
+  workflow_dispatch:
 
 jobs:
   deploy:
