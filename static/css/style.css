@@ -1011,10 +1011,15 @@ a {
   font-size: 12px;
 }
 
-.admin-check {
+/* Scoped to .admin-form label so it outweighs that rule's flex-direction:
+   column — otherwise the checkbox stacks above its text and centres instead
+   of sitting left of it. */
+.admin-check,
+.admin-form label.admin-check {
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: flex-start;
   gap: 8px;
   font-size: 13px;
   text-transform: none;

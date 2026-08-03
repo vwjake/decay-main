@@ -213,7 +213,9 @@ func main() {
 			return c.JSON(http.StatusOK, ev.Response(siteURL, openRoles))
 		}
 		signup := views.SignupBox{
-			Show: ev.StartsAt.After(time.Now()),
+			// Offer the signup form only for upcoming events that the admin
+			// has actually flagged as needing volunteers.
+			Show: ev.StartsAt.After(time.Now()) && len(volunteers) > 0,
 			Done: c.QueryParam("signed") != "",
 		}
 		return views.EventDetail(ev, openRoles, signup, views.EventMeta(ev, siteURL)).Render(c.Request().Context(), c.Response())

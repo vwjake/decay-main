@@ -21,7 +21,7 @@ type StaffPage struct {
 templ AdminStaff(p StaffPage, me db.User) {
 	@AdminLayout("Staff · DECAY Admin", me) {
 		<p class="admin-heading">Staff calendar</p>
-		<p class="admin-sub mono">DECAY's internal staff calendar — board and organising meetings, read live from Nextcloud. Read-only here; edit it in Nextcloud.</p>
+		<p class="admin-sub mono">DECAY's internal staff calendar — board and organizing meetings, read live from Nextcloud. Read-only here; edit it in Nextcloud.</p>
 
 		if !p.Configured {
 			<div class="admin-flash mono">

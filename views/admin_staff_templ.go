@@ -59,7 +59,7 @@ func AdminStaff(p StaffPage, me db.User) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<p class=\"admin-heading\">Staff calendar</p><p class=\"admin-sub mono\">DECAY's internal staff calendar — board and organising meetings, read live from Nextcloud. Read-only here; edit it in Nextcloud.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<p class=\"admin-heading\">Staff calendar</p><p class=\"admin-sub mono\">DECAY's internal staff calendar — board and organizing meetings, read live from Nextcloud. Read-only here; edit it in Nextcloud.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

@@ -15,7 +15,6 @@ templ AdminPeople(people []db.Person, me db.User, errorMsg string) {
 		}
 		<table class="admin-table">
 			<tr>
-				<th>Order</th>
 				<th>Name</th>
 				<th>Role</th>
 				<th>Photo</th>
@@ -23,7 +22,6 @@ templ AdminPeople(people []db.Person, me db.User, errorMsg string) {
 			</tr>
 			for _, p := range people {
 				<tr>
-					<td class="mono">{ fmt.Sprint(p.Position) }</td>
 					<td>
 						<a href={ templ.URL(fmt.Sprintf("/admin/people/%d", p.ID)) }>{ p.Name }</a>
 					</td>
