@@ -1,10 +1,24 @@
+/* Tan theme — the old DECAY site's terminal-ish palette, restored as the
+   active scheme. Swap these five values back to the brutalist white/black
+   set (--bg/--surface/--surface-alt: #fff, #fff, #f4f4f2; --accent: #111;
+   --on-ink: #fff) to return to the mockup look. */
+:root {
+  --bg: #d2b48c;          /* tan page background */
+  --surface: #f5f0e8;     /* light card/panel wash */
+  --surface-alt: #e0d8cf; /* mid panel tint */
+  --ink: #111;            /* text and borders */
+  --muted: #666;
+  --accent: #336633;      /* forest-green links / CTAs */
+  --on-ink: #f5f0e8;      /* light text on the dark invert */
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  background: #fff;
+  background: var(--bg);
   color: #111;
   font-family: 'Archivo', Arial, sans-serif;
 }
@@ -43,7 +57,7 @@ a {
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: #fff;
+  background: var(--bg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -88,7 +102,7 @@ a {
   justify-content: space-between;
   gap: 10px;
   padding: 20px;
-  background: #fff;
+  background: var(--bg);
   border-bottom: 3px solid #111;
 }
 
@@ -112,7 +126,8 @@ a {
 }
 
 .site-nav a {
-  border-bottom: 1px solid #111;
+  color: var(--accent);
+  border-bottom: 1px solid var(--accent);
 }
 
 /* Hero */
@@ -179,7 +194,7 @@ a {
 .events {
   padding: 44px 20px;
   border-bottom: 2px solid #111;
-  background: #f4f4f2;
+  background: var(--surface-alt);
 }
 
 /* Month heading on the /events listing, repeated down the page. */
@@ -211,13 +226,13 @@ a {
   align-items: center;
   padding: 16px;
   border: 2px solid #111;
-  background: #fff;
+  background: var(--surface);
   transition: background 0.15s ease, color 0.15s ease;
 }
 
 .event-item:hover {
   background: #111;
-  color: #fff;
+  color: var(--on-ink);
 }
 
 .event-title {
@@ -250,9 +265,10 @@ a {
   font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  border: 2px solid #111;
+  border: 2px solid var(--accent);
+  color: var(--accent);
   padding: 14px;
-  background: #fff;
+  background: var(--surface);
 }
 
 .subscribe-note {
@@ -325,7 +341,7 @@ a {
   margin-top: 32px;
   padding: 16px;
   border: 2px solid #111;
-  background: #f4f4f2;
+  background: var(--surface-alt);
 }
 
 .volunteer-list {
@@ -342,7 +358,7 @@ a {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   border: 2px solid #111;
-  background: #fff;
+  background: var(--surface);
   padding: 6px 10px;
 }
 
@@ -368,7 +384,7 @@ a {
   min-width: 460px;
   border-collapse: collapse;
   table-layout: fixed;
-  background: #fff;
+  background: var(--surface);
 }
 
 .calendar th {
@@ -377,7 +393,7 @@ a {
   font-size: 11px;
   letter-spacing: 0.1em;
   background: #111;
-  color: #fff;
+  color: var(--on-ink);
 }
 
 .cal-day {
@@ -389,7 +405,7 @@ a {
 }
 
 .cal-day.is-outside {
-  background: #f4f4f2;
+  background: var(--surface-alt);
 }
 
 .cal-day.is-today {
@@ -412,7 +428,7 @@ a {
 .cal-event {
   display: block;
   border: 1px solid #111;
-  background: #f4f4f2;
+  background: var(--surface-alt);
   padding: 3px 4px;
   margin-bottom: 3px;
   font-size: 10px;
@@ -421,7 +437,7 @@ a {
 
 .cal-event:hover {
   background: #111;
-  color: #fff;
+  color: var(--on-ink);
 }
 
 .cal-event-time {
@@ -484,7 +500,7 @@ a {
   margin: 18px 0 0;
   padding: 14px 16px;
   border-left: 4px solid #111;
-  background: #f4f4f2;
+  background: var(--surface-alt);
   font-size: 14px;
   line-height: 1.6;
   font-style: italic;
@@ -498,7 +514,7 @@ a {
   margin-top: 12px;
   border: 2px solid #111;
   padding: 12px 14px;
-  background: #fff;
+  background: var(--surface);
 }
 
 .partner-grid {
@@ -526,7 +542,8 @@ a {
 }
 
 .footer-links a {
-  border-bottom: 1px solid #111;
+  color: var(--accent);
+  border-bottom: 1px solid var(--accent);
 }
 
 /* Gallery */
@@ -541,7 +558,7 @@ a {
 .gallery-item {
   margin: 0;
   border: 2px solid #111;
-  background: #fff;
+  background: var(--surface);
 }
 
 /* Photos arrive in whatever shape a phone took them, so each is cropped
@@ -572,7 +589,7 @@ a {
   margin-top: 24px;
   border: 2px solid #111;
   padding: 12px 14px;
-  background: #fff;
+  background: var(--surface);
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -630,7 +647,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f4f4f2;
+  background: var(--surface-alt);
   color: #999;
   font-size: 11px;
   text-align: center;
@@ -694,7 +711,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f4f4f2;
+  background: var(--surface-alt);
   color: #999;
   font-size: 12px;
 }
@@ -735,7 +752,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f4f4f2;
+  background: var(--surface-alt);
   color: #999;
   font-size: 8px;
   text-align: center;
@@ -798,7 +815,7 @@ a {
 
 .signup-submit:hover {
   background: #111;
-  color: #fff;
+  color: var(--on-ink);
 }
 
 .social-links {
@@ -812,7 +829,8 @@ a {
 }
 
 .social-links a {
-  border-bottom: 1px solid #111;
+  color: var(--accent);
+  border-bottom: 1px solid var(--accent);
 }
 
 /* Footer */
@@ -938,7 +956,7 @@ a {
 
 .admin-next {
   border: 2px solid #111;
-  background: #f4f4f2;
+  background: var(--surface-alt);
   padding: 16px;
   margin-bottom: 8px;
 }
@@ -970,7 +988,7 @@ a {
   padding: 8px;
   font: inherit;
   font-size: 13px;
-  background: #fff;
+  background: var(--surface);
 }
 
 .admin-caption-form {
@@ -1014,7 +1032,7 @@ a {
 }
 
 .admin-table th {
-  background: #f4f4f2;
+  background: var(--surface-alt);
   text-transform: uppercase;
   font-size: 11px;
   letter-spacing: 0.05em;
@@ -1050,7 +1068,7 @@ a {
   padding: 10px 12px;
   font-family: inherit;
   font-size: 14px;
-  background: #fff;
+  background: var(--surface);
   color: #111;
 }
 
@@ -1077,7 +1095,7 @@ a {
 
 .admin-btn:hover {
   background: #111;
-  color: #fff;
+  color: var(--on-ink);
 }
 
 /* A log-out button sized to sit among the nav's text links rather than
@@ -1094,7 +1112,7 @@ a {
 
 .admin-btn-danger:hover {
   background: #a00;
-  color: #fff;
+  color: var(--on-ink);
 }
 
 .admin-flash {
@@ -1143,13 +1161,13 @@ a {
 
 .report-period:hover {
   background: #111;
-  color: #fff;
+  color: var(--on-ink);
 }
 
 /* The quarter currently shown reads as pressed, not clickable. */
 .report-period.is-current {
   background: #111;
-  color: #fff;
+  color: var(--on-ink);
 }
 
 .report-range {
@@ -1274,7 +1292,7 @@ a {
   align-items: center;
   justify-content: center;
   background: #111;
-  color: #fff;
+  color: var(--on-ink);
   font-size: 40px;
   letter-spacing: 0.05em;
 }
@@ -1335,7 +1353,7 @@ a {
 
 .group-card:hover {
   background: #111;
-  color: #fff;
+  color: var(--on-ink);
 }
 
 .group-card-name {
@@ -1420,7 +1438,7 @@ a {
   top: 6px;
   left: 6px;
   background: #111;
-  color: #fff;
+  color: var(--on-ink);
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -1483,7 +1501,7 @@ a {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   background: #111;
-  color: #fff;
+  color: var(--on-ink);
   padding: 2px 6px;
 }
 
@@ -1571,7 +1589,7 @@ a {
 .post-body h4 { font-size: 15px; text-transform: uppercase; letter-spacing: 0.06em; }
 
 .post-body a {
-  color: #111;
+  color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -1590,7 +1608,7 @@ a {
   margin: 18px 0;
   padding: 12px 16px;
   border-left: 4px solid #111;
-  background: #f4f4f2;
+  background: var(--surface-alt);
   font-style: italic;
 }
 
@@ -1613,14 +1631,14 @@ a {
 .post-body code {
   font-family: "Space Mono", monospace;
   font-size: 0.9em;
-  background: #f4f4f2;
+  background: var(--surface-alt);
   padding: 1px 5px;
   border: 1px solid #ddd;
 }
 
 .post-body pre {
   background: #111;
-  color: #f4f4f2;
+  color: var(--surface-alt);
   padding: 14px 16px;
   overflow-x: auto;
   margin: 0 0 16px;
@@ -1657,7 +1675,7 @@ a {
 }
 
 .cal-meeting:hover {
-  background: #f4f4f2;
+  background: var(--surface-alt);
   color: inherit;
 }
 
@@ -1743,12 +1761,12 @@ a {
   padding: 6px;
   border: 2px solid #111;
   border-bottom: none;
-  background: #f4f4f2;
+  background: var(--surface-alt);
 }
 
 .md-btn {
   border: 1px solid #111;
-  background: #fff;
+  background: var(--surface);
   color: #111;
   min-width: 30px;
   padding: 4px 8px;
@@ -1760,7 +1778,7 @@ a {
 
 .md-btn:hover {
   background: #111;
-  color: #fff;
+  color: var(--on-ink);
 }
 
 /* The textarea butts directly against the toolbar, so they read as one
@@ -1868,7 +1886,7 @@ body.lightbox-open { overflow: hidden; }
 }
 
 .lightbox-caption {
-  color: #fff;
+  color: var(--on-ink);
   font-size: 12px;
   text-align: center;
   max-width: 80vw;
@@ -1880,7 +1898,7 @@ body.lightbox-open { overflow: hidden; }
 .lightbox-nav {
   border: 2px solid #fff;
   background: rgba(0, 0, 0, 0.4);
-  color: #fff;
+  color: var(--on-ink);
   cursor: pointer;
   line-height: 1;
   font-family: 'Space Mono', monospace;
@@ -1906,7 +1924,7 @@ body.lightbox-open { overflow: hidden; }
 
 .lightbox-close:hover,
 .lightbox-nav:hover {
-  background: #fff;
+  background: var(--surface);
   color: #111;
 }
 
