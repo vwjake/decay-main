@@ -1,16 +1,16 @@
 /* Tan theme — the old DECAY site's terminal aesthetic. Strictly three
    colours: black, forest green, and tan. No white, cream, or grey. Cards
    and panels sit on the tan page and are set apart by black borders and a
-   slightly deeper tan wash; secondary text is green; anything on a dark
-   (inverted) surface is tan. */
+   slightly deeper tan wash. All text is black; green appears only as a
+   box drawn around links. Anything on a dark (inverted) surface is tan. */
 :root {
   --bg: #d2b48c;          /* tan page background */
   --surface: #d2b48c;     /* cards — same tan, separated by black borders */
   --surface-alt: #c2a06e; /* deeper tan wash for panels / inset areas */
-  --ink: #111;            /* text and borders */
-  --muted: #336633;       /* green secondary text */
-  --accent: #336633;      /* forest-green links / CTAs */
-  --on-ink: #d2b48c;      /* tan text on a black or green surface */
+  --ink: #111;            /* all text and borders — black */
+  --muted: #111;          /* secondary text — also black */
+  --accent: #336633;      /* forest green — link boxes / CTA outlines only */
+  --on-ink: #d2b48c;      /* tan text on a black surface */
 }
 
 * {
@@ -127,8 +127,9 @@ a {
 }
 
 .site-nav a {
-  color: var(--accent);
-  border-bottom: 1px solid var(--accent);
+  color: var(--ink);
+  border: 1px solid var(--accent);
+  padding: 3px 7px;
 }
 
 /* Hero */
@@ -267,7 +268,7 @@ a {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   border: 2px solid var(--accent);
-  color: var(--accent);
+  color: var(--ink);
   padding: 14px;
   background: var(--surface);
 }
@@ -543,8 +544,9 @@ a {
 }
 
 .footer-links a {
-  color: var(--accent);
-  border-bottom: 1px solid var(--accent);
+  color: var(--ink);
+  border: 1px solid var(--accent);
+  padding: 3px 7px;
 }
 
 /* Gallery */
@@ -830,8 +832,9 @@ a {
 }
 
 .social-links a {
-  color: var(--accent);
-  border-bottom: 1px solid var(--accent);
+  color: var(--ink);
+  border: 1px solid var(--accent);
+  padding: 3px 7px;
 }
 
 /* Footer */
@@ -1590,9 +1593,13 @@ a {
 .post-body h4 { font-size: 15px; text-transform: uppercase; letter-spacing: 0.06em; }
 
 .post-body a {
-  color: var(--accent);
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  color: var(--ink);
+  text-decoration: none;
+  border: 1px solid var(--accent);
+  padding: 0 4px;
+  /* Keep the box intact when a link wraps across lines. */
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 .post-body ul,
