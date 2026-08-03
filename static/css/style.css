@@ -1,15 +1,16 @@
 /* Tan theme — the old DECAY site's terminal aesthetic. Strictly three
    colours: black, forest green, and tan. No white, cream, or grey. Cards
    and panels sit on the tan page and are set apart by black borders and a
-   slightly deeper tan wash. All text is black; green appears only as a
-   box drawn around links. Anything on a dark (inverted) surface is tan. */
+   slightly deeper tan wash. All text and boxes are black; green appears
+   only on the blog post divider (hr). Anything on a dark (inverted)
+   surface is tan. */
 :root {
   --bg: #d2b48c;          /* tan page background */
   --surface: #d2b48c;     /* cards — same tan, separated by black borders */
   --surface-alt: #c2a06e; /* deeper tan wash for panels / inset areas */
   --ink: #111;            /* all text and borders — black */
   --muted: #111;          /* secondary text — also black */
-  --accent: #336633;      /* forest green — link boxes / CTA outlines only */
+  --accent: #336633;      /* forest green — blog post divider (hr) only */
   --on-ink: #d2b48c;      /* tan text on a black surface */
 }
 
@@ -128,7 +129,7 @@ a {
 
 .site-nav a {
   color: var(--ink);
-  border: 1px solid var(--accent);
+  border: 1px solid var(--ink);
   padding: 3px 7px;
 }
 
@@ -267,7 +268,7 @@ a {
   font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  border: 2px solid var(--accent);
+  border: 2px solid var(--ink);
   color: var(--ink);
   padding: 14px;
   background: var(--surface);
@@ -545,7 +546,7 @@ a {
 
 .footer-links a {
   color: var(--ink);
-  border: 1px solid var(--accent);
+  border: 1px solid var(--ink);
   padding: 3px 7px;
 }
 
@@ -833,7 +834,7 @@ a {
 
 .social-links a {
   color: var(--ink);
-  border: 1px solid var(--accent);
+  border: 1px solid var(--ink);
   padding: 3px 7px;
 }
 
@@ -1595,7 +1596,7 @@ a {
 .post-body a {
   color: var(--ink);
   text-decoration: none;
-  border: 1px solid var(--accent);
+  border: 1px solid var(--ink);
   padding: 0 4px;
   /* Keep the box intact when a link wraps across lines. */
   box-decoration-break: clone;
@@ -1632,7 +1633,7 @@ a {
 
 .post-body hr {
   border: none;
-  border-top: 2px solid #111;
+  border-top: 2px solid var(--accent);
   margin: 28px 0;
 }
 
