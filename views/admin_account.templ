@@ -1,0 +1,128 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/db"
+)
+
+// AccountPage carries the flash state for /admin/account. The profile and
+// password forms report separately, so a rejected password doesn't look
+// like the blurb above it failed to save.
+type AccountPage struct {
+	Saved         bool
+	ProfileError  string
+	PasswordError string
+}
+
+// AdminAccount is the signed-in account's own page: the card everyone else
+// sees, and the forms behind it. Every account reaches this, whatever
+// their role does or doesn't grant.
+templ AdminAccount(me db.User, page AccountPage) {
+	@AdminLayout("Your account · DECAY Admin", me) {
+		<p class="admin-heading">Your account</p>
+		if page.Saved && page.ProfileError == "" && page.PasswordError == "" {
+			<div class="admin-flash mono">Saved.</div>
+		}
+
+		@ProfileCard(me)
+
+		<p class="admin-heading">Profile</p>
+		if page.ProfileError != "" {
+			<div class="admin-flash admin-flash-error mono">{ page.ProfileError }</div>
+		}
+		<form method="post" action="/admin/account" class="admin-form">
+			<label>
+				Display name
+				<input type="text" name="display_name" value={ me.DisplayName } placeholder={ me.Username }/>
+			</label>
+			<label>
+				{ fmt.Sprintf("Blurb (%d characters, tops)", db.MaxBlurbLength) }
+				<textarea name="blurb" maxlength={ fmt.Sprint(db.MaxBlurbLength) } data-counter="blurb-count">{ me.Blurb }</textarea>
+			</label>
+			<p class="admin-sub mono">
+				<span id="blurb-count">{ fmt.Sprint(len([]rune(me.Blurb))) }</span>/{ fmt.Sprint(db.MaxBlurbLength) }.
+				Plain text only — HTML and scripts are stripped out before it's saved.
+			</p>
+			<button type="submit" class="admin-btn">Save profile</button>
+		</form>
+
+		<p class="admin-heading">Photo</p>
+		<form method="post" action="/admin/account/photo" enctype="multipart/form-data" class="admin-form">
+			<label>
+				if me.HasPhoto() {
+					Replace photo
+				} else {
+					Upload photo
+				}
+				<input type="file" name="photo" accept="image/*" required/>
+			</label>
+			<button type="submit" class="admin-btn">Save photo</button>
+		</form>
+		if me.HasPhoto() {
+			<form method="post" action="/admin/account/photo/delete" onsubmit="return confirm('Remove your photo?')">
+				<button type="submit" class="admin-btn admin-btn-danger">Remove photo</button>
+			</form>
+		}
+
+		<p class="admin-heading">Password</p>
+		if page.PasswordError != "" {
+			<div class="admin-flash admin-flash-error mono">{ page.PasswordError }</div>
+		}
+		<form method="post" action="/admin/account/password" class="admin-form">
+			<label>
+				Current password
+				<input type="password" name="current_password" required autocomplete="current-password"/>
+			</label>
+			<label>
+				{ fmt.Sprintf("New password (at least %d characters)", db.MinPasswordLength) }
+				<input type="password" name="password" required autocomplete="new-password" minlength={ fmt.Sprint(db.MinPasswordLength) }/>
+			</label>
+			<button type="submit" class="admin-btn">Change password</button>
+		</form>
+
+		<p class="admin-heading">Access</p>
+		<p class="admin-sub mono">
+			{ me.RoleLabel() } &middot; { me.RoleDescription() }
+			<br/>
+			Only an account manager can change this.
+		</p>
+		<ul class="volunteer-list mono">
+			for _, p := range db.AllPermissions {
+				if me.Can(p) {
+					<li>{ p.Label() }</li>
+				}
+			}
+		</ul>
+	}
+}
+
+// ProfileCard is the account as everyone else sees it — photo, name, role,
+// blurb. The blurb is rendered line by line as text, never as markup.
+templ ProfileCard(u db.User) {
+	<div class="profile-card">
+		<div class="profile-avatar">
+			if u.HasPhoto() {
+				<img src={ u.PhotoPath() } alt={ u.Name() }/>
+			} else {
+				<span class="profile-initials" aria-hidden="true">{ initials(u.Name()) }</span>
+			}
+		</div>
+		<div class="profile-body">
+			<p class="profile-name">{ u.Name() }</p>
+			<p class="profile-meta mono">{ u.Username } &middot; { u.RoleLabel() }</p>
+			if u.HasBlurb() {
+				<p class="profile-blurb">
+					for i, line := range u.BlurbLines() {
+						if i > 0 {
+							<br/>
+						}
+						{ line }
+					}
+				</p>
+			} else {
+				<p class="profile-blurb profile-blurb-empty mono">No blurb yet.</p>
+			}
+		</div>
+	</div>
+}

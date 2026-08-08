@@ -27,6 +27,7 @@ import (
 	"decay-main/mail"
 	"decay-main/shop"
 	"decay-main/views"
+	"decay-main/youtube"
 
 	stripe "github.com/stripe/stripe-go/v79"
 
@@ -99,6 +100,29 @@ func main() {
 		log.Printf("booking mailbox connected: %s", bookingMailer.Address())
 	} else {
 		log.Println("BOOKING_IMAP_HOST not set — the booking email history panel is hidden.")
+	}
+
+	// Recent uploads on /media, read off the channel's public Atom feed —
+	// no API key, no credentials, the same read-only arrangement as the
+	// staff calendar. YOUTUBE_CHANNEL takes a handle or a "UC…" id and
+	// defaults to DECAY's own channel; set it empty to switch the section
+	// off. The feed is warmed here so the first visitor after a restart
+	// doesn't wait on YouTube.
+	channel := youtube.DefaultChannel
+	if v, ok := os.LookupEnv("YOUTUBE_CHANNEL"); ok {
+		channel = strings.TrimSpace(v)
+	}
+	tube := youtube.NewClient(channel)
+	channelURL := ""
+	if tube.Configured() {
+		channelURL = youtube.ChannelURL(channel)
+		go func() {
+			if err := tube.Warm(); err != nil {
+				log.Printf("YouTube feed for %s unavailable at startup (/media just leaves the section out): %v", channel, err)
+			}
+		}()
+	} else {
+		log.Println("YOUTUBE_CHANNEL set empty — /media shows only curated videos and photos.")
 	}
 
 	// Stripe integration for shop checkout. Leave STRIPE_SECRET_KEY unset to disable.
@@ -363,12 +387,34 @@ func main() {
 		return views.PostPage(post, views.PostMeta(post, siteURL)).Render(c.Request().Context(), c.Response())
 	})
 
-	e.GET("/photos", func(c echo.Context) error {
+	e.GET("/media", func(c echo.Context) error {
 		photos, err := db.ListPhotos(conn)
 		if err != nil {
 			return err
 		}
-		return views.Photos(photos).Render(c.Request().Context(), c.Response())
+		featured, err := db.ListVideos(conn)
+		if err != nil {
+			return err
+		}
+		page := views.MediaPage{Featured: featured, Photos: photos}
+
+		// Recent uploads are a bonus on top of what's in the database: a
+		// YouTube outage costs the page that section, not the page.
+		if tube.Configured() {
+			recent, err := tube.Recent(12)
+			if err != nil {
+				log.Printf("youtube feed: %v (showing %d cached videos)", err, len(recent))
+			}
+			page.Recent = withoutFeatured(recent, featured)
+			page.ChannelURL = channelURL
+		}
+		return views.Media(page).Render(c.Request().Context(), c.Response())
+	})
+
+	// The gallery was /photos before it grew videos. Old links, printed
+	// flyers, and search results still point there.
+	e.GET("/photos", func(c echo.Context) error {
+		return c.Redirect(http.StatusMovedPermanently, "/media")
 	})
 
 	// PORT lets the host pick the listen port; it defaults to 8080 for
@@ -464,6 +510,26 @@ func notifyContact(mailer *mail.Mailer, m db.ContactMessage) {
 			log.Printf("contact-form email to %s failed (message is saved in /admin/messages): %v", mailer.To(), err)
 		}
 	}()
+}
+
+// withoutFeatured drops uploads that are already shown as featured videos
+// higher up the page, so a hand-picked set isn't repeated by the automatic
+// list underneath it.
+func withoutFeatured(recent []youtube.Video, featured []db.Video) []youtube.Video {
+	if len(featured) == 0 {
+		return recent
+	}
+	shown := make(map[string]bool, len(featured))
+	for _, v := range featured {
+		shown[v.YouTubeID] = true
+	}
+	out := make([]youtube.Video, 0, len(recent))
+	for _, v := range recent {
+		if !shown[v.ID] {
+			out = append(out, v)
+		}
+	}
+	return out
 }
 
 // validEmail reports whether addr parses as a single email address.

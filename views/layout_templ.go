@@ -404,7 +404,7 @@ func Header() templ.Component {
 			templ_7745c5c3_Var19 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<header class=\"site-header\"><a href=\"/\"><img src=\"/static/img/logo.png\" alt=\"DECAY\"></a><nav class=\"site-nav mono\"><a href=\"/events\">Events</a> <a href=\"/calendar\">Calendar</a> <a href=\"/groups\">Groups</a> <a href=\"/about\">About</a> <a href=\"/blog\">Blog</a> <a href=\"/photos\">Photos</a> <a href=\"/shop\">Shop</a> <a href=\"/support\">Support</a> <a href=\"/get-involved\">Get Involved</a> <a href=\"/contact\">Contact</a></nav></header>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<header class=\"site-header\"><a href=\"/\"><img src=\"/static/img/logo.png\" alt=\"DECAY\"></a><nav class=\"site-nav mono\"><a href=\"/events\">Events</a> <a href=\"/calendar\">Calendar</a> <a href=\"/groups\">Groups</a> <a href=\"/about\">About</a> <a href=\"/blog\">Blog</a> <a href=\"/media\">Media</a> <a href=\"/shop\">Shop</a> <a href=\"/support\">Support</a> <a href=\"/get-involved\">Get Involved</a> <a href=\"/contact\">Contact</a></nav></header>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

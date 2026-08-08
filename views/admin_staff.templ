@@ -9,19 +9,32 @@ import (
 
 // StaffPage is everything the internal staff-calendar screen renders. When
 // the calendar URL isn't configured, Configured is false and the page
-// explains how to turn it on instead of showing an empty grid.
+// explains how to turn it on instead of showing an empty grid — Events
+// still renders either way, since it comes off the database rather than
+// Nextcloud.
 type StaffPage struct {
 	Configured bool
 	Error      string
 	Month      staff.Month
 	Upcoming   []staff.Meeting
-	Venue      *time.Location
+	// Events is the same month of the site's own calendar, shown on a
+	// second grid below the meetings one.
+	Events db.CalendarMonth
+	Venue  *time.Location
 }
 
 templ AdminStaff(p StaffPage, me db.User) {
 	@AdminLayout("Staff · DECAY Admin", me) {
 		<p class="admin-heading">Staff calendar</p>
 		<p class="admin-sub mono">DECAY's internal staff calendar — board and organizing meetings, read live from Nextcloud. Read-only here; edit it in Nextcloud.</p>
+
+		// One nav for both grids. It reads its months off the events
+		// calendar, which is built whether or not Nextcloud is configured.
+		<nav class="pager mono">
+			<a href={ templ.URL("/admin/staff?month=" + p.Events.Prev) } class="pager-link">&larr; Prev</a>
+			<span class="pager-status">{ p.Events.Label() }</span>
+			<a href={ templ.URL("/admin/staff?month=" + p.Events.Next) } class="pager-link">Next &rarr;</a>
+		</nav>
 
 		if !p.Configured {
 			<div class="admin-flash mono">
@@ -33,12 +46,6 @@ templ AdminStaff(p StaffPage, me db.User) {
 			if p.Error != "" {
 				<div class="admin-flash admin-flash-error mono">{ p.Error }</div>
 			}
-
-			<nav class="pager mono">
-				<a href={ templ.URL("/admin/staff?month=" + p.Month.Prev) } class="pager-link">&larr; Prev</a>
-				<span class="pager-status">{ p.Month.Label() }</span>
-				<a href={ templ.URL("/admin/staff?month=" + p.Month.Next) } class="pager-link">Next &rarr;</a>
-			</nav>
 
 			<div class="calendar-scroll">
 				<table class="calendar">
@@ -72,8 +79,15 @@ templ AdminStaff(p StaffPage, me db.User) {
 					</tbody>
 				</table>
 			</div>
+			if p.Month.Count == 0 {
+				<p class="subscribe-note mono">No meetings on the staff calendar this month.</p>
+			}
+		}
 
-			<h2 class="admin-subheading">Upcoming</h2>
+		@EventsGrid(p.Events)
+
+		if p.Configured {
+			<h2 class="admin-subheading">Upcoming meetings</h2>
 			if len(p.Upcoming) == 0 {
 				<p class="subscribe-note mono">Nothing coming up on the staff calendar.</p>
 			} else {
@@ -98,5 +112,52 @@ templ AdminStaff(p StaffPage, me db.User) {
 				</ul>
 			}
 		}
+	}
+}
+
+// EventsGrid is the second calendar on the staff page: the same month of
+// the site's public schedule, laid out identically to the meetings grid
+// above it so the two read against each other. Cells link to the public
+// event page rather than the admin one, since reaching this page doesn't
+// imply permission to edit events.
+templ EventsGrid(month db.CalendarMonth) {
+	<h2 class="admin-subheading">Events</h2>
+	<p class="admin-sub mono">
+		What the public sees this month, from the site's own calendar.
+	</p>
+	<div class="calendar-scroll">
+		<table class="calendar">
+			<thead>
+				<tr>
+					for _, day := range db.Weekdays {
+						<th class="mono">{ day }</th>
+					}
+				</tr>
+			</thead>
+			<tbody>
+				for _, week := range month.Weeks {
+					<tr>
+						for _, day := range week {
+							if day.InMonth {
+								<td class={ "cal-day", templ.KV("is-today", day.Today) }>
+									<span class="cal-date mono">{ day.Day() }</span>
+									for _, ev := range day.Events {
+										<a href={ templ.URL(ev.Path()) } class="cal-event" title={ ev.Title } target="_blank" rel="noopener">
+											<span class="cal-event-time mono">{ ev.StartClock() }</span>
+											<span class="cal-event-title">{ db.ShortTitle(ev.Title) }</span>
+										</a>
+									}
+								</td>
+							} else {
+								<td class="cal-day is-outside"></td>
+							}
+						}
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+	if month.Count == 0 {
+		<p class="subscribe-note mono">Nothing scheduled this month.</p>
 	}
 }

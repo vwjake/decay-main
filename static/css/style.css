@@ -583,6 +583,72 @@ a {
   border-top: 2px solid #111;
 }
 
+/* Recent uploads on /media. Same tile treatment as the photo gallery, but
+   a separate class on purpose: .gallery is what the lightbox binds to, and
+   these tiles link out to YouTube rather than opening in place. Wider
+   columns, since a 16:9 still is unreadable at photo-tile size. */
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.video-item {
+  margin: 0;
+  border: 2px solid #111;
+  background: var(--surface);
+}
+
+.video-item a {
+  display: block;
+  position: relative;
+}
+
+.video-item img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+/* A play marker, so a still reads as a video rather than a photo. */
+.video-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
+  opacity: 0.85;
+}
+
+.video-item a:hover .video-play {
+  opacity: 1;
+}
+
+.video-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--muted);
+  padding: 6px 8px;
+  border-top: 2px solid #111;
+}
+
+.video-title {
+  color: #111;
+  overflow-wrap: anywhere;
+}
+
+.video-date {
+  font-size: 9px;
+}
+
 /* Pager */
 
 .pager {
@@ -985,6 +1051,117 @@ a {
   font-size: 11px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* The small square beside a name in a list or the nav. A photo and the
+   initials fallback are the same size, so a mixed list doesn't jump. */
+.admin-avatar {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  object-fit: cover;
+  border: 1px solid #111;
+  background: var(--surface-alt);
+}
+
+.admin-avatar-empty {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Keeps the avatar, name, and "you" tag on one line in the accounts
+   table. */
+.admin-who {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Edit sits next to Delete without the form below it. */
+.admin-row-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-row-actions a.admin-btn {
+  text-decoration: none;
+}
+
+/* The account card: photo left, name and blurb right — an AIM profile,
+   more or less. */
+.profile-card {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  border: 2px solid #111;
+  background: var(--surface-alt);
+  padding: 16px;
+  margin-bottom: 24px;
+  max-width: 480px;
+}
+
+.profile-avatar {
+  width: 96px;
+  height: 96px;
+  flex: none;
+  border: 2px solid #111;
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-initials {
+  font-family: 'Space Mono', monospace;
+  font-size: 28px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.profile-body {
+  min-width: 0;
+}
+
+.profile-name {
+  font-weight: 900;
+  font-size: 18px;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.profile-meta {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 2px 0 10px;
+}
+
+/* Blurbs are typed by hand and can carry a long unbroken string; wrapping
+   it keeps one out of the card's edge. */
+.profile-blurb {
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.profile-blurb-empty {
   color: var(--muted);
 }
 

@@ -39,6 +39,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Live character counts for capped fields (the account blurb). The
+  // textarea's own maxlength does the enforcing; this just says how much
+  // room is left. Without JS the count is simply the value on page load.
+  document.querySelectorAll('textarea[data-counter]').forEach((field) => {
+    const out = document.getElementById(field.dataset.counter);
+    if (!out) return;
+    const update = () => { out.textContent = String(field.value.length); };
+    field.addEventListener('input', update);
+    update();
+  });
+
   setupGallery();
 });
 

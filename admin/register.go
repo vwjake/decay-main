@@ -77,9 +77,12 @@ func Register(e *echo.Echo, conn *sql.DB, sessionSecret []byte, uploadsDir strin
 
 	staffClient := staff.NewClient(staffURL, venue)
 	staffGroup := g.Group("", requirePermission(db.PermStaff))
-	registerStaffRoutes(staffGroup, staffClient, venue)
+	registerStaffRoutes(staffGroup, conn, staffClient, venue)
 
-	registerUserRoutes(g, conn)
+	registerUserRoutes(g, conn, uploadsDir)
+
+	// Everyone has an account page, whatever else their role reaches.
+	registerAccountRoutes(g, conn, uploadsDir)
 }
 
 func dashboard(conn *sql.DB) echo.HandlerFunc {

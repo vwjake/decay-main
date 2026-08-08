@@ -33,13 +33,19 @@ CREATE TABLE IF NOT EXISTS event_volunteers (
 
 -- Admin accounts. Roles are defined in Go (db/roles.go) rather than in a
 -- table, so the set of permissions a role grants is reviewable in code and
--- can't drift per-database. Only 'master' exists so far.
+-- can't drift per-database: 'master', 'manager', and 'keyholder'.
+-- photo and blurb are the account's own profile, edited at /admin/account.
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL,
     display_name TEXT NOT NULL DEFAULT '',
     password_hash TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'master',
+    -- Filename under uploads/avatars/. Empty when there's no photo.
+    photo TEXT NOT NULL DEFAULT '',
+    -- Free text about yourself, capped at 250 characters and stored
+    -- stripped of markup (db.SanitizeBlurb).
+    blurb TEXT NOT NULL DEFAULT '',
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     last_login_at TEXT
 );

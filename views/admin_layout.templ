@@ -63,7 +63,12 @@ templ AdminLayout(title string, me db.User) {
 							<a href="/admin/users">Accounts</a>
 						}
 						<a href="/" target="_blank" rel="noopener">View site</a>
-						<span class="admin-whoami">{ me.Name() }</span>
+						// Your own name is the way into your account page —
+						// every role has one, so it's outside the checks above.
+						<a href="/admin/account" class="admin-whoami">
+							@Avatar(me)
+							{ me.Name() }
+						</a>
 						<form method="post" action="/admin/logout" style="display:inline">
 							<button type="submit" class="admin-btn admin-btn-small">Log out</button>
 						</form>

@@ -23,20 +23,26 @@ templ AdminUsers(users []db.User, me db.User, errorMsg string) {
 			for _, u := range users {
 				<tr>
 					<td>
-						<a href={ templ.URL(fmt.Sprintf("/admin/users/%d", u.ID)) }>{ u.Name() }</a>
-						if u.ID == me.ID {
-							<span class="admin-tag mono">you</span>
-						}
+						<span class="admin-who">
+							@Avatar(u)
+							<a href={ templ.URL(fmt.Sprintf("/admin/users/%d", u.ID)) }>{ u.Name() }</a>
+							if u.ID == me.ID {
+								<span class="admin-tag mono">you</span>
+							}
+						</span>
 					</td>
 					<td class="mono">{ u.Username }</td>
 					<td>{ u.RoleLabel() }</td>
 					<td class="mono">{ u.LastLogin() }</td>
 					<td>
-						if u.ID != me.ID {
-							<form method="post" action={ templ.URL(fmt.Sprintf("/admin/users/%d/delete", u.ID)) } onsubmit="return confirm('Delete this account?')">
-								<button type="submit" class="admin-btn admin-btn-danger">Delete</button>
-							</form>
-						}
+						<span class="admin-row-actions">
+							<a href={ templ.URL(fmt.Sprintf("/admin/users/%d", u.ID)) } class="admin-btn admin-btn-small">Edit</a>
+							if u.ID != me.ID {
+								<form method="post" action={ templ.URL(fmt.Sprintf("/admin/users/%d/delete", u.ID)) } onsubmit="return confirm('Delete this account?')">
+									<button type="submit" class="admin-btn admin-btn-small admin-btn-danger">Delete</button>
+								</form>
+							}
+						</span>
 					</td>
 				</tr>
 			}
@@ -53,15 +59,12 @@ templ AdminUsers(users []db.User, me db.User, errorMsg string) {
 			<label>
 				Role
 				<select name="role">
-					for _, r := range db.RoleNames {
-						<option value={ r }>{ db.RoleLabelFor(r) }</option>
+					for _, r := range me.AssignableRoles() {
+						<option value={ r } selected?={ r == db.RoleKeyholder }>{ db.RoleLabelFor(r) }</option>
 					}
 				</select>
 			</label>
-			<p class="admin-sub mono">
-				Master is the only role so far and grants everything, including
-				managing accounts. Narrower roles get added in code.
-			</p>
+			@RoleKey(me)
 			<button type="submit" class="admin-btn">Create account</button>
 		</form>
 	}
@@ -80,17 +83,43 @@ templ AdminUserEdit(user db.User, me db.User, errorMsg string) {
 		}
 
 		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/users/%d", user.ID)) } class="admin-form">
-			<label>Display name<input type="text" name="display_name" value={ user.DisplayName }/></label>
+			<label>Display name<input type="text" name="display_name" value={ user.DisplayName } placeholder={ user.Username }/></label>
 			<label>
 				Role
 				<select name="role">
-					for _, r := range db.RoleNames {
+					for _, r := range me.AssignableRoles() {
 						<option value={ r } selected?={ r == user.Role }>{ db.RoleLabelFor(r) }</option>
 					}
 				</select>
 			</label>
+			<label>
+				{ fmt.Sprintf("Blurb (%d characters, tops)", db.MaxBlurbLength) }
+				<textarea name="blurb" maxlength={ fmt.Sprint(db.MaxBlurbLength) }>{ user.Blurb }</textarea>
+			</label>
+			<p class="admin-sub mono">
+				if user.ID == me.ID {
+					Yours to write — the same box lives on your own account page.
+				} else {
+					{ user.Name() } writes this on their own account page; clear it here if it needs clearing.
+				}
+			</p>
+			@RoleKey(me)
 			<button type="submit" class="admin-btn">Save account</button>
 		</form>
+
+		<p class="admin-heading">Photo</p>
+		if user.HasPhoto() {
+			<img class="admin-flyer-preview" src={ user.PhotoPath() } alt={ user.Name() }/>
+			<form method="post" action={ templ.URL(fmt.Sprintf("/admin/users/%d/photo/delete", user.ID)) } onsubmit="return confirm('Remove this photo?')">
+				<button type="submit" class="admin-btn admin-btn-danger">Remove photo</button>
+			</form>
+		} else {
+			<p class="admin-sub mono">No photo yet.</p>
+		}
+		<p class="admin-sub mono">
+			Photos are uploaded by the account holder at
+			<a href="/admin/account">their own account page</a>.
+		</p>
 
 		<p class="admin-heading">Access</p>
 		<ul class="volunteer-list mono">
@@ -112,5 +141,24 @@ templ AdminUserEdit(user db.User, me db.User, errorMsg string) {
 			}
 			<button type="submit" class="admin-btn">Set password</button>
 		</form>
+	}
+}
+
+// RoleKey explains the roles on offer. It lists only the roles the reader
+// can assign, so master goes unmentioned to everyone who isn't one.
+templ RoleKey(me db.User) {
+	<ul class="admin-sub mono">
+		for _, r := range me.AssignableRoles() {
+			<li><strong>{ db.RoleLabelFor(r) }</strong> — { db.RoleDescription(r) }</li>
+		}
+	</ul>
+}
+
+// Avatar is the small round photo shown beside a name in a list.
+templ Avatar(u db.User) {
+	if u.HasPhoto() {
+		<img class="admin-avatar" src={ u.PhotoPath() } alt=""/>
+	} else {
+		<span class="admin-avatar admin-avatar-empty mono" aria-hidden="true">{ initials(u.Name()) }</span>
 	}
 }

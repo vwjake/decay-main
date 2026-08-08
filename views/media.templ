@@ -1,0 +1,113 @@
+package views
+
+import (
+	"decay-main/db"
+	"decay-main/youtube"
+)
+
+// MediaPage is the public /media page: what DECAY has recorded and
+// photographed. Featured are the videos an admin picked at /admin/media —
+// the same ones the home page carries — and Recent is whatever @no_tape
+// has uploaded lately, read off YouTube's public feed. Either can be
+// empty; the page just leaves that part out.
+type MediaPage struct {
+	Featured []db.Video
+	Recent   []youtube.Video
+	Photos   []db.Photo
+	// ChannelURL is the channel the recent videos came from, empty when
+	// the feed isn't configured.
+	ChannelURL string
+}
+
+func (p MediaPage) HasVideos() bool { return len(p.Featured) > 0 || len(p.Recent) > 0 }
+
+templ Media(p MediaPage) {
+	@Layout("Media · DECAY") {
+		<section class="about">
+			<p class="about-statement">Media</p>
+			<p class="about-body">Sets, sessions, and photographs from 402 Washington St NE.</p>
+		</section>
+
+		if len(p.Featured) > 0 {
+			<section class="events">
+				<span class="section-label mono">Featured</span>
+				<div class="media-list">
+					for _, v := range p.Featured {
+						<div class="media-video">
+							<div class="media-video-frame">
+								<iframe
+									src={ templ.URL(v.EmbedURL()) }
+									title={ videoTitle(v) }
+									loading="lazy"
+									referrerpolicy="strict-origin-when-cross-origin"
+									allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+									allowfullscreen
+								></iframe>
+							</div>
+							if v.Title != "" {
+								<div class="media-video-caption mono">
+									<span>{ v.Title }</span>
+									<a href={ templ.URL(v.WatchURL()) } target="_blank" rel="noopener">YouTube &rarr;</a>
+								</div>
+							}
+						</div>
+					}
+				</div>
+			</section>
+		}
+
+		if len(p.Recent) > 0 {
+			<section class="events">
+				<span class="section-label mono">Recent uploads</span>
+				// Thumbnails rather than players: a page of embeds would
+				// load a YouTube frame per video before anyone asked for
+				// one. Clicking opens the video on YouTube. Deliberately
+				// not .gallery — that class is what the photo lightbox
+				// binds to, and these links leave the site.
+				<div class="video-grid">
+					for _, v := range p.Recent {
+						<figure class="video-item">
+							<a href={ templ.URL(v.WatchURL()) } target="_blank" rel="noopener" title={ v.Title }>
+								<img src={ v.ThumbURL() } alt={ v.Title } loading="lazy"/>
+								<span class="video-play" aria-hidden="true">&#9654;</span>
+							</a>
+							<figcaption class="video-caption mono">
+								<span class="video-title">{ v.Title }</span>
+								if v.PublishedLabel() != "" {
+									<span class="video-date">{ v.PublishedLabel() }</span>
+								}
+							</figcaption>
+						</figure>
+					}
+				</div>
+				if p.ChannelURL != "" {
+					<a href={ templ.URL(p.ChannelURL) } class="btn-outline mono" target="_blank" rel="noopener">
+						No Tape on YouTube
+					</a>
+				}
+			</section>
+		}
+
+		<section class="events">
+			if p.HasVideos() {
+				<span class="section-label mono">Photos</span>
+			}
+			if len(p.Photos) == 0 {
+				<p class="about-body">No photos yet — check back soon.</p>
+			} else {
+				<div class="gallery">
+					for _, photo := range p.Photos {
+						<figure class="gallery-item">
+							<a href={ templ.URL(photo.Path()) } target="_blank" rel="noopener">
+								<img src={ photo.WebPath() } alt={ photo.Alt() } loading="lazy"/>
+							</a>
+							if photo.Caption != "" {
+								<figcaption class="gallery-caption mono">{ photo.Caption }</figcaption>
+							}
+						</figure>
+					}
+				</div>
+			}
+		</section>
+	}
+}

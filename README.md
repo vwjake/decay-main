@@ -39,12 +39,46 @@ Access is by permission, not by role name — `events`, `posts`, `shop`,
 `photos`, `people`, `groups`, `media`, `bookings`, `messages`, `forms`,
 `reports`, `staff`, and `users`. Roles map to sets of those in
 `db/roles.go`, and handlers check the permission, so adding a narrower
-role later means adding an entry there and changing no handlers.
-**`master` is the only role so far** and grants everything.
+role later means adding an entry there and changing no handlers. There
+are three:
+
+- **Keyholder** — running the space: events, bookings, messages, photos,
+  reports, and the staff calendar. Not the shop, the site's copy, or
+  accounts.
+- **Manager** — everything, including creating accounts and handing out
+  access.
+- **Master** — everything a manager has, and hidden. It's the owner
+  account, so `/admin/users` is the one place the difference shows.
+
+**A master is invisible to anyone who isn't one.** Managers don't see
+master accounts in the list, aren't offered the role on any form, and get
+a 404 — not a 403 — from a master's edit, password, or delete URL, since
+"forbidden" would confirm the account is there. The role only appears to
+a master. `ADMIN_USERNAME`/`ADMIN_PASSWORD` still creates the first
+account as a master, so a fresh install has one.
 
 Two things the panel refuses, because both would lock everyone out
 permanently: deleting the account you're signed in as, and removing the
 last account that can manage accounts.
+
+### Your account
+
+`/admin/account` is everyone's own page, behind no permission at all — a
+keyholder who can reach nothing else still has one. It holds the display
+name shown around the panel, a photo, a blurb of up to 250 characters,
+and a password change (which asks for the current password, so a session
+left open isn't enough to lock its owner out).
+
+The blurb is stored as plain text, whatever gets posted: `db.SanitizeBlurb`
+strips tags, drops `script` and `style` bodies whole, and removes control
+characters before it ever reaches the column. The templates escape what
+they render, so that isn't what stands between the site and an injection
+— it's so nothing executable is in the database to begin with, for
+whatever reads it later. An account manager can clear someone's blurb or
+photo from `/admin/users/<id>`; nobody but the owner can set them.
+
+Photos land in `uploads/avatars/` with a web-sized copy alongside, the
+same as flyers and product shots.
 
 ### Live reload
 
@@ -144,9 +178,13 @@ Outbound links are only to accounts DECAY actually uses: YouTube
 newsletter. There's no Bandcamp and the Twitch account is unused, so
 neither is linked.
 
-## Photos
+## Media
 
-`/photos` is the gallery, uploaded at `/admin/photos`. Files live under
+`/media` is videos and photographs together. It was `/photos` until it
+grew videos; that URL now redirects, since old links and printed material
+still point at it.
+
+**Photos** are uploaded at `/admin/photos`. Files live under
 `uploads/photos/` with web-sized copies in `uploads/photos/web/`, the
 same arrangement as flyers and product shots — the page shows the copy
 and links the original behind it. Tiles are cropped square so a grid of
@@ -156,6 +194,31 @@ is one click away.
 Captions are optional and double as the image's alt text. Without one the
 alt is deliberately empty, which marks the image as decorative rather
 than reading a generated filename out to a screen reader.
+
+**Videos** come from two places. *Featured* are the ones entered at
+`/admin/media` — the same handful the home page carries — and they get
+real embedded players. *Recent uploads* are read live from the channel's
+public Atom feed, and are thumbnails linking out to YouTube rather than
+players: a dozen embeds would load a YouTube frame each before anyone
+asked to watch anything. Anything already featured is dropped from the
+recent list so it isn't shown twice.
+
+The feed needs no API key and no credentials, the same read-only
+arrangement as the staff calendar. `YOUTUBE_CHANNEL` takes either a
+handle (`@no_tape`) or a channel id (`UC…`) and defaults to DECAY's own
+channel, so it works unconfigured; set it to empty to drop the section
+entirely. A handle costs one extra fetch of the channel page to resolve,
+which happens once per process.
+
+Two things worth knowing if this ever misbehaves. Resolving a handle
+reads the channel id out of the page's canonical `/channel/UC…` link
+specifically — a channel page is full of other id-shaped strings, and
+taking the first one resolves to a stranger's channel whose feed then
+404s. And the endpoint intermittently answers 404 or 500 to a perfectly
+good request, so a fetch is retried once and the results are cached for
+an hour; a failed refresh keeps serving the last good list. The section
+is a bonus on top of the database, so YouTube being down costs the page
+that section, never the page.
 
 ## Flyers and volunteers
 
@@ -220,6 +283,7 @@ once events are managed there, stop re-importing.
 - `cmd/importshop/` — one-way converter from the shop.decay.events export
 - `ics/` — renders events as a subscribable iCalendar feed
 - `staff/` — reads DECAY's internal Nextcloud calendar for `/admin/staff`
+- `youtube/` — reads recent uploads off a channel's public feed for `/media`
 - `markdown/` — renders blog post Markdown to HTML
 - `embed/` — resolves YouTube/Bandcamp links in posts into players
 - `mail/` — best-effort SMTP notification for contact-form messages
@@ -228,7 +292,7 @@ once events are managed there, stop re-importing.
 - `admin/` — session auth, permission checks, and CRUD handlers for `/admin/*`
 - `db/roles.go` — the permission set each role grants
 - `static/css`, `static/js`, `static/img` — assets, embedded into the binary at build time
-- `uploads/` — photo and flyer uploads written at runtime (not embedded, not committed)
+- `uploads/` — photo, flyer, and avatar uploads written at runtime (not embedded, not committed)
 
 Editing a `.templ` file requires regenerating its Go code:
 
