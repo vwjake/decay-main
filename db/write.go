@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -81,6 +82,77 @@ func UpdateProduct(conn *sql.DB, p Product) error {
 		`UPDATE products SET name = ?, price_cents = ?, placeholder = ?, stripe_url = ?, stripe_price_id = ?, variants = ?, description = ?, sold_out = ?, position = ? WHERE id = ?`,
 		p.Name, p.PriceCents, p.Placeholder, p.StripeURL, p.StripePriceID, p.Variants, p.Description, p.SoldOut, p.Position, p.ID,
 	)
+	return err
+}
+
+// StripeProduct is one item as Stripe describes it — the fields the shop
+// takes from there, with everything else (photo, ordering) staying local.
+type StripeProduct struct {
+	ProductID   string
+	PriceID     string
+	Name        string
+	Description string
+	PriceCents  int
+}
+
+// UpsertStripeProduct writes one synced item, matching on stripe_product_id.
+// It deliberately lists the columns it touches rather than replacing the
+// row: image, variants, placeholder, and position are the site's to own, and
+// a sync must not blank the photo an admin uploaded here. Returns whether
+// the row was newly created, for the sync summary.
+func UpsertStripeProduct(conn *sql.DB, sp StripeProduct) (created bool, err error) {
+	res, err := conn.Exec(
+		`UPDATE products SET name = ?, price_cents = ?, description = ?, stripe_price_id = ?, sold_out = 0
+		 WHERE stripe_product_id = ?`,
+		sp.Name, sp.PriceCents, sp.Description, sp.PriceID, sp.ProductID,
+	)
+	if err != nil {
+		return false, err
+	}
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if affected > 0 {
+		return false, nil
+	}
+
+	// New to the site. An admin adds the photo afterwards, so it starts on
+	// the placeholder and sorts to the end of the catalogue.
+	_, err = conn.Exec(
+		`INSERT INTO products (name, price_cents, placeholder, description, stripe_product_id, stripe_price_id, position)
+		 VALUES (?, ?, 'product photo', ?, ?, ?, (SELECT COALESCE(MAX(position), 0) + 1 FROM products))`,
+		sp.Name, sp.PriceCents, sp.Description, sp.ProductID, sp.PriceID,
+	)
+	return true, err
+}
+
+// RetireMissingStripeProducts marks synced items that Stripe no longer lists
+// as sold out. They're kept rather than deleted so the photo and the item's
+// ordering survive it being relisted. Local-only rows (no stripe_product_id)
+// are never touched. Returns how many were retired.
+func RetireMissingStripeProducts(conn *sql.DB, seen []string) (int, error) {
+	query := `UPDATE products SET sold_out = 1 WHERE stripe_product_id <> '' AND sold_out = 0`
+	args := make([]any, 0, len(seen))
+	if len(seen) > 0 {
+		placeholders := strings.Repeat(",?", len(seen))[1:]
+		query += ` AND stripe_product_id NOT IN (` + placeholders + `)`
+		for _, id := range seen {
+			args = append(args, id)
+		}
+	}
+	res, err := conn.Exec(query, args...)
+	if err != nil {
+		return 0, err
+	}
+	n, err := res.RowsAffected()
+	return int(n), err
+}
+
+// LinkProductToStripe attaches an existing local row to a Stripe product, so
+// merch that predates the sync joins up instead of being duplicated by it.
+func LinkProductToStripe(conn *sql.DB, id int64, stripeProductID string) error {
+	_, err := conn.Exec(`UPDATE products SET stripe_product_id = ? WHERE id = ?`, stripeProductID, id)
 	return err
 }
 

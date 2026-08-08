@@ -11,18 +11,42 @@ import (
 
 	"decay-main/db"
 	"decay-main/images"
+	"decay-main/shop"
 	"decay-main/views"
 
 	"github.com/labstack/echo/v4"
 )
 
+// Items are created in Stripe and pulled in by the sync, so there's no
+// create route here — only editing what the sync doesn't own (the photo,
+// variants, ordering), and removing a row.
 func registerProductRoutes(g *echo.Group, conn *sql.DB, uploadsDir string) {
 	g.GET("/products", listProducts(conn))
-	g.POST("/products", createProduct(conn))
+	g.POST("/products/sync", syncProducts(conn))
 	g.GET("/products/:id", editProduct(conn))
 	g.POST("/products/:id", saveProduct(conn))
 	g.POST("/products/:id/image", uploadProductImage(conn, uploadsDir))
 	g.POST("/products/:id/delete", deleteProduct(conn))
+}
+
+// syncProducts pulls the catalogue down from Stripe. The button is only
+// rendered when Stripe is configured, but the check is repeated here so the
+// endpoint can't be posted to blind and fail deep inside the API client.
+func syncProducts(conn *sql.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		if !shop.Configured() {
+			return rerenderProductsError(c, conn, "Stripe isn't configured — set STRIPE_SECRET_KEY to sync.")
+		}
+		result, err := shop.SyncProducts(conn)
+		if err != nil {
+			return rerenderProductsError(c, conn, "Sync failed: "+err.Error())
+		}
+		products, err := db.ListProducts(conn)
+		if err != nil {
+			return err
+		}
+		return views.AdminProducts(products, currentUser(c), "", result.Summary(), true).Render(c.Request().Context(), c.Response())
+	}
 }
 
 // productsSubdir keeps shop photos apart from flyers and gallery photos.
@@ -143,43 +167,7 @@ func listProducts(conn *sql.DB) echo.HandlerFunc {
 		if err != nil {
 			return err
 		}
-		return views.AdminProducts(products, currentUser(c), "").Render(c.Request().Context(), c.Response())
-	}
-}
-
-func createProduct(conn *sql.DB) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		name := c.FormValue("name")
-		if name == "" {
-			return rerenderProductsError(c, conn, "Name is required.")
-		}
-		priceDollars, err := strconv.ParseFloat(c.FormValue("price"), 64)
-		if err != nil || priceDollars < 0 {
-			return rerenderProductsError(c, conn, "Invalid price.")
-		}
-
-		placeholder := c.FormValue("placeholder")
-		if placeholder == "" {
-			placeholder = "product photo"
-		}
-		position, err := parsePosition(c.FormValue("position"))
-		if err != nil {
-			return rerenderProductsError(c, conn, "Order has to be a whole number.")
-		}
-
-		p := db.Product{
-			Name:          name,
-			PriceCents:    int(priceDollars*100 + 0.5),
-			Placeholder:   placeholder,
-			StripeURL:     c.FormValue("stripe_url"),
-			StripePriceID: strings.TrimSpace(c.FormValue("stripe_price_id")),
-			Description:   strings.TrimSpace(c.FormValue("description")),
-			Position:      position,
-		}
-		if err := db.CreateProduct(conn, p); err != nil {
-			return err
-		}
-		return c.Redirect(http.StatusSeeOther, "/admin/products")
+		return views.AdminProducts(products, currentUser(c), "", "", shop.Configured()).Render(c.Request().Context(), c.Response())
 	}
 }
 
@@ -201,5 +189,5 @@ func rerenderProductsError(c echo.Context, conn *sql.DB, msg string) error {
 	if err != nil {
 		return err
 	}
-	return views.AdminProducts(products, currentUser(c), msg).Render(c.Request().Context(), c.Response())
+	return views.AdminProducts(products, currentUser(c), msg, "", shop.Configured()).Render(c.Request().Context(), c.Response())
 }

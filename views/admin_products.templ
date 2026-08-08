@@ -6,13 +6,27 @@ import (
 	"decay-main/db"
 )
 
-templ AdminProducts(products []db.Product, me db.User, errorMsg string) {
+templ AdminProducts(products []db.Product, me db.User, errorMsg, notice string, stripeReady bool) {
 	@AdminLayout("Shop · DECAY Admin", me) {
 		<p class="admin-heading">Shop</p>
 		if errorMsg != "" {
 			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
 		}
+		if notice != "" {
+			<div class="admin-flash mono">{ notice }</div>
+		}
 		<p class="admin-sub mono">Shown on the public /shop page in the order below.</p>
+		<form method="post" action="/admin/products/sync" class="admin-form">
+			<p class="admin-sub mono">
+				Items are added and priced in Stripe, then pulled in here. Names,
+				prices, and descriptions come from Stripe; photos are kept on this
+				site, so syncing never replaces one.
+			</p>
+			if !stripeReady {
+				<p class="admin-sub mono">Stripe isn't configured yet — set STRIPE_SECRET_KEY to enable this.</p>
+			}
+			<button type="submit" class="admin-btn" disabled?={ !stripeReady }>Sync from Stripe</button>
+		</form>
 		<table class="admin-table">
 			<tr>
 				<th>Order</th>
@@ -34,8 +48,12 @@ templ AdminProducts(products []db.Product, me db.User, errorMsg string) {
 						} else {
 							available
 						}
+						if p.SyncedFromStripe() {
+							· stripe
+						}
 					</td>
-					<td>
+					<td class="admin-row-actions">
+						<a class="admin-btn" href={ templ.URL(fmt.Sprintf("/admin/products/%d", p.ID)) }>Edit</a>
 						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/products/%d/delete", p.ID)) } onsubmit="return confirm('Delete this product?')">
 							<button type="submit" class="admin-btn admin-btn-danger">Delete</button>
 						</form>
@@ -43,18 +61,8 @@ templ AdminProducts(products []db.Product, me db.User, errorMsg string) {
 				</tr>
 			}
 		</table>
-
-		<p class="admin-heading">Add product</p>
-		<form method="post" action="/admin/products" class="admin-form">
-			<label>Name<input type="text" name="name" required/></label>
-			<label>Price (USD)<input type="number" name="price" min="0" step="0.01" required/></label>
-			<label>Description (optional)<textarea name="description"></textarea></label>
-			<label>Placeholder text<input type="text" name="placeholder" placeholder="product photo"/></label>
-			<label>Stripe link (optional)<input type="text" name="stripe_url"/></label>
-			<label>Stripe Price ID (optional)<input type="text" name="stripe_price_id" placeholder="price_..."/></label>
-			<label>Order<input type="number" name="position" value="0"/></label>
-			<p class="admin-sub mono">Add the photo, variants, and sold-out status after creating it.</p>
-			<button type="submit" class="admin-btn">Create</button>
-		</form>
+		if len(products) == 0 {
+			<p class="admin-sub mono">Nothing here yet — add an item in Stripe, then sync.</p>
+		}
 	}
 }

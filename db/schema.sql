@@ -242,7 +242,16 @@ CREATE TABLE IF NOT EXISTS products (
     -- Text shown in place of a photo when there isn't one yet.
     placeholder TEXT NOT NULL DEFAULT '',
     stripe_url TEXT NOT NULL DEFAULT '',
-    -- Stripe Price ID for Checkout Session integration
+    -- Stripe is the catalogue's source of truth: /admin/products syncs name,
+    -- price, and description down from it. The photo is deliberately not —
+    -- it stays local, in uploads/products/, keyed by the image column below.
+    --
+    -- Rows are matched on stripe_product_id, which survives a price change;
+    -- stripe_price_id is whatever that product's current one-time price is
+    -- and gets rewritten on each sync, since Stripe prices are immutable and
+    -- editing an amount mints a new id. A row with no stripe_product_id is
+    -- local-only and sync never touches it.
+    stripe_product_id TEXT NOT NULL DEFAULT '',
     stripe_price_id TEXT NOT NULL DEFAULT '',
     -- Filename under uploads/products/. Empty falls back to placeholder.
     image TEXT NOT NULL DEFAULT '',

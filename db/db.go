@@ -45,6 +45,7 @@ func migrate(conn *sql.DB) error {
 		{"products", "sold_out", `ALTER TABLE products ADD COLUMN sold_out INTEGER NOT NULL DEFAULT 0`},
 		{"products", "position", `ALTER TABLE products ADD COLUMN position INTEGER NOT NULL DEFAULT 0`},
 		{"products", "stripe_price_id", `ALTER TABLE products ADD COLUMN stripe_price_id TEXT NOT NULL DEFAULT ''`},
+		{"products", "stripe_product_id", `ALTER TABLE products ADD COLUMN stripe_product_id TEXT NOT NULL DEFAULT ''`},
 		{"users", "photo", `ALTER TABLE users ADD COLUMN photo TEXT NOT NULL DEFAULT ''`},
 		{"users", "blurb", `ALTER TABLE users ADD COLUMN blurb TEXT NOT NULL DEFAULT ''`},
 	}

@@ -147,14 +147,18 @@ func formatClock(t time.Time) string {
 }
 
 type Product struct {
-	ID            int64
-	Name          string
-	PriceCents    int
-	Placeholder   string
-	StripeURL     string
-	StripePriceID string
-	Image         string
-	Variants      string
+	ID          int64
+	Name        string
+	PriceCents  int
+	Placeholder string
+	StripeURL   string
+	// StripeProductID is the sync key; empty means the item is local-only
+	// and a sync leaves it alone. StripePriceID is the current one-time
+	// price, rewritten on each sync.
+	StripeProductID string
+	StripePriceID   string
+	Image           string
+	Variants        string
 	// Description is optional copy shown under the item on the shop page.
 	Description string
 	// SoldOut marks an item as unavailable — it stays on the page with a
@@ -583,13 +587,17 @@ func ListAllEvents(conn *sql.DB) ([]Event, error) {
 	return scanEvents(rows)
 }
 
-const productColumns = `id, name, price_cents, placeholder, stripe_url, stripe_price_id, image, variants, description, sold_out, position`
+const productColumns = `id, name, price_cents, placeholder, stripe_url, stripe_product_id, stripe_price_id, image, variants, description, sold_out, position`
 
 func scanProduct(s interface {
 	Scan(...any) error
 }, p *Product) error {
-	return s.Scan(&p.ID, &p.Name, &p.PriceCents, &p.Placeholder, &p.StripeURL, &p.StripePriceID, &p.Image, &p.Variants, &p.Description, &p.SoldOut, &p.Position)
+	return s.Scan(&p.ID, &p.Name, &p.PriceCents, &p.Placeholder, &p.StripeURL, &p.StripeProductID, &p.StripePriceID, &p.Image, &p.Variants, &p.Description, &p.SoldOut, &p.Position)
 }
+
+// SyncedFromStripe reports whether a row is tied to a Stripe product, and
+// so has its name, price, and description managed there rather than here.
+func (p Product) SyncedFromStripe() bool { return p.StripeProductID != "" }
 
 func ListProducts(conn *sql.DB) ([]Product, error) {
 	rows, err := conn.Query(`SELECT ` + productColumns + ` FROM products ORDER BY position ASC, id ASC`)

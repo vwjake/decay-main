@@ -29,8 +29,6 @@ import (
 	"decay-main/views"
 	"decay-main/youtube"
 
-	stripe "github.com/stripe/stripe-go/v79"
-
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -125,14 +123,15 @@ func main() {
 		log.Println("YOUTUBE_CHANNEL set empty — /media shows only curated videos and photos.")
 	}
 
-	// Stripe integration for shop checkout. Leave STRIPE_SECRET_KEY unset to disable.
-	stripeSecretKey := os.Getenv("STRIPE_SECRET_KEY")
-	stripeWebhookSecret := os.Getenv("STRIPE_WEBHOOK_SECRET")
-	if stripeSecretKey != "" {
-		stripe.Key = stripeSecretKey
-		log.Println("Stripe Checkout integration enabled")
+	// Stripe backs the shop: it owns the catalogue (synced down at
+	// /admin/products) and takes the payments. Unset STRIPE_SECRET_KEY
+	// leaves all of it dormant rather than half-working — the shop stays a
+	// catalogue that links out, which is what it was before.
+	stripeReady := shop.Configure()
+	if stripeReady {
+		log.Println("Stripe enabled — catalogue syncs from Stripe, checkout is live")
 	} else {
-		log.Println("STRIPE_SECRET_KEY not set — Stripe Checkout disabled, shop links out to shop.decay.events")
+		log.Println("STRIPE_SECRET_KEY not set — Stripe disabled, shop links out to shop.decay.events")
 	}
 
 	e := echo.New()
@@ -317,7 +316,7 @@ func main() {
 	})
 
 	// Stripe Checkout routes (only active if STRIPE_SECRET_KEY is set)
-	if stripeSecretKey != "" {
+	if stripeReady {
 		e.POST("/shop/checkout", func(c echo.Context) error {
 			return handleShopCheckout(c, conn, siteURL)
 		})
@@ -331,7 +330,7 @@ func main() {
 		})
 
 		e.POST("/webhooks/stripe", func(c echo.Context) error {
-			return handleStripeWebhook(c, conn, stripeWebhookSecret)
+			return handleStripeWebhook(c, conn, shop.WebhookSecret())
 		})
 	}
 

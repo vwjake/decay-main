@@ -2,7 +2,9 @@ package views
 
 import (
 	"context"
+	"fmt"
 	"io"
+	"strings"
 	"testing"
 
 	"decay-main/db"
@@ -25,5 +27,75 @@ func TestShopViewRenders(t *testing.T) {
 	// Home reuses merchCard, so render it with the same mix.
 	if err := Home(nil, products, nil).Render(context.Background(), io.Discard); err != nil {
 		t.Fatalf("Home render: %v", err)
+	}
+}
+
+// TestAdminProductsSyncButton covers the sync control. It's always on the
+// page — hiding it when Stripe is unconfigured just reads as a missing
+// feature — but it's disabled until there's a key to sync with.
+func TestAdminProductsSyncButton(t *testing.T) {
+	me := db.User{ID: 1, Username: "admin", Role: db.RoleMaster}
+	products := []db.Product{
+		{ID: 1, Name: "Logo Tee", PriceCents: 3000, StripeProductID: "prod_abc"},
+		{ID: 2, Name: "Zine", PriceCents: 500},
+	}
+
+	for _, tc := range []struct {
+		name         string
+		stripeReady  bool
+		wantDisabled bool
+	}{
+		{"stripe configured", true, false},
+		{"stripe absent", false, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			var b strings.Builder
+			if err := AdminProducts(products, me, "", "", tc.stripeReady).Render(context.Background(), &b); err != nil {
+				t.Fatalf("render: %v", err)
+			}
+			if !strings.Contains(b.String(), "/admin/products/sync") {
+				t.Error("sync form missing")
+			}
+			if got := strings.Contains(b.String(), "disabled"); got != tc.wantDisabled {
+				t.Errorf("sync button disabled = %v, want %v", got, tc.wantDisabled)
+			}
+		})
+	}
+
+	// Items are created in Stripe, so the page must not offer a create form.
+	var list strings.Builder
+	if err := AdminProducts(products, me, "", "", true).Render(context.Background(), &list); err != nil {
+		t.Fatalf("render: %v", err)
+	}
+	if strings.Contains(list.String(), `action="/admin/products"`) {
+		t.Error("add-product form still on the page")
+	}
+	// Every row needs a way through to its edit page.
+	for _, p := range products {
+		want := fmt.Sprintf("/admin/products/%d", p.ID)
+		if !strings.Contains(list.String(), want) {
+			t.Errorf("no edit link for product %d", p.ID)
+		}
+	}
+
+	// The two flashes are distinct: a sync summary must not be dressed up as
+	// an error, and vice versa.
+	var b strings.Builder
+	if err := AdminProducts(products, me, "", "Synced from Stripe: 1 added.", true).Render(context.Background(), &b); err != nil {
+		t.Fatalf("render with notice: %v", err)
+	}
+	if strings.Contains(b.String(), "admin-flash-error") {
+		t.Error("sync summary rendered with the error style")
+	}
+	// A Stripe-backed row is marked as such so it's clear which items an
+	// admin's edits here would be overwritten on the next sync. Match the
+	// marker itself — a bare "stripe" also hits the add form's field names.
+	if !strings.Contains(b.String(), "· stripe") {
+		t.Error("Stripe-synced product not flagged in the list")
+	}
+	// The local-only row must not be flagged, or the marker says nothing.
+	if strings.Count(b.String(), "· stripe") != 1 {
+		t.Errorf("want exactly one Stripe marker for two products, got %d",
+			strings.Count(b.String(), "· stripe"))
 	}
 }
