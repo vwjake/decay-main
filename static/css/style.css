@@ -1001,6 +1001,10 @@ button.merch-item {
   width: auto;
   margin-bottom: 6px;
   display: block;
+  /* .footer-info is a column flexbox, so without this the image stretches
+     to the column's full width (the address text below it) instead of
+     keeping its own aspect ratio. */
+  align-self: center;
 }
 
 .site-footer span {
