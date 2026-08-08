@@ -147,13 +147,14 @@ func formatClock(t time.Time) string {
 }
 
 type Product struct {
-	ID          int64
-	Name        string
-	PriceCents  int
-	Placeholder string
-	StripeURL   string
-	Image       string
-	Variants    string
+	ID            int64
+	Name          string
+	PriceCents    int
+	Placeholder   string
+	StripeURL     string
+	StripePriceID string
+	Image         string
+	Variants      string
 	// Description is optional copy shown under the item on the shop page.
 	Description string
 	// SoldOut marks an item as unavailable — it stays on the page with a
@@ -189,6 +190,25 @@ func (p Product) Price() string {
 		return fmt.Sprintf("$%d", p.PriceCents/100)
 	}
 	return fmt.Sprintf("$%.2f", float64(p.PriceCents)/100)
+}
+
+type Order struct {
+	ID            int64
+	SecureToken   string
+	CustomerName  string
+	CustomerEmail string
+	Status        string
+	RedeemCode    *string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+}
+
+type OrderItem struct {
+	ID              int64
+	OrderID         int64
+	ProductID       int64
+	Quantity        int
+	PriceAtPurchase int
 }
 
 type Post struct {
@@ -563,12 +583,12 @@ func ListAllEvents(conn *sql.DB) ([]Event, error) {
 	return scanEvents(rows)
 }
 
-const productColumns = `id, name, price_cents, placeholder, stripe_url, image, variants, description, sold_out, position`
+const productColumns = `id, name, price_cents, placeholder, stripe_url, stripe_price_id, image, variants, description, sold_out, position`
 
 func scanProduct(s interface {
 	Scan(...any) error
 }, p *Product) error {
-	return s.Scan(&p.ID, &p.Name, &p.PriceCents, &p.Placeholder, &p.StripeURL, &p.Image, &p.Variants, &p.Description, &p.SoldOut, &p.Position)
+	return s.Scan(&p.ID, &p.Name, &p.PriceCents, &p.Placeholder, &p.StripeURL, &p.StripePriceID, &p.Image, &p.Variants, &p.Description, &p.SoldOut, &p.Position)
 }
 
 func ListProducts(conn *sql.DB) ([]Product, error) {

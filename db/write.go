@@ -78,8 +78,8 @@ func SetProductImage(conn *sql.DB, id int64, filename string) (string, error) {
 // UpdateProduct saves edits to a shop item.
 func UpdateProduct(conn *sql.DB, p Product) error {
 	_, err := conn.Exec(
-		`UPDATE products SET name = ?, price_cents = ?, placeholder = ?, stripe_url = ?, variants = ?, description = ?, sold_out = ?, position = ? WHERE id = ?`,
-		p.Name, p.PriceCents, p.Placeholder, p.StripeURL, p.Variants, p.Description, p.SoldOut, p.Position, p.ID,
+		`UPDATE products SET name = ?, price_cents = ?, placeholder = ?, stripe_url = ?, stripe_price_id = ?, variants = ?, description = ?, sold_out = ?, position = ? WHERE id = ?`,
+		p.Name, p.PriceCents, p.Placeholder, p.StripeURL, p.StripePriceID, p.Variants, p.Description, p.SoldOut, p.Position, p.ID,
 	)
 	return err
 }
@@ -277,4 +277,91 @@ func DeletePhoto(conn *sql.DB, id int64) (string, error) {
 		return "", err
 	}
 	return filename, nil
+}
+
+// CreateOrder inserts a new pending order and returns its ID.
+func CreateOrder(conn *sql.DB, o Order) (int64, error) {
+	res, err := conn.Exec(
+		`INSERT INTO orders (secure_token, customer_name, customer_email, status, created_at, updated_at) VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))`,
+		o.SecureToken, o.CustomerName, o.CustomerEmail, o.Status,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return res.LastInsertId()
+}
+
+// UpdateOrderStatus updates an order's status and updated_at timestamp.
+func UpdateOrderStatus(conn *sql.DB, id int64, status string) error {
+	_, err := conn.Exec(
+		`UPDATE orders SET status = ?, updated_at = datetime('now') WHERE id = ?`,
+		status, id,
+	)
+	return err
+}
+
+// SetOrderRedeemCode sets the redeem code for an order.
+func SetOrderRedeemCode(conn *sql.DB, id int64, code string) error {
+	_, err := conn.Exec(
+		`UPDATE orders SET redeem_code = ?, updated_at = datetime('now') WHERE id = ?`,
+		code, id,
+	)
+	return err
+}
+
+// OrderByToken fetches an order by its secure token.
+func OrderByToken(conn *sql.DB, token string) (Order, error) {
+	var o Order
+	var createdAt, updatedAt string
+	err := conn.QueryRow(
+		`SELECT id, secure_token, customer_name, customer_email, status, redeem_code, created_at, updated_at FROM orders WHERE secure_token = ?`,
+		token,
+	).Scan(&o.ID, &o.SecureToken, &o.CustomerName, &o.CustomerEmail, &o.Status, &o.RedeemCode, &createdAt, &updatedAt)
+	if err != nil {
+		return o, err
+	}
+	var errCreatedAt, errUpdatedAt error
+	o.CreatedAt, errCreatedAt = time.Parse("2006-01-02 15:04:05", createdAt)
+	o.UpdatedAt, errUpdatedAt = time.Parse("2006-01-02 15:04:05", updatedAt)
+	if errCreatedAt != nil || errUpdatedAt != nil {
+		return o, fmt.Errorf("error parsing timestamps: %v, %v", errCreatedAt, errUpdatedAt)
+	}
+	return o, nil
+}
+
+// AddOrderItem inserts an item into an order.
+func AddOrderItem(conn *sql.DB, oi OrderItem) error {
+	_, err := conn.Exec(
+		`INSERT INTO order_items (order_id, product_id, quantity, price_at_purchase) VALUES (?, ?, ?, ?)`,
+		oi.OrderID, oi.ProductID, oi.Quantity, oi.PriceAtPurchase,
+	)
+	return err
+}
+
+// ItemsForOrder fetches all items in an order, joined with product details.
+type OrderItemDetail struct {
+	OrderItem
+	ProductName string
+}
+
+func ItemsForOrder(conn *sql.DB, orderID int64) ([]OrderItemDetail, error) {
+	rows, err := conn.Query(
+		`SELECT oi.id, oi.order_id, oi.product_id, oi.quantity, oi.price_at_purchase, p.name FROM order_items oi
+		 JOIN products p ON p.id = oi.product_id WHERE oi.order_id = ?`,
+		orderID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var items []OrderItemDetail
+	for rows.Next() {
+		var item OrderItemDetail
+		if err := rows.Scan(&item.ID, &item.OrderID, &item.ProductID, &item.Quantity, &item.PriceAtPurchase, &item.ProductName); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+	return items, rows.Err()
 }

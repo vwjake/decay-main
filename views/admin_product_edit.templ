@@ -23,6 +23,7 @@ templ AdminProductEdit(p db.Product, me db.User, errorMsg string) {
 			<label>Variants (shown as text)<input type="text" name="variants" value={ p.Variants }/></label>
 			<label>Placeholder text (shown when there's no photo)<input type="text" name="placeholder" value={ p.Placeholder }/></label>
 			<label>Buy link<input type="text" name="stripe_url" value={ p.StripeURL } placeholder="https://shop.decay.events/..."/></label>
+			<label>Stripe Price ID (for Checkout)<input type="text" name="stripe_price_id" value={ p.StripePriceID } placeholder="price_..."/></label>
 			<label>Order<input type="number" name="position" value={ fmt.Sprint(p.Position) }/></label>
 			<label class="inline">
 				<input type="checkbox" name="sold_out" value="1" checked?={ p.SoldOut }/> Sold out

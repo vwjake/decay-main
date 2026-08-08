@@ -113,6 +113,7 @@ func saveProduct(conn *sql.DB) echo.HandlerFunc {
 		p.PriceCents = int(priceDollars*100 + 0.5)
 		p.Placeholder = placeholder
 		p.StripeURL = strings.TrimSpace(c.FormValue("stripe_url"))
+		p.StripePriceID = strings.TrimSpace(c.FormValue("stripe_price_id"))
 		p.Variants = strings.TrimSpace(c.FormValue("variants"))
 		p.Description = strings.TrimSpace(c.FormValue("description"))
 		p.SoldOut = c.FormValue("sold_out") != ""
@@ -167,12 +168,13 @@ func createProduct(conn *sql.DB) echo.HandlerFunc {
 		}
 
 		p := db.Product{
-			Name:        name,
-			PriceCents:  int(priceDollars*100 + 0.5),
-			Placeholder: placeholder,
-			StripeURL:   c.FormValue("stripe_url"),
-			Description: strings.TrimSpace(c.FormValue("description")),
-			Position:    position,
+			Name:          name,
+			PriceCents:    int(priceDollars*100 + 0.5),
+			Placeholder:   placeholder,
+			StripeURL:     c.FormValue("stripe_url"),
+			StripePriceID: strings.TrimSpace(c.FormValue("stripe_price_id")),
+			Description:   strings.TrimSpace(c.FormValue("description")),
+			Position:      position,
 		}
 		if err := db.CreateProduct(conn, p); err != nil {
 			return err

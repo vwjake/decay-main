@@ -6,11 +6,13 @@ import (
 	"embed"
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"log"
 	"net/http"
 	netmail "net/mail"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -23,7 +25,10 @@ import (
 	"decay-main/db"
 	"decay-main/ics"
 	"decay-main/mail"
+	"decay-main/shop"
 	"decay-main/views"
+
+	stripe "github.com/stripe/stripe-go/v79"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
@@ -94,6 +99,16 @@ func main() {
 		log.Printf("booking mailbox connected: %s", bookingMailer.Address())
 	} else {
 		log.Println("BOOKING_IMAP_HOST not set — the booking email history panel is hidden.")
+	}
+
+	// Stripe integration for shop checkout. Leave STRIPE_SECRET_KEY unset to disable.
+	stripeSecretKey := os.Getenv("STRIPE_SECRET_KEY")
+	stripeWebhookSecret := os.Getenv("STRIPE_WEBHOOK_SECRET")
+	if stripeSecretKey != "" {
+		stripe.Key = stripeSecretKey
+		log.Println("Stripe Checkout integration enabled")
+	} else {
+		log.Println("STRIPE_SECRET_KEY not set — Stripe Checkout disabled, shop links out to shop.decay.events")
 	}
 
 	e := echo.New()
@@ -276,6 +291,25 @@ func main() {
 		}
 		return views.Shop(products).Render(c.Request().Context(), c.Response())
 	})
+
+	// Stripe Checkout routes (only active if STRIPE_SECRET_KEY is set)
+	if stripeSecretKey != "" {
+		e.POST("/shop/checkout", func(c echo.Context) error {
+			return handleShopCheckout(c, conn, siteURL)
+		})
+
+		e.GET("/order/confirm", func(c echo.Context) error {
+			return handleOrderConfirm(c, conn)
+		})
+
+		e.GET("/api/order-status", func(c echo.Context) error {
+			return handleOrderStatus(c, conn)
+		})
+
+		e.POST("/webhooks/stripe", func(c echo.Context) error {
+			return handleStripeWebhook(c, conn, stripeWebhookSecret)
+		})
+	}
 
 	e.GET("/groups", func(c echo.Context) error {
 		groups, err := db.EnabledGroups(conn)
@@ -544,4 +578,104 @@ func sessionSecret() []byte {
 		log.Fatal(err)
 	}
 	return secret
+}
+
+// handleShopCheckout creates a Stripe Checkout Session for the requested products.
+func handleShopCheckout(c echo.Context, conn *sql.DB, siteURL string) error {
+	// Parse product IDs and quantities from form
+	// For MVP, we'll accept ?product_id=ID&quantity=QTY format
+	productID := c.FormValue("product_id")
+	quantity := c.FormValue("quantity")
+	email := c.FormValue("email")
+
+	if productID == "" || quantity == "" || email == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "missing product_id, quantity, or email"})
+	}
+
+	id, err := strconv.ParseInt(productID, 10, 64)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid product_id"})
+	}
+
+	qty, err := strconv.Atoi(quantity)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid quantity"})
+	}
+
+	// Create Checkout Session
+	successURL := siteURL + "/order/confirm?token={CHECKOUT_SESSION_ID}"
+	cancelURL := siteURL + "/shop"
+
+	sessionID, orderToken, err := shop.CreateCheckoutSession(conn, shop.CreateCheckoutSessionParams{
+		ProductIDs: []int64{id},
+		Quantities: []int{qty},
+		Email:      email,
+		SuccessURL: successURL,
+		CancelURL:  cancelURL,
+	})
+	if err != nil {
+		log.Printf("error creating checkout session: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "failed to create checkout session"})
+	}
+
+	// Redirect to Stripe Checkout
+	return c.JSON(http.StatusOK, map[string]string{
+		"sessionId":  sessionID,
+		"orderToken": orderToken,
+	})
+}
+
+// handleOrderConfirm shows the order confirmation page with polling for payment confirmation.
+func handleOrderConfirm(c echo.Context, conn *sql.DB) error {
+	// For MVP, just show a placeholder confirmation page
+	// In a full implementation, this would display the order details and redeem code
+	token := c.QueryParam("token")
+	if token == "" {
+		return c.String(http.StatusBadRequest, "Missing order token")
+	}
+
+	return c.String(http.StatusOK, fmt.Sprintf("Order confirmation page for token: %s (placeholder)", token))
+}
+
+// handleOrderStatus returns the status of an order for client-side polling.
+func handleOrderStatus(c echo.Context, conn *sql.DB) error {
+	token := c.QueryParam("token")
+	if token == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "missing token"})
+	}
+
+	order, err := db.OrderByToken(conn, token)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return c.JSON(http.StatusNotFound, map[string]string{"error": "order not found"})
+		}
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "failed to fetch order"})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"status":      order.Status,
+		"redeem_code": order.RedeemCode,
+	})
+}
+
+// handleStripeWebhook processes incoming Stripe webhook events.
+func handleStripeWebhook(c echo.Context, conn *sql.DB, webhookSecret string) error {
+	payload, err := io.ReadAll(c.Request().Body)
+	if err != nil {
+		log.Printf("error reading webhook payload: %v", err)
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "error reading request body"})
+	}
+
+	signature := c.Request().Header.Get("Stripe-Signature")
+	if signature == "" {
+		log.Println("webhook missing Stripe-Signature header")
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "missing Stripe-Signature header"})
+	}
+
+	if err := shop.HandleStripeWebhook(conn, payload, signature, webhookSecret); err != nil {
+		log.Printf("error processing webhook: %v", err)
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("webhook error: %v", err)})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"status": "received"})
 }

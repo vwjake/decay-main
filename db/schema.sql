@@ -236,6 +236,8 @@ CREATE TABLE IF NOT EXISTS products (
     -- Text shown in place of a photo when there isn't one yet.
     placeholder TEXT NOT NULL DEFAULT '',
     stripe_url TEXT NOT NULL DEFAULT '',
+    -- Stripe Price ID for Checkout Session integration
+    stripe_price_id TEXT NOT NULL DEFAULT '',
     -- Filename under uploads/products/. Empty falls back to placeholder.
     image TEXT NOT NULL DEFAULT '',
     -- Sizes, colours, prints — shown as text, since the site doesn't
@@ -247,4 +249,30 @@ CREATE TABLE IF NOT EXISTS products (
     sold_out INTEGER NOT NULL DEFAULT 0,
     -- Orders the catalogue; lower comes first.
     position INTEGER NOT NULL DEFAULT 0
+);
+
+-- Shop orders from Stripe Checkout Sessions. status moves pending -> paid
+-- on the checkout.session.completed webhook.
+CREATE TABLE IF NOT EXISTS orders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    -- Unguessable id for the confirmation URL, so an order page can't be
+    -- walked by incrementing a number.
+    secure_token TEXT NOT NULL UNIQUE,
+    customer_name TEXT NOT NULL,
+    customer_email TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    -- Short human-readable reference a customer quotes when they get in
+    -- touch. Assigned once the order is paid; nothing is redeemed with it.
+    redeem_code TEXT UNIQUE,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Items within an order
+CREATE TABLE IF NOT EXISTS order_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    product_id INTEGER NOT NULL REFERENCES products(id),
+    quantity INTEGER NOT NULL,
+    price_at_purchase INTEGER NOT NULL
 );
