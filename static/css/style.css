@@ -978,6 +978,7 @@ button.merch-item {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  align-items: center;
   text-align: center;
 }
 
@@ -985,9 +986,14 @@ button.merch-item {
   flex-shrink: 0;
 }
 
+/* Overrides .footer-column's flex-direction: the links sit in a row of
+   pill tags, not stacked — flex-direction: column left each <a> stretched
+   to the column's full width, one per line. */
 .footer-links {
   flex: 1;
   min-width: 150px;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .footer-copyright {
@@ -1001,10 +1007,6 @@ button.merch-item {
   width: auto;
   margin-bottom: 6px;
   display: block;
-  /* .footer-info is a column flexbox, so without this the image stretches
-     to the column's full width (the address text below it) instead of
-     keeping its own aspect ratio. */
-  align-self: center;
 }
 
 .site-footer span {
