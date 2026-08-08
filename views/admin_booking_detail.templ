@@ -1,0 +1,202 @@
+package views
+
+import (
+	"fmt"
+	"strings"
+	"time"
+
+	"decay-main/bookingmail"
+	"decay-main/db"
+)
+
+// BookingDetailData bundles a booking with its correspondence for the
+// detail page. Thread is the zero value when the mailbox isn't configured
+// or the booking has no email on file, in which case the panel explains why
+// instead of showing a broken one.
+type BookingDetailData struct {
+	Booking        db.BookingRequest
+	Thread         bookingmail.Thread
+	CanSend        bool
+	MailboxAddress string
+	Venue          *time.Location
+	FlashError     string
+	FlashNotice    string
+}
+
+templ AdminBookingDetail(d BookingDetailData, me db.User) {
+	@AdminLayout(fmt.Sprintf("%s · DECAY Admin", d.Booking.Name), me) {
+		<div class="admin-heading-row">
+			<a href="/admin/bookings" class="admin-btn admin-btn-small">← All requests</a>
+		</div>
+		if d.FlashNotice != "" {
+			<div class="admin-flash mono">{ d.FlashNotice }</div>
+		}
+		if d.FlashError != "" {
+			<div class="admin-flash admin-flash-error mono">{ d.FlashError }</div>
+		}
+		<div class="booking-card">
+			<div class="booking-head">
+				<strong>{ d.Booking.Name }</strong>
+				if d.Booking.IsNew() {
+					<span class="booking-badge mono">New</span>
+				}
+				if d.Booking.IsArchived() {
+					<span class="booking-badge booking-badge-muted mono">Archived</span>
+				}
+				<span class="mono booking-when">{ d.Booking.When() }</span>
+			</div>
+			<dl class="booking-fields mono">
+				if d.Booking.EventName != "" {
+					<dt>Event</dt>
+					<dd>{ d.Booking.EventName }</dd>
+				}
+				@bookingContact(d.Booking)
+				if d.Booking.PreferredDate != "" {
+					<dt>Dates</dt>
+					<dd>{ d.Booking.PreferredDate }</dd>
+				}
+				if d.Booking.ExpectedAttendance != "" {
+					<dt>Headcount</dt>
+					<dd>{ d.Booking.ExpectedAttendance }</dd>
+				}
+			</dl>
+			if d.Booking.Description != "" {
+				<p class="booking-desc">{ d.Booking.Description }</p>
+			}
+			<div class="booking-actions">
+				if d.Booking.IsNew() {
+					@bookingAction(d.Booking.ID, db.BookingReviewed, "Mark reviewed", "admin-btn-small")
+				}
+				if !d.Booking.IsArchived() {
+					@bookingAction(d.Booking.ID, db.BookingArchived, "Archive", "admin-btn-small")
+				} else {
+					@bookingAction(d.Booking.ID, db.BookingNew, "Restore", "admin-btn-small")
+				}
+				<form method="post" action={ templ.URL(fmt.Sprintf("/admin/bookings/%d/delete", d.Booking.ID)) } onsubmit="return confirm('Delete this request for good?')">
+					<button type="submit" class="admin-btn admin-btn-small admin-btn-danger">Delete</button>
+				</form>
+			</div>
+		</div>
+
+		@emailThreadPanel(d)
+	}
+}
+
+templ emailThreadPanel(d BookingDetailData) {
+	<div class="admin-heading-row" style="margin-top:1.6em;">
+		<p class="admin-heading">Email history</p>
+		if d.Thread.Configured {
+			<a href={ templ.URL(fmt.Sprintf("/admin/bookings/%d?refresh=1", d.Booking.ID)) } class="admin-btn admin-btn-small">Refresh</a>
+		}
+	</div>
+	if d.Booking.Email == "" {
+		<p class="admin-sub mono">No email address on file, so there is nothing to look up.</p>
+	} else if !d.Thread.Configured {
+		<p class="admin-sub mono">The booking mailbox is not connected on this server yet. Set BOOKING_IMAP_HOST to enable it.</p>
+	} else if d.Thread.Err != nil {
+		<p class="admin-sub mono">Couldn't read the booking mailbox: { d.Thread.Err.Error() }</p>
+	} else if len(d.Thread.Messages) == 0 {
+		<p class="admin-sub mono">No emails to or from { d.Booking.Email } in the booking mailbox yet.</p>
+	} else {
+		{{ received, sent := d.Thread.Counts() }}
+		<p class="admin-sub mono">
+			{ fmt.Sprintf("%s — %d received, %d sent", plural(len(d.Thread.Messages), "message", "messages"), received, sent) }
+			if d.Thread.Cached {
+				{ " (cached)" }
+			}
+		</p>
+		for i, m := range d.Thread.Messages {
+			@emailMessage(m, d.Venue, i == len(d.Thread.Messages)-1)
+		}
+	}
+
+	if d.CanSend && d.Booking.Email != "" {
+		@replyForm(d)
+	}
+}
+
+templ emailMessage(m bookingmail.Message, venue *time.Location, open bool) {
+	<details class={ "email-msg", templ.KV("email-msg-sent", m.IsSent()), templ.KV("email-msg-received", !m.IsSent()) } open?={ open }>
+		<summary>
+			<span class="email-dir mono">
+				if m.IsSent() {
+					{ "→ Sent" }
+				} else {
+					{ "← Received" }
+				}
+			</span>
+			<span class="email-date mono">{ m.When(venue) }</span>
+			<span class="email-subject">
+				if m.Subject != "" {
+					{ m.Subject }
+				} else {
+					{ "(no subject)" }
+				}
+			</span>
+			if s := m.Snippet(120); s != "" {
+				<span class="email-snippet">{ s }</span>
+			}
+		</summary>
+		<div class="email-headers mono">
+			<div><strong>From:</strong>
+				if m.FromName != "" {
+					{ m.FromName } { "<" + m.FromEmail + ">" }
+				} else {
+					{ m.FromEmail }
+				}
+			</div>
+			if m.To != "" {
+				<div><strong>To:</strong> { m.To }</div>
+			}
+			if m.CC != "" {
+				<div><strong>Cc:</strong> { m.CC }</div>
+			}
+			if len(m.Attachments) > 0 {
+				<div><strong>Attachments:</strong> { strings.Join(m.Attachments, ", ") }</div>
+			}
+		</div>
+		if m.Body == "" {
+			<p class="admin-sub mono">(no readable text in this message)</p>
+		} else {
+			<pre class="email-body">{ m.DisplayBody() }</pre>
+		}
+		if m.Quoted != "" {
+			<details class="email-quoted">
+				<summary>Show quoted text</summary>
+				<pre class="email-body email-quoted-body">{ m.Quoted }</pre>
+			</details>
+		}
+	</details>
+}
+
+templ replyForm(d BookingDetailData) {
+	<details class="email-compose">
+		<summary>Write a reply</summary>
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/bookings/%d/reply/preview", d.Booking.ID)) }>
+			<label>Subject
+				<input type="text" name="subject" required value={ replySubject(d) }/>
+			</label>
+			<label>Message
+				<textarea name="body" rows="8" required placeholder="Your reply. Your name is added at the end automatically."></textarea>
+			</label>
+			<p class="admin-sub mono">Goes out as DECAY Booking &lt;{ d.MailboxAddress }&gt;, signed with your name. You'll see a preview before anything sends.</p>
+			<button type="submit" class="admin-btn admin-btn-small">Preview &amp; send</button>
+		</form>
+	</details>
+}
+
+// replySubject prefills Re: <last subject> when there's a thread to reply
+// into, so the recipient's mail client keeps it in the same conversation.
+func replySubject(d BookingDetailData) string {
+	if len(d.Thread.Messages) == 0 {
+		return ""
+	}
+	last := d.Thread.Messages[len(d.Thread.Messages)-1]
+	if last.Subject == "" {
+		return ""
+	}
+	if len(last.Subject) >= 3 && (last.Subject[:3] == "Re:" || last.Subject[:3] == "RE:") {
+		return last.Subject
+	}
+	return "Re: " + last.Subject
+}

@@ -1945,3 +1945,161 @@ body.lightbox-open { overflow: hidden; }
 @media (max-width: 640px) {
   .lightbox-nav { width: 38px; height: 38px; font-size: 22px; }
 }
+
+/* Booking email history + reply ------------------------------------------ */
+
+.email-msg {
+  border: 2px solid #111;
+  margin-bottom: 8px;
+}
+
+.email-msg > summary {
+  cursor: pointer;
+  padding: 8px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  list-style: none;
+}
+
+.email-msg > summary::-webkit-details-marker {
+  display: none;
+}
+
+.email-msg > summary:hover {
+  background: var(--surface-alt);
+}
+
+.email-dir {
+  font-weight: bold;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.email-date {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.email-subject {
+  font-weight: bold;
+}
+
+.email-snippet {
+  flex-basis: 100%;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.email-headers {
+  padding: 8px 12px;
+  font-size: 12px;
+  border-top: 2px solid #111;
+  background: var(--surface-alt);
+}
+
+.email-body {
+  margin: 0;
+  padding: 10px 12px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  max-height: 24em;
+  overflow-y: auto;
+}
+
+.email-quoted {
+  border-top: 2px solid #111;
+}
+
+.email-quoted > summary {
+  cursor: pointer;
+  padding: 6px 12px;
+  font-size: 11px;
+  color: var(--muted);
+  list-style: none;
+}
+
+.email-quoted > summary::-webkit-details-marker {
+  display: none;
+}
+
+.email-quoted-body {
+  color: var(--muted);
+  font-size: 13px;
+  border-top: 2px solid #111;
+}
+
+.email-compose {
+  border: 2px solid #111;
+  margin-top: 16px;
+}
+
+.email-compose > summary {
+  cursor: pointer;
+  padding: 10px 14px;
+  font-weight: bold;
+  list-style: none;
+}
+
+.email-compose > summary::-webkit-details-marker {
+  display: none;
+}
+
+.email-compose > summary:hover {
+  background: var(--surface-alt);
+}
+
+.email-compose form {
+  padding: 0 14px 14px;
+}
+
+.email-compose label {
+  display: block;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.email-compose input[type="text"],
+.email-compose textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 4px;
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: normal;
+  border: 2px solid #111;
+  background: var(--surface);
+}
+
+.email-compose textarea {
+  resize: vertical;
+  min-height: 8em;
+  line-height: 1.5;
+}
+
+.send-preview {
+  margin: 0 0 16px;
+}
+
+.send-preview dt {
+  font-weight: bold;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.send-preview dd {
+  margin: 0 0 8px;
+}

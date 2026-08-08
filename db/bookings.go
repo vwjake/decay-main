@@ -79,6 +79,23 @@ func ListBookingRequests(conn *sql.DB, includeArchived bool) ([]BookingRequest, 
 	return scanBookings(rows)
 }
 
+// BookingByID looks up a single request, for the detail page.
+func BookingByID(conn *sql.DB, id int64) (BookingRequest, error) {
+	row := conn.QueryRow(`SELECT `+bookingColumns+` FROM booking_requests WHERE id = ?`, id)
+	var b BookingRequest
+	var created string
+	if err := row.Scan(&b.ID, &b.Name, &b.Email, &b.Phone, &b.EventName, &b.Description,
+		&b.PreferredDate, &b.ExpectedAttendance, &b.Status, &created); err != nil {
+		return BookingRequest{}, err
+	}
+	t, err := time.Parse("2006-01-02 15:04:05", created)
+	if err != nil {
+		return BookingRequest{}, err
+	}
+	b.CreatedAt = t
+	return b, nil
+}
+
 // SetBookingStatus moves a request between new, reviewed, and archived.
 func SetBookingStatus(conn *sql.DB, id int64, status string) error {
 	_, err := conn.Exec(`UPDATE booking_requests SET status = ? WHERE id = ?`, status, id)

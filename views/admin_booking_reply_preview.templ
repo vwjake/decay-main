@@ -1,0 +1,56 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/bookingmail"
+	"decay-main/db"
+)
+
+// ReplyPreviewData is what's shown before a reply actually sends — the exact
+// text a Send call will produce, plus everything the confirm POST needs to
+// carry forward. The recipient itself is deliberately not part of this: the
+// send handler re-derives it from the booking record by ID, never from a
+// form field, so a tampered form can't redirect the mail to someone else.
+type ReplyPreviewData struct {
+	Booking        db.BookingRequest
+	MailboxAddress string
+	FromName       string
+	Subject        string
+	Body           string // as the admin typed it
+	SenderName     string
+	InReplyTo      string
+	Nonce          string
+}
+
+templ AdminBookingReplyPreview(d ReplyPreviewData, me db.User) {
+	@AdminLayout("Send this reply? · DECAY Admin", me) {
+		<div class="admin-heading-row">
+			<a href={ templ.URL(fmt.Sprintf("/admin/bookings/%d", d.Booking.ID)) } class="admin-btn admin-btn-small">← Cancel</a>
+		</div>
+		<p class="admin-heading">Send this reply?</p>
+		<dl class="send-preview mono">
+			<dt>From</dt>
+			<dd>{ d.FromName } &lt;{ d.MailboxAddress }&gt;</dd>
+			<dt>To</dt>
+			<dd>
+				if d.Booking.Name != "" {
+					{ d.Booking.Name } { "<" + d.Booking.Email + ">" }
+				} else {
+					{ d.Booking.Email }
+				}
+			</dd>
+			<dt>Subject</dt>
+			<dd>{ d.Subject }</dd>
+		</dl>
+		<pre class="email-body" style="border:2px solid #111;">{ bookingmail.SignBody(d.Body, d.SenderName) }</pre>
+		<p class="admin-sub mono">This goes out as the shared booking address, signed with your name. Replies come back to the booking mailbox and appear in the history.</p>
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/bookings/%d/reply/send", d.Booking.ID)) }>
+			<input type="hidden" name="subject" value={ d.Subject }/>
+			<input type="hidden" name="body" value={ d.Body }/>
+			<input type="hidden" name="in_reply_to" value={ d.InReplyTo }/>
+			<input type="hidden" name="nonce" value={ d.Nonce }/>
+			<button type="submit" class="admin-btn">Send it</button>
+		</form>
+	}
+}

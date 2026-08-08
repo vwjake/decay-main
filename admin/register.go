@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"decay-main/bookingmail"
 	"decay-main/db"
 	"decay-main/staff"
 	"decay-main/views"
@@ -15,10 +16,12 @@ import (
 )
 
 // Register wires up session middleware and every /admin route on e. venue
-// is the timezone dates are read in, and staffURL is the shared .ics feed
-// of the internal staff calendar (empty disables the staff page).
-// secureCookies marks the session cookie Secure (HTTPS-only) in production.
-func Register(e *echo.Echo, conn *sql.DB, sessionSecret []byte, uploadsDir string, venue *time.Location, staffURL string, secureCookies bool) {
+// is the timezone dates are read in, staffURL is the shared .ics feed of the
+// internal staff calendar (empty disables the staff page), and bookingMailer
+// reads/replies to the booking mailbox for the booking detail page (a
+// disabled Handler just hides that panel). secureCookies marks the session
+// cookie Secure (HTTPS-only) in production.
+func Register(e *echo.Echo, conn *sql.DB, sessionSecret []byte, uploadsDir string, venue *time.Location, staffURL string, bookingMailer *bookingmail.Handler, secureCookies bool) {
 	store := sessions.NewCookieStore(sessionSecret)
 	store.Options = &sessions.Options{
 		Path:     "/",
@@ -61,7 +64,7 @@ func Register(e *echo.Echo, conn *sql.DB, sessionSecret []byte, uploadsDir strin
 	registerMediaRoutes(media, conn)
 
 	bookings := g.Group("", requirePermission(db.PermBookings))
-	registerBookingRoutes(bookings, conn)
+	registerBookingRoutes(bookings, conn, bookingMailer, venue)
 
 	messages := g.Group("", requirePermission(db.PermMessages))
 	registerMessageRoutes(messages, conn)

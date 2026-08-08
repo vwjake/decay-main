@@ -19,6 +19,7 @@ import (
 	_ "time/tzdata"
 
 	"decay-main/admin"
+	"decay-main/bookingmail"
 	"decay-main/db"
 	"decay-main/ics"
 	"decay-main/mail"
@@ -84,6 +85,17 @@ func main() {
 		log.Println("SMTP not configured — contact messages are saved to /admin/messages only, no email sent. Set SMTP_HOST to enable notifications.")
 	}
 
+	// Reads and replies to the booking mailbox for the admin's booking
+	// detail page. Disabled (the panel just hides) unless BOOKING_IMAP_HOST
+	// is set — this is a real mailbox, not a notification address, so it
+	// stays off by default rather than half-configured.
+	bookingMailer := bookingmail.New(bookingmail.FromEnv())
+	if bookingMailer.Enabled() {
+		log.Printf("booking mailbox connected: %s", bookingMailer.Address())
+	} else {
+		log.Println("BOOKING_IMAP_HOST not set — the booking email history panel is hidden.")
+	}
+
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -118,7 +130,7 @@ func main() {
 
 	// The internal staff calendar is read from a separate Nextcloud
 	// share; an unset URL simply leaves that admin page dormant.
-	admin.Register(e, conn, sessionSecret(), uploadsDir, venue, os.Getenv("STAFF_ICS_URL"), secureCookies)
+	admin.Register(e, conn, sessionSecret(), uploadsDir, venue, os.Getenv("STAFF_ICS_URL"), bookingMailer, secureCookies)
 
 	e.GET("/", func(c echo.Context) error {
 		events, err := db.ListUpcomingEvents(conn, 4)

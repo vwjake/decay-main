@@ -25,7 +25,7 @@ templ AdminBookings(requests []db.BookingRequest, showingArchived bool, me db.Us
 			for _, b := range requests {
 				<div class="booking-card">
 					<div class="booking-head">
-						<strong>{ b.Name }</strong>
+						<strong><a href={ templ.URL(fmt.Sprintf("/admin/bookings/%d", b.ID)) }>{ b.Name }</a></strong>
 						if b.IsNew() {
 							<span class="booking-badge mono">New</span>
 						}
