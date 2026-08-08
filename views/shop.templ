@@ -1,42 +1,67 @@
 package views
 
-import "decay-main/db"
+import (
+	"fmt"
 
-// Shop is the public catalogue. The site displays merch only; each item
-// links out to shop.decay.events, which takes the actual orders.
-templ Shop(products []db.Product) {
+	"decay-main/db"
+)
+
+// Shop is the public catalogue. When Stripe is configured, buying an item
+// happens right here via Checkout; otherwise it falls back to linking out to
+// shop.decay.events, which is what the site was before Stripe checkout
+// landed.
+templ Shop(products []db.Product, stripeReady bool, checkoutError bool) {
 	@Layout("Shop · DECAY") {
 		<section class="about">
 			<p class="about-statement">Shop</p>
 			<p class="about-body">
-				Merch keeps the space running and funds studio residencies. Browse below,
-				then check out over at shop.decay.events — the site here is just the catalogue.
+				if stripeReady {
+					Merch keeps the space running. Pick something below and check out
+					right here on the site.
+				} else {
+					Merch keeps the space running. Browse below, then check out over at
+					shop.decay.events — the site here is just the catalogue.
+				}
 			</p>
 		</section>
 
 		<section class="events">
+			if checkoutError {
+				<div class="admin-flash admin-flash-error mono">Couldn't start checkout — try again, or get in touch if it keeps happening.</div>
+			}
 			if len(products) == 0 {
 				<p class="admin-sub mono">Nothing in the shop right now — check back soon.</p>
 			} else {
 				<div class="merch-grid">
 					for _, p := range products {
-						@merchCard(p)
+						@merchCard(p, stripeReady)
 					}
 				</div>
 			}
-			<a href="https://shop.decay.events" class="btn-outline mono" target="_blank" rel="noopener">Check out at shop.decay.events</a>
+			if !stripeReady {
+				<a href="https://shop.decay.events" class="btn-outline mono" target="_blank" rel="noopener">Check out at shop.decay.events</a>
+			}
 		</section>
 	}
 }
 
 // merchCard renders one catalogue item, shared by the home preview and the
-// shop page. A sold-out item shows a badge and doesn't link out, since
-// there's nothing to buy.
-templ merchCard(p db.Product) {
+// shop page. A sold-out item shows a badge and links nowhere, since there's
+// nothing to buy. A Stripe-synced item buys through this site's own
+// Checkout; anything else (local-only merch, or Stripe unconfigured) falls
+// back to its manually set buy link, or shop.decay.events if it has none.
+templ merchCard(p db.Product, stripeReady bool) {
 	if p.SoldOut {
 		<div class="merch-item is-soldout">
 			@merchCardBody(p)
 		</div>
+	} else if stripeReady && p.StripePriceID != "" {
+		<form method="post" action="/shop/checkout" class="merch-form">
+			<input type="hidden" name="product_id" value={ fmt.Sprint(p.ID) }/>
+			<button type="submit" class="merch-item merch-item-buy">
+				@merchCardBody(p)
+			</button>
+		</form>
 	} else {
 		<a href={ templ.URL(p.BuyURL()) } class="merch-item" target="_blank" rel="noopener">
 			@merchCardBody(p)

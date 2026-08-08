@@ -175,8 +175,9 @@ func (p Product) HasImage() bool { return p.Image != "" }
 // HasDescription reports whether there's blurb worth rendering.
 func (p Product) HasDescription() bool { return p.Description != "" }
 
-// BuyURL is where a listing sends someone to actually buy it. The site
-// displays the catalogue only; shop.decay.events takes the orders.
+// BuyURL is the fallback for items that don't check out through this
+// site's own Stripe Checkout: a manually set buy link if there is one,
+// shop.decay.events otherwise.
 func (p Product) BuyURL() string {
 	if p.StripeURL != "" {
 		return p.StripeURL

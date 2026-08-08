@@ -17,7 +17,9 @@ import (
 type CreateCheckoutSessionParams struct {
 	ProductIDs []int64
 	Quantities []int
-	Email      string
+	// Email pre-fills the buyer's address if the caller already has it.
+	// Left empty, Stripe collects it on its own hosted page instead.
+	Email string
 	// SuccessURL is where Stripe returns the buyer after payment. Any
 	// "{ORDER_TOKEN}" in it is replaced with this order's secure token,
 	// the same way Stripe substitutes its own {CHECKOUT_SESSION_ID}. The
@@ -27,9 +29,10 @@ type CreateCheckoutSessionParams struct {
 	CancelURL  string
 }
 
-// CreateCheckoutSession creates a Stripe Checkout Session and returns its ID.
-// It also creates a pending order record in the database.
-func CreateCheckoutSession(conn *sql.DB, params CreateCheckoutSessionParams) (sessionID string, orderToken string, err error) {
+// CreateCheckoutSession creates a Stripe Checkout Session and returns the
+// hosted URL to send the buyer to. It also creates a pending order record in
+// the database.
+func CreateCheckoutSession(conn *sql.DB, params CreateCheckoutSessionParams) (checkoutURL string, orderToken string, err error) {
 	// Fetch product details
 	var products []db.Product
 	for _, id := range params.ProductIDs {
@@ -88,12 +91,14 @@ func CreateCheckoutSession(conn *sql.DB, params CreateCheckoutSessionParams) (se
 		PaymentMethodTypes: stripe.StringSlice([]string{"card"}),
 		Mode:               stripe.String(string(stripe.CheckoutSessionModePayment)),
 		LineItems:          lineItems,
-		CustomerEmail:      stripe.String(params.Email),
 		SuccessURL:         stripe.String(successURLFor(params.SuccessURL, orderToken)),
 		CancelURL:          stripe.String(params.CancelURL),
 		Metadata: map[string]string{
 			"order_token": orderToken,
 		},
+	}
+	if params.Email != "" {
+		params_stripe.CustomerEmail = stripe.String(params.Email)
 	}
 
 	sess, err := session.New(params_stripe)
@@ -101,7 +106,7 @@ func CreateCheckoutSession(conn *sql.DB, params CreateCheckoutSessionParams) (se
 		return "", "", fmt.Errorf("failed to create Stripe session: %w", err)
 	}
 
-	return sess.ID, orderToken, nil
+	return sess.URL, orderToken, nil
 }
 
 // successURLFor puts this order's token into the URL Stripe returns the

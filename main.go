@@ -194,7 +194,7 @@ func main() {
 			}
 		}
 
-		return views.Home(events, products, videos, latestYouTube).Render(c.Request().Context(), c.Response())
+		return views.Home(events, products, videos, latestYouTube, stripeReady).Render(c.Request().Context(), c.Response())
 	})
 
 	e.GET("/about", func(c echo.Context) error {
@@ -348,7 +348,8 @@ func main() {
 		if err != nil {
 			return err
 		}
-		return views.Shop(products).Render(c.Request().Context(), c.Response())
+		checkoutError := c.QueryParam("error") != ""
+		return views.Shop(products, stripeReady, checkoutError).Render(c.Request().Context(), c.Response())
 	})
 
 	// Stripe Checkout routes (only active if STRIPE_SECRET_KEY is set)
@@ -689,29 +690,16 @@ func sessionSecret() []byte {
 	return secret
 }
 
-// handleShopCheckout creates a Stripe Checkout Session for the requested products.
+// handleShopCheckout starts a Stripe Checkout Session for one product and
+// sends the buyer straight there. It's a plain form post — Stripe collects
+// the buyer's email and card on its own hosted page, so no JavaScript is
+// needed on this end.
 func handleShopCheckout(c echo.Context, conn *sql.DB, siteURL string) error {
-	// Parse product IDs and quantities from form
-	// For MVP, we'll accept ?product_id=ID&quantity=QTY format
-	productID := c.FormValue("product_id")
-	quantity := c.FormValue("quantity")
-	email := c.FormValue("email")
-
-	if productID == "" || quantity == "" || email == "" {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "missing product_id, quantity, or email"})
-	}
-
-	id, err := strconv.ParseInt(productID, 10, 64)
+	id, err := strconv.ParseInt(c.FormValue("product_id"), 10, 64)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid product_id"})
+		return c.Redirect(http.StatusSeeOther, "/shop?error=1")
 	}
 
-	qty, err := strconv.Atoi(quantity)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid quantity"})
-	}
-
-	// Create Checkout Session
 	// {ORDER_TOKEN} is substituted with the order's own secure token, which
 	// is what the confirmation page looks orders up by. Stripe's
 	// {CHECKOUT_SESSION_ID} would be its session id, which matches nothing
@@ -719,23 +707,18 @@ func handleShopCheckout(c echo.Context, conn *sql.DB, siteURL string) error {
 	successURL := siteURL + "/order/confirm?token={ORDER_TOKEN}"
 	cancelURL := siteURL + "/shop"
 
-	sessionID, orderToken, err := shop.CreateCheckoutSession(conn, shop.CreateCheckoutSessionParams{
+	checkoutURL, _, err := shop.CreateCheckoutSession(conn, shop.CreateCheckoutSessionParams{
 		ProductIDs: []int64{id},
-		Quantities: []int{qty},
-		Email:      email,
+		Quantities: []int{1},
 		SuccessURL: successURL,
 		CancelURL:  cancelURL,
 	})
 	if err != nil {
 		log.Printf("error creating checkout session: %v", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "failed to create checkout session"})
+		return c.Redirect(http.StatusSeeOther, "/shop?error=1")
 	}
 
-	// Redirect to Stripe Checkout
-	return c.JSON(http.StatusOK, map[string]string{
-		"sessionId":  sessionID,
-		"orderToken": orderToken,
-	})
+	return c.Redirect(http.StatusSeeOther, checkoutURL)
 }
 
 // handleOrderConfirm shows a buyer their order: what they bought, what it

@@ -187,6 +187,35 @@ func TestCheckoutCompletedWithoutMailer(t *testing.T) {
 	}
 }
 
+// A one-click buy from the shop grid creates the order with no email —
+// Stripe collects it on the hosted checkout page instead. The webhook has
+// to pull it back from the completed session so the confirmation page and
+// receipt have somewhere to go.
+func TestCheckoutCompletedBackfillsEmailFromStripe(t *testing.T) {
+	conn := testDB(t)
+	token := seedPendingOrder(t, conn, "")
+	mailer := &fakeMailer{enabled: true}
+	cfg := WebhookConfig{Mailer: mailer, SiteURL: "https://decay.events"}
+
+	session := completedSession(token)
+	session.CustomerDetails = &stripe.CheckoutSessionCustomerDetails{Email: "buyer@example.com"}
+
+	if err := handleCheckoutSessionCompleted(conn, session, cfg); err != nil {
+		t.Fatalf("handling the completed checkout: %v", err)
+	}
+
+	order, err := db.OrderByToken(conn, token)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if order.CustomerEmail != "buyer@example.com" {
+		t.Errorf("order email = %q, want the address Stripe collected", order.CustomerEmail)
+	}
+	if len(mailer.sent) != 1 || mailer.sent[0].to != "buyer@example.com" {
+		t.Errorf("receipt not sent to the backfilled address: %+v", mailer.sent)
+	}
+}
+
 func TestOrderConfirmationBodyListsItemsAndTotal(t *testing.T) {
 	order := db.Order{SecureToken: "tok_xyz", CustomerEmail: "buyer@example.com"}
 	items := []db.OrderItemDetail{

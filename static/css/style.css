@@ -709,6 +709,23 @@ a {
   text-align: center;
 }
 
+/* A buyable item posts to /shop/checkout instead of linking out, so the
+   card is a <button> inside a <form>. display:contents drops the form from
+   the grid's box layout, and the reset makes the button match the <a>
+   variant exactly. */
+.merch-form {
+  display: contents;
+}
+
+button.merch-item {
+  all: unset;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+}
+
 .merch-photo {
   position: relative;
   border: 2px solid #111;

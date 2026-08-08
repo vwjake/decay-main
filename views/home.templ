@@ -14,7 +14,7 @@ func videoTitle(v db.Video) string {
 	return "DECAY video"
 }
 
-templ Home(events []db.Event, products []db.Product, videos []db.Video, latestYouTube *youtube.Video) {
+templ Home(events []db.Event, products []db.Product, videos []db.Video, latestYouTube *youtube.Video, stripeReady bool) {
 	@Layout("DECAY") {
 		<section id="top" class="hero">
 			<div class="hero-box">
@@ -40,10 +40,10 @@ templ Home(events []db.Event, products []db.Product, videos []db.Video, latestYo
 
 		<section id="merch" class="merch">
 			<span class="section-label mono">Shop</span>
-			<p class="merch-intro">Proceeds fund studio residencies.</p>
+			<p class="merch-intro">Merch keeps the space running.</p>
 			<div class="merch-grid">
 				for _, item := range products {
-					@merchCard(item)
+					@merchCard(item, stripeReady)
 				}
 			</div>
 			<a href="/shop" class="btn-outline mono">Browse the shop</a>

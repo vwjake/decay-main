@@ -22,7 +22,7 @@ func videoTitle(v db.Video) string {
 	return "DECAY video"
 }
 
-func Home(events []db.Event, products []db.Product, videos []db.Video, latestYouTube *youtube.Video) templ.Component {
+func Home(events []db.Event, products []db.Product, videos []db.Video, latestYouTube *youtube.Video, stripeReady bool) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -65,12 +65,12 @@ func Home(events []db.Event, products []db.Product, videos []db.Video, latestYou
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div><a href=\"/events\" class=\"btn-outline mono\">Full calendar</a></section><section id=\"merch\" class=\"merch\"><span class=\"section-label mono\">Shop</span><p class=\"merch-intro\">Proceeds fund studio residencies.</p><div class=\"merch-grid\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div><a href=\"/events\" class=\"btn-outline mono\">Full calendar</a></section><section id=\"merch\" class=\"merch\"><span class=\"section-label mono\">Shop</span><p class=\"merch-intro\">Merch keeps the space running.</p><div class=\"merch-grid\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, item := range products {
-				templ_7745c5c3_Err = merchCard(item).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = merchCard(item, stripeReady).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

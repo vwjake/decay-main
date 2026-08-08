@@ -76,6 +76,17 @@ func handleCheckoutSessionCompleted(conn *sql.DB, session *stripe.CheckoutSessio
 		return nil
 	}
 
+	// A one-click "buy" leaves the site's own order with no email — the
+	// buyer entered it on Stripe's hosted page instead. Save it now so the
+	// confirmation page and receipt have somewhere to go.
+	if order.CustomerEmail == "" && session.CustomerDetails != nil && session.CustomerDetails.Email != "" {
+		if err := db.SetOrderCustomerEmail(conn, order.ID, session.CustomerDetails.Email); err != nil {
+			log.Printf("order %s: could not save the email Stripe collected: %v", orderToken, err)
+		} else {
+			order.CustomerEmail = session.CustomerDetails.Email
+		}
+	}
+
 	// Update order status to paid
 	if err := db.UpdateOrderStatus(conn, order.ID, "paid"); err != nil {
 		return fmt.Errorf("error updating order status: %w", err)

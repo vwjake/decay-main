@@ -381,6 +381,16 @@ func SetOrderRedeemCode(conn *sql.DB, id int64, code string) error {
 	return err
 }
 
+// SetOrderCustomerEmail fills in the buyer's email once Stripe collects it
+// on its hosted checkout page, for an order that started without one.
+func SetOrderCustomerEmail(conn *sql.DB, id int64, email string) error {
+	_, err := conn.Exec(
+		`UPDATE orders SET customer_email = ?, updated_at = datetime('now') WHERE id = ?`,
+		email, id,
+	)
+	return err
+}
+
 // OrderByToken fetches an order by its secure token.
 func OrderByToken(conn *sql.DB, token string) (Order, error) {
 	var o Order

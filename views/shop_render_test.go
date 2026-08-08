@@ -13,20 +13,68 @@ import (
 func TestShopViewRenders(t *testing.T) {
 	products := []db.Product{
 		{ID: 1, Name: "Logo Tee", PriceCents: 3000, Image: "t.png",
-			Variants: "S, M, L", Description: "Soft cotton.", Position: 1},
+			Variants: "S, M, L", Description: "Soft cotton.", Position: 1, StripePriceID: "price_tee"},
 		{ID: 2, Name: "Bandana", PriceCents: 1000, Placeholder: "product photo",
 			SoldOut: true, Position: 2},
 	}
-	if err := Shop(products).Render(context.Background(), io.Discard); err != nil {
+	if err := Shop(products, true, false).Render(context.Background(), io.Discard); err != nil {
 		t.Fatalf("Shop render: %v", err)
 	}
 	// Empty catalogue still renders.
-	if err := Shop(nil).Render(context.Background(), io.Discard); err != nil {
+	if err := Shop(nil, true, false).Render(context.Background(), io.Discard); err != nil {
 		t.Fatalf("Shop(nil) render: %v", err)
 	}
 	// Home reuses merchCard, so render it with the same mix.
-	if err := Home(nil, products, nil).Render(context.Background(), io.Discard); err != nil {
+	if err := Home(nil, products, nil, nil, true).Render(context.Background(), io.Discard); err != nil {
 		t.Fatalf("Home render: %v", err)
+	}
+}
+
+// TestShopCheckoutWiring covers where a buy click actually goes. A
+// Stripe-synced item should check out right on this site once Stripe is
+// configured, rather than the old behaviour of linking out to
+// shop.decay.events; a local-only item (no Stripe price) keeps using its
+// manually set buy link either way, and the site-wide shop.decay.events
+// fallback only appears when Stripe isn't configured at all.
+func TestShopCheckoutWiring(t *testing.T) {
+	synced := db.Product{ID: 1, Name: "Logo Tee", PriceCents: 3000, StripePriceID: "price_tee"}
+	localOnly := db.Product{ID: 2, Name: "Zine", PriceCents: 500, StripeURL: "https://buy.stripe.com/zine"}
+	products := []db.Product{synced, localOnly}
+
+	var live strings.Builder
+	if err := Shop(products, true, false).Render(context.Background(), &live); err != nil {
+		t.Fatalf("render: %v", err)
+	}
+	if !strings.Contains(live.String(), `action="/shop/checkout"`) {
+		t.Error("Stripe-synced item doesn't post to /shop/checkout")
+	}
+	if !strings.Contains(live.String(), `name="product_id" value="1"`) {
+		t.Error("checkout form doesn't carry the product id")
+	}
+	if strings.Contains(live.String(), "shop.decay.events") {
+		t.Error("shop.decay.events still referenced with Stripe configured")
+	}
+	if !strings.Contains(live.String(), "https://buy.stripe.com/zine") {
+		t.Error("local-only item lost its manual buy link")
+	}
+
+	var unconfigured strings.Builder
+	if err := Shop(products, false, false).Render(context.Background(), &unconfigured); err != nil {
+		t.Fatalf("render: %v", err)
+	}
+	if strings.Contains(unconfigured.String(), `action="/shop/checkout"`) {
+		t.Error("checkout form rendered with Stripe unconfigured")
+	}
+	if !strings.Contains(unconfigured.String(), "https://shop.decay.events") {
+		t.Error("unconfigured shop lost its shop.decay.events fallback")
+	}
+
+	var errored strings.Builder
+	if err := Shop(products, true, true).Render(context.Background(), &errored); err != nil {
+		t.Fatalf("render: %v", err)
+	}
+	if !strings.Contains(errored.String(), "admin-flash-error") {
+		t.Error("checkout error flag didn't render a flash")
 	}
 }
 
