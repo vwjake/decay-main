@@ -185,7 +185,16 @@ func main() {
 		if err != nil {
 			return err
 		}
-		return views.Home(events, products, videos).Render(c.Request().Context(), c.Response())
+
+		var latestYouTube *youtube.Video
+		if tube.Configured() {
+			recent, err := tube.Recent(1)
+			if err == nil && len(recent) > 0 {
+				latestYouTube = &recent[0]
+			}
+		}
+
+		return views.Home(events, products, videos, latestYouTube).Render(c.Request().Context(), c.Response())
 	})
 
 	e.GET("/about", func(c echo.Context) error {
@@ -394,6 +403,10 @@ func main() {
 		photos, err := db.ListPhotos(conn)
 		if err != nil {
 			return err
+		}
+		// Limit to 4 most recent photos
+		if len(photos) > 4 {
+			photos = photos[:4]
 		}
 		featured, err := db.ListVideos(conn)
 		if err != nil {

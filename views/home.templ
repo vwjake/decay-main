@@ -1,6 +1,9 @@
 package views
 
-import "decay-main/db"
+import (
+	"decay-main/db"
+	"decay-main/youtube"
+)
 
 // videoTitle gives the embed's iframe a non-empty accessible name even when
 // no caption was set.
@@ -11,7 +14,7 @@ func videoTitle(v db.Video) string {
 	return "DECAY video"
 }
 
-templ Home(events []db.Event, products []db.Product, videos []db.Video) {
+templ Home(events []db.Event, products []db.Product, videos []db.Video, latestYouTube *youtube.Video) {
 	@Layout("DECAY") {
 		<section id="top" class="hero">
 			<div class="hero-box">
@@ -49,7 +52,28 @@ templ Home(events []db.Event, products []db.Product, videos []db.Video) {
 		<section id="media" class="media">
 			<span class="section-label mono">Media</span>
 			<p class="merch-intro">Sets and sessions recorded at the space.</p>
-			if len(videos) > 0 {
+			if latestYouTube != nil {
+				<div class="media-list">
+					<div class="media-video">
+						<div class="media-video-frame">
+							<iframe
+								src={ templ.URL(latestYouTube.EmbedURL()) }
+								title={ latestYouTube.Title }
+								loading="lazy"
+								referrerpolicy="strict-origin-when-cross-origin"
+								allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+								allowfullscreen
+							></iframe>
+						</div>
+						if latestYouTube.Title != "" {
+							<div class="media-video-caption mono">
+								<span>{ latestYouTube.Title }</span>
+								<a href={ templ.URL(latestYouTube.WatchURL()) } target="_blank" rel="noopener">YouTube &rarr;</a>
+							</div>
+						}
+					</div>
+				</div>
+			} else if len(videos) > 0 {
 				<div class="media-list">
 					for _, v := range videos {
 						<div class="media-video">
@@ -73,9 +97,7 @@ templ Home(events []db.Event, products []db.Product, videos []db.Video) {
 					}
 				</div>
 			}
-			<a href="https://www.youtube.com/@no_tape/videos" class="btn-outline mono" target="_blank" rel="noopener">
-				No Tape on YouTube
-			</a>
+			<a href="/media" class="btn-outline mono">Browse more</a>
 		</section>
 
 		<section id="contact" class="contact">

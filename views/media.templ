@@ -59,25 +59,16 @@ templ Media(p MediaPage) {
 		if len(p.Recent) > 0 {
 			<section class="events">
 				<span class="section-label mono">Recent uploads</span>
-				// Thumbnails rather than players: a page of embeds would
-				// load a YouTube frame per video before anyone asked for
-				// one. Clicking opens the video on YouTube. Deliberately
-				// not .gallery — that class is what the photo lightbox
-				// binds to, and these links leave the site.
-				<div class="video-grid">
+				<div class="event-list">
 					for _, v := range p.Recent {
-						<figure class="video-item">
-							<a href={ templ.URL(v.WatchURL()) } target="_blank" rel="noopener" title={ v.Title }>
-								<img src={ v.ThumbURL() } alt={ v.Title } loading="lazy"/>
-								<span class="video-play" aria-hidden="true">&#9654;</span>
-							</a>
-							<figcaption class="video-caption mono">
-								<span class="video-title">{ v.Title }</span>
-								if v.PublishedLabel() != "" {
-									<span class="video-date">{ v.PublishedLabel() }</span>
-								}
-							</figcaption>
-						</figure>
+						<div class="event-row">
+							<span>
+								<a href={ templ.URL(v.WatchURL()) } target="_blank" rel="noopener">{ v.Title }</a>
+							</span>
+							if v.PublishedLabel() != "" {
+								<span class="event-date">{ v.PublishedLabel() }</span>
+							}
+						</div>
 					}
 				</div>
 				if p.ChannelURL != "" {
