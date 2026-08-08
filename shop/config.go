@@ -16,7 +16,7 @@ import (
 // Configure reads the Stripe credentials from the environment and returns
 // whether the integration is live. Everything Stripe-facing — the checkout
 // routes, the webhook, the sync button — stays dormant when it isn't, so an
-// unconfigured site keeps linking out to shop.decay.events instead of
+// unconfigured site's items just have no checkout yet instead of
 // half-working.
 func Configure() bool {
 	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")

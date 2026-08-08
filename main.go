@@ -131,7 +131,7 @@ func main() {
 	if stripeReady {
 		log.Println("Stripe enabled — catalogue syncs from Stripe, checkout is live")
 	} else {
-		log.Println("STRIPE_SECRET_KEY not set — Stripe disabled, shop links out to shop.decay.events")
+		log.Println("STRIPE_SECRET_KEY not set — Stripe disabled, shop items have no checkout until it's configured and synced")
 	}
 
 	e := echo.New()

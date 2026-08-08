@@ -118,8 +118,9 @@ list marks which of the two each row is.
 ### Checkout
 
 With `STRIPE_SECRET_KEY` set, the shop takes payment through Stripe
-Checkout. Unset, all of it stays dormant and the shop is a catalogue
-linking out to shop.decay.events, which is what it was before.
+Checkout. Unset, all of it stays dormant and an item just has no working
+buy link until it's set and the catalogue is synced from `/admin/products`.
+shop.decay.events, which the site used to link out to, is being retired.
 
 Stripe returns the buyer to `/order/confirm`, showing what they bought
 and their **order code** — a short reference to quote if they get in

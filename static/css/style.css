@@ -1761,8 +1761,12 @@ button.merch-item {
   margin-top: 6px;
 }
 
-/* A sold-out card doesn't link anywhere, so dim it and drop the pointer. */
-.merch-item.is-soldout {
+/* A sold-out card doesn't link anywhere, so dim it and drop the pointer.
+   An item with no checkout path yet (not synced from Stripe, no manual
+   buy link) gets the same treatment, minus the "Sold out" badge — it
+   isn't sold out, it just isn't purchasable through the site yet. */
+.merch-item.is-soldout,
+.merch-item.is-unavailable {
   opacity: 0.72;
   cursor: default;
 }

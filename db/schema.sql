@@ -256,8 +256,8 @@ CREATE TABLE IF NOT EXISTS products (
     stripe_price_id TEXT NOT NULL DEFAULT '',
     -- Filename under uploads/products/. Empty falls back to placeholder.
     image TEXT NOT NULL DEFAULT '',
-    -- Sizes, colours, prints — shown as text, since the site doesn't
-    -- take orders. shop.decay.events still handles the actual selling.
+    -- Sizes, colours, prints — shown as text only; Checkout has no way to
+    -- capture which one a buyer picked.
     variants TEXT NOT NULL DEFAULT '',
     -- Optional blurb shown under the item on the shop page.
     description TEXT NOT NULL DEFAULT '',

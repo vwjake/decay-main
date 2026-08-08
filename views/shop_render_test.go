@@ -31,15 +31,16 @@ func TestShopViewRenders(t *testing.T) {
 }
 
 // TestShopCheckoutWiring covers where a buy click actually goes. A
-// Stripe-synced item should check out right on this site once Stripe is
-// configured, rather than the old behaviour of linking out to
-// shop.decay.events; a local-only item (no Stripe price) keeps using its
-// manually set buy link either way, and the site-wide shop.decay.events
-// fallback only appears when Stripe isn't configured at all.
+// Stripe-synced item checks out right on this site once Stripe is
+// configured; a local-only item (no Stripe price) keeps using its manually
+// set buy link either way; and an item with neither renders as
+// unpurchasable rather than linking anywhere — shop.decay.events is being
+// retired, so there's no external site left to fall back to.
 func TestShopCheckoutWiring(t *testing.T) {
 	synced := db.Product{ID: 1, Name: "Logo Tee", PriceCents: 3000, StripePriceID: "price_tee"}
 	localOnly := db.Product{ID: 2, Name: "Zine", PriceCents: 500, StripeURL: "https://buy.stripe.com/zine"}
-	products := []db.Product{synced, localOnly}
+	notYetLinked := db.Product{ID: 3, Name: "Sticker Pack", PriceCents: 500}
+	products := []db.Product{synced, localOnly, notYetLinked}
 
 	var live strings.Builder
 	if err := Shop(products, true, false).Render(context.Background(), &live); err != nil {
@@ -51,11 +52,11 @@ func TestShopCheckoutWiring(t *testing.T) {
 	if !strings.Contains(live.String(), `name="product_id" value="1"`) {
 		t.Error("checkout form doesn't carry the product id")
 	}
-	if strings.Contains(live.String(), "shop.decay.events") {
-		t.Error("shop.decay.events still referenced with Stripe configured")
-	}
 	if !strings.Contains(live.String(), "https://buy.stripe.com/zine") {
 		t.Error("local-only item lost its manual buy link")
+	}
+	if !strings.Contains(live.String(), `class="merch-item is-unavailable"`) {
+		t.Error("item with no checkout path doesn't render as unavailable")
 	}
 
 	var unconfigured strings.Builder
@@ -65,8 +66,16 @@ func TestShopCheckoutWiring(t *testing.T) {
 	if strings.Contains(unconfigured.String(), `action="/shop/checkout"`) {
 		t.Error("checkout form rendered with Stripe unconfigured")
 	}
-	if !strings.Contains(unconfigured.String(), "https://shop.decay.events") {
-		t.Error("unconfigured shop lost its shop.decay.events fallback")
+	if !strings.Contains(unconfigured.String(), "https://buy.stripe.com/zine") {
+		t.Error("local-only item lost its manual buy link when Stripe is unconfigured")
+	}
+
+	// shop.decay.events is retired — nothing should ever point there again,
+	// configured or not.
+	for _, rendered := range []string{live.String(), unconfigured.String()} {
+		if strings.Contains(rendered, "shop.decay.events") {
+			t.Error("shop.decay.events still referenced")
+		}
 	}
 
 	var errored strings.Builder

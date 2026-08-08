@@ -161,20 +161,20 @@ func AdminProductEdit(p db.Product, me db.User, errorMsg string) templ.Component
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\"></label> <label>Buy link<input type=\"text\" name=\"stripe_url\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\"></label> <label>Buy link (for items not sold through Stripe Checkout)<input type=\"text\" name=\"stripe_url\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.StripeURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_product_edit.templ`, Line: 25, Col: 74}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_product_edit.templ`, Line: 25, Col: 119}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" placeholder=\"https://shop.decay.events/...\"></label> <label>Stripe Price ID (for Checkout)<input type=\"text\" name=\"stripe_price_id\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" placeholder=\"https://buy.stripe.com/...\"></label> <label>Stripe Price ID (for Checkout)<input type=\"text\" name=\"stripe_price_id\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

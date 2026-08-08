@@ -6,10 +6,9 @@ import (
 	"decay-main/db"
 )
 
-// Shop is the public catalogue. When Stripe is configured, buying an item
-// happens right here via Checkout; otherwise it falls back to linking out to
-// shop.decay.events, which is what the site was before Stripe checkout
-// landed.
+// Shop is the public catalogue. Buying an item happens right here via
+// Stripe Checkout — shop.decay.events is being retired, so there's nowhere
+// left to link out to.
 templ Shop(products []db.Product, stripeReady bool, checkoutError bool) {
 	@Layout("Shop · DECAY") {
 		<section class="about">
@@ -19,8 +18,7 @@ templ Shop(products []db.Product, stripeReady bool, checkoutError bool) {
 					Merch keeps the space running. Pick something below and check out
 					right here on the site.
 				} else {
-					Merch keeps the space running. Browse below, then check out over at
-					shop.decay.events — the site here is just the catalogue.
+					Merch keeps the space running.
 				}
 			</p>
 		</section>
@@ -38,9 +36,6 @@ templ Shop(products []db.Product, stripeReady bool, checkoutError bool) {
 					}
 				</div>
 			}
-			if !stripeReady {
-				<a href="https://shop.decay.events" class="btn-outline mono" target="_blank" rel="noopener">Check out at shop.decay.events</a>
-			}
 		</section>
 	}
 }
@@ -48,8 +43,9 @@ templ Shop(products []db.Product, stripeReady bool, checkoutError bool) {
 // merchCard renders one catalogue item, shared by the home preview and the
 // shop page. A sold-out item shows a badge and links nowhere, since there's
 // nothing to buy. A Stripe-synced item buys through this site's own
-// Checkout; anything else (local-only merch, or Stripe unconfigured) falls
-// back to its manually set buy link, or shop.decay.events if it has none.
+// Checkout; a local-only item falls back to its manually set buy link.
+// Anything with neither isn't purchasable yet — shop.decay.events is being
+// retired, so there's no external site left to send someone to instead.
 templ merchCard(p db.Product, stripeReady bool) {
 	if p.SoldOut {
 		<div class="merch-item is-soldout">
@@ -62,10 +58,14 @@ templ merchCard(p db.Product, stripeReady bool) {
 				@merchCardBody(p)
 			</button>
 		</form>
-	} else {
+	} else if p.BuyURL() != "" {
 		<a href={ templ.URL(p.BuyURL()) } class="merch-item" target="_blank" rel="noopener">
 			@merchCardBody(p)
 		</a>
+	} else {
+		<div class="merch-item is-unavailable">
+			@merchCardBody(p)
+		</div>
 	}
 }
 

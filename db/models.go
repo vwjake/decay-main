@@ -175,14 +175,12 @@ func (p Product) HasImage() bool { return p.Image != "" }
 // HasDescription reports whether there's blurb worth rendering.
 func (p Product) HasDescription() bool { return p.Description != "" }
 
-// BuyURL is the fallback for items that don't check out through this
-// site's own Stripe Checkout: a manually set buy link if there is one,
-// shop.decay.events otherwise.
+// BuyURL is the manually set buy link for an item that doesn't check out
+// through this site's own Stripe Checkout — empty if there isn't one.
+// shop.decay.events is being retired, so there's no external site left to
+// fall back to; an item with neither isn't purchasable yet.
 func (p Product) BuyURL() string {
-	if p.StripeURL != "" {
-		return p.StripeURL
-	}
-	return "https://shop.decay.events"
+	return p.StripeURL
 }
 
 // ImagePath is the web-sized copy, which is what pages should display.
