@@ -15,8 +15,9 @@ import (
 	"time"
 )
 
-// Mailer sends plain-text notifications to a fixed inbox (the DECAY address).
-// The zero value is a disabled mailer whose Notify does nothing.
+// Mailer sends plain-text mail: notifications to a fixed inbox (the DECAY
+// address) via Notify, and one-off messages to a named recipient via Send.
+// The zero value is a disabled mailer whose Notify and Send do nothing.
 type Mailer struct {
 	addr        string // host:port; empty means disabled
 	host        string // host alone, for auth and TLS
@@ -84,16 +85,32 @@ func (m *Mailer) Notify(subject, body, replyTo string) error {
 		return nil
 	}
 	msg := buildMessage(m.from, m.to, replyTo, subject, body)
-	return m.send(msg)
+	return m.send(m.to, msg)
+}
+
+// Send delivers a plain-text message to one named recipient, rather than to
+// DECAY's own inbox: an order confirmation goes to whoever bought something.
+// It returns nil when mail is disabled, so an unconfigured site still
+// completes a sale — the order is recorded either way, and the confirmation
+// page carries the same details.
+func (m *Mailer) Send(to, subject, body string) error {
+	if !m.Enabled() {
+		return nil
+	}
+	to = sanitizeHeader(to)
+	if to == "" {
+		return fmt.Errorf("mail: no recipient address")
+	}
+	return m.send(to, buildMessage(m.from, to, "", subject, body))
 }
 
 // send delivers the assembled message. Port 587 (and 25) use STARTTLS, which
 // net/smtp's SendMail negotiates for us. Port 465 is implicit TLS — the
 // connection is TLS from the first byte — which SendMail can't do, so that
 // case is dialed directly. Hover, the mail host, offers both.
-func (m *Mailer) send(msg []byte) error {
+func (m *Mailer) send(to string, msg []byte) error {
 	if !m.implicitTLS {
-		return smtp.SendMail(m.addr, m.auth, m.from, []string{m.to}, msg)
+		return smtp.SendMail(m.addr, m.auth, m.from, []string{to}, msg)
 	}
 
 	conn, err := tls.Dial("tcp", m.addr, &tls.Config{ServerName: m.host})
@@ -116,7 +133,7 @@ func (m *Mailer) send(msg []byte) error {
 	if err := c.Mail(m.from); err != nil {
 		return err
 	}
-	if err := c.Rcpt(m.to); err != nil {
+	if err := c.Rcpt(to); err != nil {
 		return err
 	}
 	w, err := c.Data()

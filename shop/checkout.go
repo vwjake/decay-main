@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
+	"strings"
 
 	"decay-main/db"
 
@@ -17,6 +18,11 @@ type CreateCheckoutSessionParams struct {
 	ProductIDs []int64
 	Quantities []int
 	Email      string
+	// SuccessURL is where Stripe returns the buyer after payment. Any
+	// "{ORDER_TOKEN}" in it is replaced with this order's secure token,
+	// the same way Stripe substitutes its own {CHECKOUT_SESSION_ID}. The
+	// confirmation page looks orders up by that token, so it has to be
+	// ours in the URL rather than Stripe's session id.
 	SuccessURL string
 	CancelURL  string
 }
@@ -83,7 +89,7 @@ func CreateCheckoutSession(conn *sql.DB, params CreateCheckoutSessionParams) (se
 		Mode:               stripe.String(string(stripe.CheckoutSessionModePayment)),
 		LineItems:          lineItems,
 		CustomerEmail:      stripe.String(params.Email),
-		SuccessURL:         stripe.String(params.SuccessURL),
+		SuccessURL:         stripe.String(successURLFor(params.SuccessURL, orderToken)),
 		CancelURL:          stripe.String(params.CancelURL),
 		Metadata: map[string]string{
 			"order_token": orderToken,
@@ -96,6 +102,15 @@ func CreateCheckoutSession(conn *sql.DB, params CreateCheckoutSessionParams) (se
 	}
 
 	return sess.ID, orderToken, nil
+}
+
+// successURLFor puts this order's token into the URL Stripe returns the
+// buyer to. Stripe substitutes its own {CHECKOUT_SESSION_ID} in the same
+// string, and that id matches nothing in the orders table — the
+// confirmation page finds an order by its secure token, so that is what
+// has to end up in the link.
+func successURLFor(template, orderToken string) string {
+	return strings.ReplaceAll(template, "{ORDER_TOKEN}", orderToken)
 }
 
 // generateSecureToken creates a random hex token for secure order identification.

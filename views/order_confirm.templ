@@ -1,0 +1,80 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/db"
+)
+
+// OrderConfirmPage is where Stripe returns a buyer after they pay. The
+// redirect happens the moment the payment goes through, but the webhook
+// that marks the order paid and mints its code is a separate call that can
+// land a second or two later — so the page has to render an order that
+// isn't confirmed yet, and fill itself in once it is.
+type OrderConfirmPage struct {
+	Order db.Order
+	Items []db.OrderItemDetail
+}
+
+// Total is what the order came to, summed from the prices recorded at the
+// time of purchase rather than today's catalogue.
+func (p OrderConfirmPage) Total() string { return db.Dollars(db.OrderTotal(p.Items)) }
+
+templ OrderConfirm(p OrderConfirmPage) {
+	@Layout("Order · DECAY") {
+		<section class="about">
+			if p.Order.Paid() {
+				<p class="about-statement">Order confirmed</p>
+				<p class="about-body">
+					Thanks — the payment went through. Keep your order code somewhere
+					handy and quote it if you ever need to ask us about this order.
+				</p>
+			} else {
+				<p class="about-statement">Confirming your payment</p>
+				<p class="about-body">
+					Your payment has gone to Stripe and we're waiting on confirmation.
+					It usually takes a few seconds, and this page updates itself when
+					it arrives — nothing here needs doing.
+				</p>
+			}
+		</section>
+
+		<section class="events">
+			<div class="order-card">
+				if p.Order.Paid() {
+					<div class="order-code-block">
+						<span class="order-code-label mono">Order code</span>
+						<span class="order-code mono">{ p.Order.Code() }</span>
+					</div>
+				} else {
+					<p class="order-pending mono" data-order-poll={ p.Order.SecureToken }>Waiting for confirmation…</p>
+				}
+
+				if len(p.Items) > 0 {
+					<ul class="order-items">
+						for _, it := range p.Items {
+							<li class="order-item">
+								<span class="order-qty mono">{ fmt.Sprintf("%d ×", it.Quantity) }</span>
+								<span class="order-name">{ it.ProductName }</span>
+								<span class="order-line mono">{ db.Dollars(it.LineTotal()) }</span>
+							</li>
+						}
+					</ul>
+					<p class="order-total mono">Total <span>{ p.Total() }</span></p>
+				}
+
+				if p.Order.CustomerEmail != "" {
+					<p class="order-note">
+						if p.Order.Paid() {
+							A receipt is on its way to { p.Order.CustomerEmail }.
+						} else {
+							We'll email a receipt to { p.Order.CustomerEmail } once it's confirmed.
+						}
+					</p>
+				}
+			</div>
+
+			<a href="/shop" class="btn-outline mono">Back to the shop</a>
+		</section>
+	}
+}

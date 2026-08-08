@@ -207,6 +207,21 @@ type Order struct {
 	UpdatedAt     time.Time
 }
 
+// Paid reports whether Stripe's webhook has confirmed payment. An order is
+// pending until then, which is a state the confirmation page can genuinely
+// land in: the buyer's browser is redirected back the moment they pay, and
+// the webhook is a separate call that can arrive a moment later.
+func (o Order) Paid() bool { return o.Status == "paid" }
+
+// Code is the order's short reference, assigned when the payment is
+// confirmed and empty before that.
+func (o Order) Code() string {
+	if o.RedeemCode == nil {
+		return ""
+	}
+	return *o.RedeemCode
+}
+
 type OrderItem struct {
 	ID              int64
 	OrderID         int64

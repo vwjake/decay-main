@@ -50,8 +50,48 @@ document.addEventListener('DOMContentLoaded', () => {
     update();
   });
 
+  pollOrderStatus();
   setupGallery();
 });
+
+// pollOrderStatus fills in the order confirmation page when it was reached
+// before Stripe's webhook arrived. The buyer is redirected back the instant
+// they pay, so a pending order is normal for a second or two rather than a
+// fault. Confirmation reloads the page instead of drawing the paid state
+// here, so there's one piece of code that knows what a paid order looks
+// like. Without JS the page still shows the order and says it's pending —
+// a refresh does the same job by hand.
+function pollOrderStatus() {
+  const pending = document.querySelector('[data-order-poll]');
+  if (!pending) return;
+
+  const token = pending.dataset.orderPoll;
+  const retryMs = 3000;
+  let attempts = 0;
+
+  const tick = () => {
+    // Roughly two minutes. A webhook that hasn't landed by then isn't
+    // going to be fixed by asking again, so say so rather than spin.
+    if (attempts >= 40) {
+      pending.textContent = 'Still confirming — refresh in a minute, or email us and quote your order.';
+      return;
+    }
+    attempts += 1;
+
+    fetch('/api/order-status?token=' + encodeURIComponent(token))
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.status === 'paid') {
+          window.location.reload();
+          return;
+        }
+        window.setTimeout(tick, retryMs);
+      })
+      .catch(() => window.setTimeout(tick, retryMs));
+  };
+
+  window.setTimeout(tick, 2000);
+}
 
 // setupGallery turns the /photos grid into a clickable lightbox: a photo
 // opens full-size over a dimmed page, with prev/next, keyboard arrows, and

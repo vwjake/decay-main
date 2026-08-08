@@ -330,7 +330,11 @@ func main() {
 		})
 
 		e.POST("/webhooks/stripe", func(c echo.Context) error {
-			return handleStripeWebhook(c, conn, shop.WebhookSecret())
+			return handleStripeWebhook(c, conn, shop.WebhookConfig{
+				Secret:  shop.WebhookSecret(),
+				Mailer:  mailer,
+				SiteURL: siteURL,
+			})
 		})
 	}
 
@@ -668,7 +672,11 @@ func handleShopCheckout(c echo.Context, conn *sql.DB, siteURL string) error {
 	}
 
 	// Create Checkout Session
-	successURL := siteURL + "/order/confirm?token={CHECKOUT_SESSION_ID}"
+	// {ORDER_TOKEN} is substituted with the order's own secure token, which
+	// is what the confirmation page looks orders up by. Stripe's
+	// {CHECKOUT_SESSION_ID} would be its session id, which matches nothing
+	// here.
+	successURL := siteURL + "/order/confirm?token={ORDER_TOKEN}"
 	cancelURL := siteURL + "/shop"
 
 	sessionID, orderToken, err := shop.CreateCheckoutSession(conn, shop.CreateCheckoutSessionParams{
@@ -690,16 +698,35 @@ func handleShopCheckout(c echo.Context, conn *sql.DB, siteURL string) error {
 	})
 }
 
-// handleOrderConfirm shows the order confirmation page with polling for payment confirmation.
+// handleOrderConfirm shows a buyer their order: what they bought, what it
+// cost, and the code to quote if they get in touch about it. Stripe sends
+// them here the instant they pay, which can be before the webhook that
+// confirms the payment, so an unconfirmed order renders as pending and the
+// page fills itself in.
 func handleOrderConfirm(c echo.Context, conn *sql.DB) error {
-	// For MVP, just show a placeholder confirmation page
-	// In a full implementation, this would display the order details and redeem code
 	token := c.QueryParam("token")
 	if token == "" {
-		return c.String(http.StatusBadRequest, "Missing order token")
+		return echo.NewHTTPError(http.StatusNotFound)
 	}
 
-	return c.String(http.StatusOK, fmt.Sprintf("Order confirmation page for token: %s (placeholder)", token))
+	order, err := db.OrderByToken(conn, token)
+	if err != nil {
+		// The token is the only thing guarding an order, so a wrong one is
+		// a page that isn't there rather than a page that's refused —
+		// "forbidden" would confirm the order exists.
+		if err == sql.ErrNoRows {
+			return echo.NewHTTPError(http.StatusNotFound)
+		}
+		return err
+	}
+
+	items, err := db.ItemsForOrder(conn, order.ID)
+	if err != nil {
+		return err
+	}
+
+	page := views.OrderConfirmPage{Order: order, Items: items}
+	return views.OrderConfirm(page).Render(c.Request().Context(), c.Response())
 }
 
 // handleOrderStatus returns the status of an order for client-side polling.
@@ -724,7 +751,7 @@ func handleOrderStatus(c echo.Context, conn *sql.DB) error {
 }
 
 // handleStripeWebhook processes incoming Stripe webhook events.
-func handleStripeWebhook(c echo.Context, conn *sql.DB, webhookSecret string) error {
+func handleStripeWebhook(c echo.Context, conn *sql.DB, cfg shop.WebhookConfig) error {
 	payload, err := io.ReadAll(c.Request().Body)
 	if err != nil {
 		log.Printf("error reading webhook payload: %v", err)
@@ -737,7 +764,7 @@ func handleStripeWebhook(c echo.Context, conn *sql.DB, webhookSecret string) err
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "missing Stripe-Signature header"})
 	}
 
-	if err := shop.HandleStripeWebhook(conn, payload, signature, webhookSecret); err != nil {
+	if err := shop.HandleStripeWebhook(conn, payload, signature, cfg); err != nil {
 		log.Printf("error processing webhook: %v", err)
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("webhook error: %v", err)})
 	}

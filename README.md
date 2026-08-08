@@ -99,10 +99,55 @@ runtime data, not compiled in.
 
 ## Shop
 
-The merch listing is a **catalogue, not a store** — names, prices, photos,
-and available sizes/colours, each linking out to shop.decay.events, which
-is where orders are actually taken. Nothing here handles carts, stock, or
-payment.
+**Stripe is the catalogue's source of truth.** *Sync from Stripe* at
+`/admin/products` pulls names, prices, and descriptions down. There's no
+add-product form: an item created here that Stripe doesn't know about is
+only a way to get the two out of sync.
+
+Rows match on the Stripe *product* id rather than the price id. Stripe
+prices are immutable, so editing an amount mints a new one, and matching
+on that would duplicate the item on every price change. **Photos are
+deliberately not synced** — they stay local under `uploads/products/`,
+set per item at `/admin/products/<id>`, and the upsert names the columns
+it writes so a sync can't blank an image an admin uploaded or lose the
+catalogue's ordering. An item Stripe stops listing is marked sold out
+rather than deleted, so its photo and position survive a relisting. A row
+with no Stripe product id is local-only and sync never touches it; the
+list marks which of the two each row is.
+
+### Checkout
+
+With `STRIPE_SECRET_KEY` set, the shop takes payment through Stripe
+Checkout. Unset, all of it stays dormant and the shop is a catalogue
+linking out to shop.decay.events, which is what it was before.
+
+Stripe returns the buyer to `/order/confirm`, showing what they bought
+and their **order code** — a short reference to quote if they get in
+touch, not something redeemed at a door. The link carries the order's own
+secure token, not Stripe's checkout session id, since the token is what
+identifies an order here. A token matching nothing is a 404 rather than a
+403, on the same reasoning as hidden master accounts: "forbidden" would
+confirm the order exists.
+
+That page is routinely reached *before* the payment is confirmed — the
+browser is redirected the instant Stripe takes the money, and the webhook
+confirming it is a separate call landing a moment later. An unconfirmed
+order therefore renders as pending and polls `/api/order-status` until it
+changes, then reloads to draw the paid state, so only one piece of code
+knows what a paid order looks like. Without JavaScript the page still
+shows the order and says it's pending; a refresh does the same job.
+
+The webhook marks the order paid, assigns the code, and emails the buyer
+a receipt carrying it, using the same SMTP settings as contact
+notifications. Unconfigured mail just means no receipt — the confirmation
+page has the same details either way. Two things it's careful about:
+Stripe redelivers events it didn't get a clean response to, so an order
+already paid and coded is left alone rather than issued a second code the
+buyer has never seen; and a failed email never fails the webhook, since
+the money has already moved and an error would have Stripe retry a
+completed sale.
+
+### Legacy import
 
 `db/products.json` is generated from a shop.decay.events export:
 

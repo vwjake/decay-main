@@ -2280,3 +2280,96 @@ body.lightbox-open { overflow: hidden; }
 .send-preview dd {
   margin: 0 0 8px;
 }
+
+/* Order confirmation — the page Stripe returns a buyer to. The card is an
+   inset panel like the admin ones: a black border on the deeper tan wash,
+   no third colour introduced for "success". */
+
+.order-card {
+  border: 2px solid #111;
+  background: var(--surface);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.order-code-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #111;
+  margin-bottom: 16px;
+}
+
+.order-code-label {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* The code is read back over the phone and typed into emails, so it's the
+   largest thing on the page and spaced out enough to transcribe. */
+.order-code {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  word-break: break-all;
+}
+
+.order-pending {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #111;
+  margin: 0 0 16px;
+}
+
+.order-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.order-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: baseline;
+  padding: 8px 0;
+  border-bottom: 1px solid #111;
+}
+
+.order-qty {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.order-name {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.order-line {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.order-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 12px 0 0;
+}
+
+.order-note {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 16px 0 0;
+}

@@ -416,6 +416,23 @@ type OrderItemDetail struct {
 	ProductName string
 }
 
+// LineTotal is what this line cost: the price at the time of purchase, so a
+// later price change doesn't rewrite an old receipt.
+func (d OrderItemDetail) LineTotal() int64 {
+	return int64(d.PriceAtPurchase) * int64(d.Quantity)
+}
+
+// OrderTotal sums an order's lines. The confirmation page and the
+// confirmation email both use it, so the two can't disagree about what
+// somebody paid.
+func OrderTotal(items []OrderItemDetail) int64 {
+	var total int64
+	for _, it := range items {
+		total += it.LineTotal()
+	}
+	return total
+}
+
 func ItemsForOrder(conn *sql.DB, orderID int64) ([]OrderItemDetail, error) {
 	rows, err := conn.Query(
 		`SELECT oi.id, oi.order_id, oi.product_id, oi.quantity, oi.price_at_purchase, p.name FROM order_items oi
