@@ -94,6 +94,7 @@ CREATE TABLE IF NOT EXISTS groups (
     -- when it appears in an event's title or type, so the group page can
     -- show its own upcoming schedule off the shared calendar.
     match_terms TEXT NOT NULL DEFAULT '',
+    category TEXT NOT NULL DEFAULT '',
     position INTEGER NOT NULL DEFAULT 0,
     enabled INTEGER NOT NULL DEFAULT 1,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))

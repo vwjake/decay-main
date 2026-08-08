@@ -224,7 +224,7 @@ func Home(events []db.Event, products []db.Product, videos []db.Video, latestYou
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<a href=\"/media\" class=\"btn-outline mono\">Browse more</a></section><section id=\"contact\" class=\"contact\"><span class=\"section-label mono\">Join the list</span><p class=\"contact-heading\">Get event announcements in your inbox.</p><a href=\"https://decay.beehiiv.com\" class=\"btn-outline mono\" target=\"_blank\" rel=\"noopener\">Subscribe to the newsletter</a><div class=\"social-links mono\"><a href=\"https://instagram.com/decay_olympia\" target=\"_blank\" rel=\"noopener\">Instagram</a> <a href=\"https://discord.gg/YUAuEvwa9X\" target=\"_blank\" rel=\"noopener\">Discord</a> <a href=\"https://www.patreon.com/decayolympia\" target=\"_blank\" rel=\"noopener\">Patreon</a></div></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<a href=\"/media\" class=\"btn-outline mono\">Browse more</a></section><section id=\"contact\" class=\"contact\"><span class=\"section-label mono\">Join the list</span><p class=\"contact-heading\">Get event announcements in your inbox.</p><a href=\"https://decay.beehiiv.com\" class=\"btn-outline mono\" target=\"_blank\" rel=\"noopener\">Subscribe to the newsletter</a><div class=\"social-links mono\"><a href=\"https://instagram.com/decay_olympia\" target=\"_blank\" rel=\"noopener\">Instagram</a> <a href=\"https://discord.gg/YUAuEvwa9X\" target=\"_blank\" rel=\"noopener\">Discord</a></div></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

@@ -26,6 +26,7 @@ type Group struct {
 	Body string
 	// MatchTerms are the terms (one per line) that tie events to this group.
 	MatchTerms string
+	Category   string
 	Position   int
 	Enabled    bool
 }
@@ -148,13 +149,13 @@ func ParseBody(body string) []GroupBlock {
 	return blocks
 }
 
-const groupColumns = `id, slug, name, summary, description, pills, hero_image, hero_alt, body, match_terms, position, enabled`
+const groupColumns = `id, slug, name, summary, description, pills, hero_image, hero_alt, body, match_terms, category, position, enabled`
 
 func scanGroups(rows *sql.Rows) ([]Group, error) {
 	var groups []Group
 	for rows.Next() {
 		var g Group
-		if err := rows.Scan(&g.ID, &g.Slug, &g.Name, &g.Summary, &g.Description, &g.Pills, &g.HeroImage, &g.HeroAlt, &g.Body, &g.MatchTerms, &g.Position, &g.Enabled); err != nil {
+		if err := rows.Scan(&g.ID, &g.Slug, &g.Name, &g.Summary, &g.Description, &g.Pills, &g.HeroImage, &g.HeroAlt, &g.Body, &g.MatchTerms, &g.Category, &g.Position, &g.Enabled); err != nil {
 			return nil, err
 		}
 		groups = append(groups, g)
@@ -259,9 +260,9 @@ func GroupByID(conn *sql.DB, id int64) (Group, error) {
 // CreateGroup inserts a group and returns its new id.
 func CreateGroup(conn *sql.DB, g Group) (int64, error) {
 	res, err := conn.Exec(
-		`INSERT INTO groups (slug, name, summary, description, pills, hero_alt, body, match_terms, position, enabled)
-		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		g.Slug, g.Name, g.Summary, g.Description, g.Pills, g.HeroAlt, g.Body, g.MatchTerms, g.Position, g.Enabled,
+		`INSERT INTO groups (slug, name, summary, description, pills, hero_alt, body, match_terms, category, position, enabled)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		g.Slug, g.Name, g.Summary, g.Description, g.Pills, g.HeroAlt, g.Body, g.MatchTerms, g.Category, g.Position, g.Enabled,
 	)
 	if err != nil {
 		return 0, err
@@ -273,8 +274,8 @@ func CreateGroup(conn *sql.DB, g Group) (int64, error) {
 // separately through SetGroupHero.
 func UpdateGroup(conn *sql.DB, g Group) error {
 	_, err := conn.Exec(
-		`UPDATE groups SET slug = ?, name = ?, summary = ?, description = ?, pills = ?, hero_alt = ?, body = ?, match_terms = ?, position = ?, enabled = ? WHERE id = ?`,
-		g.Slug, g.Name, g.Summary, g.Description, g.Pills, g.HeroAlt, g.Body, g.MatchTerms, g.Position, g.Enabled, g.ID,
+		`UPDATE groups SET slug = ?, name = ?, summary = ?, description = ?, pills = ?, hero_alt = ?, body = ?, match_terms = ?, category = ?, position = ?, enabled = ? WHERE id = ?`,
+		g.Slug, g.Name, g.Summary, g.Description, g.Pills, g.HeroAlt, g.Body, g.MatchTerms, g.Category, g.Position, g.Enabled, g.ID,
 	)
 	return err
 }

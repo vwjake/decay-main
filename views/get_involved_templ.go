@@ -45,7 +45,7 @@ func GetInvolved(forms []db.ExternalForm) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"about\"><p class=\"about-statement\">Get involved</p><p class=\"about-body\">DECAY runs on the people who show up. Fill out a survey, sign up to volunteer at an event, propose something of your own — every bit helps shape the space.</p></section><section class=\"events\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"about\"><p class=\"about-statement\">Get involved</p><p class=\"about-body\">DECAY runs on the people who show up. Fill out a survey, sign up to volunteer at an event, propose something of your own — every bit helps shape the space.</p></section><section class=\"events\"><span class=\"section-label mono\">Volunteer signup</span><p class=\"about-body\">Tell us you're interested in volunteering at DECAY. We'll get in touch with opportunities and shifts that match your interests and availability.</p><form method=\"POST\" action=\"/volunteer-signup\" class=\"volunteer-form\"><input type=\"text\" name=\"name\" placeholder=\"Name\" required> <input type=\"email\" name=\"email\" placeholder=\"Email\" required> <textarea name=\"interests\" placeholder=\"What interests you? (tech, sound, door, community organizing, etc.)\" rows=\"4\"></textarea> <input type=\"hidden\" name=\"website\" value=\"\"> <button type=\"submit\" class=\"btn-outline mono\">Sign up</button></form></section><section class=\"events\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -58,7 +58,7 @@ func GetInvolved(forms []db.ExternalForm) templ.Component {
 					var templ_7745c5c3_Var3 templ.SafeURL
 					templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(f.URL))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/get_involved.templ`, Line: 20, Col: 31}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/get_involved.templ`, Line: 34, Col: 31}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 					if templ_7745c5c3_Err != nil {
@@ -71,7 +71,7 @@ func GetInvolved(forms []db.ExternalForm) templ.Component {
 					var templ_7745c5c3_Var4 string
 					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(f.Title)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/get_involved.templ`, Line: 22, Col: 41}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/get_involved.templ`, Line: 36, Col: 41}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 					if templ_7745c5c3_Err != nil {
@@ -89,7 +89,7 @@ func GetInvolved(forms []db.ExternalForm) templ.Component {
 						var templ_7745c5c3_Var5 string
 						templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(f.Description)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/get_involved.templ`, Line: 24, Col: 52}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/get_involved.templ`, Line: 38, Col: 52}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 						if templ_7745c5c3_Err != nil {

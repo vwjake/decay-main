@@ -7,18 +7,19 @@ import "database/sql"
 // reads: "# Heading" per section, "- item" per bullet, plain lines as
 // paragraphs.
 type groupSeed struct {
-	slug, name, summary, description, pills, body, matchTerms string
-	enabled                                                   bool
+	slug, name, summary, description, pills, body, matchTerms, category string
+	enabled                                                              bool
 }
 
 var groupSeeds = []groupSeed{
 	{
 		slug:        "open-draw",
 		name:        "Open Draw",
-		summary:     "Casual drawing hang for artists of every level. Bring your own supplies or use what's available, share prompts, and get feedback in a low-pressure setting.",
+		summary:     "Casual drawing hang for artists of every level. Bring your own supplies or use what’s available, share prompts, and get feedback in a low-pressure setting.",
 		description: "Open Draw is a casual drawing hang for artists of every level. Bring your own tools or use what’s on hand, swap prompts, and work alongside other people who like to make things.",
 		pills:       "Drop-in friendly\nAll skill levels\nQuiet & social corners",
 		matchTerms:  "Open Draw",
+		category:    "Visual Arts",
 		enabled:     true,
 		body: `# What to bring
 - Sketchbook or loose paper
@@ -45,6 +46,7 @@ Bring a friend or come solo—either way you’ll find someone to trade ideas wi
 		description: "No Tape is an open practice space for musicians to improvise, collaborate, and workshop songs without the pressure of a formal show. Audio-video synthesis and stage lights are also practiced and experimented with.",
 		pills:       "Collaborative jams\nAmplified & acoustic\nListeners welcome",
 		matchTerms:  "No Tape",
+		category:    "Music",
 		enabled:     true,
 		body: `# Bring along
 - Instruments, pedals, laptops, or other gear you want to experiment with
@@ -72,6 +74,7 @@ Let folks know if you’re trying collaborative jams for the first time. Someone
 		description: "Decentralized Tech meetups explore peer-to-peer tools, self-hosting, and resilient community technology through demos and collaborative tinkering.",
 		pills:       "Hands-on demos\nPeer learning\nBeginner friendly",
 		matchTerms:  "Decentralized Tech",
+		category:    "Technology",
 		enabled:     true,
 		body: `# Topics we cover
 - Mesh networking, offline-first tools, and local-first software
@@ -100,6 +103,7 @@ Tell us what you want to learn or share—we’ll point you toward a table that 
 		description: "Movie Club gathers people to watch films together, swap recommendations, and talk about what we just saw. Expect rotating hosts and themes.",
 		pills:       "Rotating curators\nSnacks encouraged\nDiscussion after",
 		matchTerms:  "Movie Club",
+		category:    "Film",
 		enabled:     true,
 		body: `# How screenings work
 - Rotating curators set the lineup and handle playback
@@ -126,6 +130,7 @@ Movie Club is low-pressure. If you’re shy, sit near the back and enjoy. If you
 		description: "Mutual Aid at DECAY connects neighbors who want to support one another through skill-sharing, resource swaps, and rapid response when needs come up.",
 		pills:       "Community care\nResource swaps\nSkill sharing",
 		matchTerms:  "Mutual Aid",
+		category:    "Community",
 		// Disabled on the old site; kept unlisted until it's ready to run.
 		enabled: false,
 		body: `# How we work
@@ -159,9 +164,9 @@ func seedGroups(conn *sql.DB) error {
 	}
 	for i, g := range groupSeeds {
 		if _, err := conn.Exec(
-			`INSERT INTO groups (slug, name, summary, description, pills, body, match_terms, position, enabled)
-			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-			g.slug, g.name, g.summary, g.description, g.pills, g.body, g.matchTerms, i, g.enabled,
+			`INSERT INTO groups (slug, name, summary, description, pills, body, match_terms, category, position, enabled)
+			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			g.slug, g.name, g.summary, g.description, g.pills, g.body, g.matchTerms, g.category, i, g.enabled,
 		); err != nil {
 			return err
 		}

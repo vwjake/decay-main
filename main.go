@@ -209,6 +209,10 @@ func main() {
 		return views.Support().Render(c.Request().Context(), c.Response())
 	})
 
+	e.GET("/donate", func(c echo.Context) error {
+		return c.Redirect(http.StatusMovedPermanently, "/support")
+	})
+
 	e.GET("/policies", func(c echo.Context) error {
 		return views.Policies().Render(c.Request().Context(), c.Response())
 	})
@@ -314,6 +318,29 @@ func main() {
 			return err
 		}
 		return views.GetInvolved(forms).Render(c.Request().Context(), c.Response())
+	})
+
+	e.POST("/volunteer-signup", func(c echo.Context) error {
+		if strings.TrimSpace(c.FormValue("website")) != "" {
+			return c.Redirect(http.StatusSeeOther, "/get-involved?signed=1")
+		}
+		m := db.ContactMessage{
+			Name:    strings.TrimSpace(c.FormValue("name")),
+			Email:   strings.TrimSpace(c.FormValue("email")),
+			Subject: "Volunteer Interest",
+			Message: strings.TrimSpace(c.FormValue("interests")),
+		}
+		if m.Name == "" || m.Message == "" {
+			return c.Redirect(http.StatusSeeOther, "/get-involved?error=1")
+		}
+		if !validEmail(m.Email) {
+			return c.Redirect(http.StatusSeeOther, "/get-involved?error=1")
+		}
+		if err := db.CreateContactMessage(conn, m); err != nil {
+			return err
+		}
+		notifyContact(mailer, m)
+		return c.Redirect(http.StatusSeeOther, "/get-involved?signed=1")
 	})
 
 	e.GET("/shop", func(c echo.Context) error {

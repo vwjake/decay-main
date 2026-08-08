@@ -15,6 +15,20 @@ templ GetInvolved(forms []db.ExternalForm) {
 		</section>
 
 		<section class="events">
+			<span class="section-label mono">Volunteer signup</span>
+			<p class="about-body">
+				Tell us you're interested in volunteering at DECAY. We'll get in touch with opportunities and shifts that match your interests and availability.
+			</p>
+			<form method="POST" action="/volunteer-signup" class="volunteer-form">
+				<input type="text" name="name" placeholder="Name" required/>
+				<input type="email" name="email" placeholder="Email" required/>
+				<textarea name="interests" placeholder="What interests you? (tech, sound, door, community organizing, etc.)" rows="4"></textarea>
+				<input type="hidden" name="website" value=""/>
+				<button type="submit" class="btn-outline mono">Sign up</button>
+			</form>
+		</section>
+
+		<section class="events">
 			if len(forms) > 0 {
 				for _, f := range forms {
 					<a href={ templ.URL(f.URL) } target="_blank" rel="noopener" class="event-item">
