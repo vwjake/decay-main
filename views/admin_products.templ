@@ -51,6 +51,7 @@ templ AdminProducts(products []db.Product, me db.User, errorMsg string) {
 			<label>Description (optional)<textarea name="description"></textarea></label>
 			<label>Placeholder text<input type="text" name="placeholder" placeholder="product photo"/></label>
 			<label>Stripe link (optional)<input type="text" name="stripe_url"/></label>
+			<label>Stripe Price ID (optional)<input type="text" name="stripe_price_id" placeholder="price_..."/></label>
 			<label>Order<input type="number" name="position" value="0"/></label>
 			<p class="admin-sub mono">Add the photo, variants, and sold-out status after creating it.</p>
 			<button type="submit" class="admin-btn">Create</button>
