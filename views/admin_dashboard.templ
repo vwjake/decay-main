@@ -63,48 +63,62 @@ templ AdminDashboard(c db.Counts, me db.User) {
 		}
 
 		<p class="admin-heading">Manage</p>
-		<div class="event-list">
-			@adminLink("/admin/events", "Events",
-				fmt.Sprintf("%d upcoming · %d past", c.UpcomingEvents, c.PastEvents))
-			@adminLink("/admin/posts", "Blog",
-				fmt.Sprintf("%d published · %d draft", c.PublishedPosts, c.Drafts))
-			@adminLink("/admin/products", "Shop", fmt.Sprintf("%d items", c.Products))
-			@adminLink("/admin/photos", "Photos", fmt.Sprintf("%d photos", c.Photos))
+		<div class="dashboard-grid">
+			@dashboardCard("/admin/events", "Events",
+				fmt.Sprintf("%d upcoming · %d past", c.UpcomingEvents, c.PastEvents),
+				"Create and manage upcoming events, volunteer roles, and event signups.")
+			@dashboardCard("/admin/posts", "Blog",
+				fmt.Sprintf("%d published · %d draft", c.PublishedPosts, c.Drafts),
+				"Write and publish blog posts with Markdown formatting.")
+			@dashboardCard("/admin/products", "Shop", fmt.Sprintf("%d items", c.Products),
+				"Manage products and sync inventory from Stripe.")
+			@dashboardCard("/admin/photos", "Photos", fmt.Sprintf("%d photos", c.Photos),
+				"Upload and organize photo galleries and event photos.")
 			if me.Can(db.PermPeople) {
-				@adminLink("/admin/people", "People", "board & staff profiles")
-				@adminLink("/admin/bios", "Bios", "community member profiles")
+				@dashboardCard("/admin/people", "People", "board & staff profiles",
+					"Manage board members and staff profiles with photos and bios.")
+				@dashboardCard("/admin/bios", "Bios", "community member profiles",
+					"Community member profiles and biographical information.")
 			}
 			if me.Can(db.PermGroups) {
-				@adminLink("/admin/groups", "Groups", "recurring programs")
+				@dashboardCard("/admin/groups", "Groups", "recurring programs",
+					"Create recurring programs and group activities.")
 			}
 			if me.Can(db.PermMedia) {
-				@adminLink("/admin/media", "Media", "embedded videos")
+				@dashboardCard("/admin/media", "Media", "embedded videos",
+					"Embed and manage YouTube videos and media content.")
 			}
 			if me.Can(db.PermBookings) {
-				@adminLink("/admin/bookings", "Bookings", "requests to use the space")
+				@dashboardCard("/admin/bookings", "Bookings", "requests to use the space",
+					"Review and manage space booking requests.")
 			}
 			if me.Can(db.PermMessages) {
-				@adminLink("/admin/messages", "Messages", "contact form inbox")
+				@dashboardCard("/admin/messages", "Messages", "contact form inbox",
+					"Read and respond to messages from the contact form.")
 			}
 			if me.Can(db.PermForms) {
-				@adminLink("/admin/forms", "Forms", "Get Involved page links")
+				@dashboardCard("/admin/forms", "Forms", "Get Involved page links",
+					"Manage links and content on the Get Involved page.")
 			}
 			if me.Can(db.PermReports) {
-				@adminLink("/admin/reports", "Reports", "quarterly and custom stats")
+				@dashboardCard("/admin/reports", "Reports", "quarterly and custom stats",
+					"Generate quarterly reports and custom statistics.")
 			}
 			if me.Can(db.PermUsers) {
-				@adminLink("/admin/users", "Accounts", "who can sign in here")
+				@dashboardCard("/admin/users", "Accounts", "who can sign in here",
+					"Manage user accounts and access permissions.")
 			}
 		</div>
 	}
 }
 
-templ adminLink(href, title, meta string) {
-	<a href={ templ.URL(href) } class="event-item">
-		<div>
-			<div class="event-title">{ title }</div>
-			<div class="event-meta mono">{ meta }</div>
+templ dashboardCard(href, title, meta, desc string) {
+	<a href={ templ.URL(href) } class="dashboard-card">
+		<div class="dashboard-card-header">
+			<div class="dashboard-card-title">{ title }</div>
+			<div class="dashboard-card-meta mono">{ meta }</div>
 		</div>
+		<p class="dashboard-card-desc">{ desc }</p>
 	</a>
 }
 

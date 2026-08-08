@@ -290,30 +290,35 @@ func AdminDashboard(c db.Counts, me db.User) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, " <p class=\"admin-heading\">Manage</p><div class=\"event-list\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, " <p class=\"admin-heading\">Manage</p><div class=\"dashboard-grid\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = adminLink("/admin/events", "Events",
-				fmt.Sprintf("%d upcoming · %d past", c.UpcomingEvents, c.PastEvents)).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = dashboardCard("/admin/events", "Events",
+				fmt.Sprintf("%d upcoming · %d past", c.UpcomingEvents, c.PastEvents),
+				"Create and manage upcoming events, volunteer roles, and event signups.").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = adminLink("/admin/posts", "Blog",
-				fmt.Sprintf("%d published · %d draft", c.PublishedPosts, c.Drafts)).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = dashboardCard("/admin/posts", "Blog",
+				fmt.Sprintf("%d published · %d draft", c.PublishedPosts, c.Drafts),
+				"Write and publish blog posts with Markdown formatting.").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = adminLink("/admin/products", "Shop", fmt.Sprintf("%d items", c.Products)).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = dashboardCard("/admin/products", "Shop", fmt.Sprintf("%d items", c.Products),
+				"Manage products and sync inventory from Stripe.").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = adminLink("/admin/photos", "Photos", fmt.Sprintf("%d photos", c.Photos)).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = dashboardCard("/admin/photos", "Photos", fmt.Sprintf("%d photos", c.Photos),
+				"Upload and organize photo galleries and event photos.").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if me.Can(db.PermPeople) {
-				templ_7745c5c3_Err = adminLink("/admin/people", "People", "board & staff profiles").Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = dashboardCard("/admin/people", "People", "board & staff profiles",
+					"Manage board members and staff profiles with photos and bios.").Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -321,49 +326,57 @@ func AdminDashboard(c db.Counts, me db.User) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = adminLink("/admin/bios", "Bios", "community member profiles").Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = dashboardCard("/admin/bios", "Bios", "community member profiles",
+					"Community member profiles and biographical information.").Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 			if me.Can(db.PermGroups) {
-				templ_7745c5c3_Err = adminLink("/admin/groups", "Groups", "recurring programs").Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = dashboardCard("/admin/groups", "Groups", "recurring programs",
+					"Create recurring programs and group activities.").Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 			if me.Can(db.PermMedia) {
-				templ_7745c5c3_Err = adminLink("/admin/media", "Media", "embedded videos").Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = dashboardCard("/admin/media", "Media", "embedded videos",
+					"Embed and manage YouTube videos and media content.").Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 			if me.Can(db.PermBookings) {
-				templ_7745c5c3_Err = adminLink("/admin/bookings", "Bookings", "requests to use the space").Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = dashboardCard("/admin/bookings", "Bookings", "requests to use the space",
+					"Review and manage space booking requests.").Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 			if me.Can(db.PermMessages) {
-				templ_7745c5c3_Err = adminLink("/admin/messages", "Messages", "contact form inbox").Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = dashboardCard("/admin/messages", "Messages", "contact form inbox",
+					"Read and respond to messages from the contact form.").Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 			if me.Can(db.PermForms) {
-				templ_7745c5c3_Err = adminLink("/admin/forms", "Forms", "Get Involved page links").Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = dashboardCard("/admin/forms", "Forms", "Get Involved page links",
+					"Manage links and content on the Get Involved page.").Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 			if me.Can(db.PermReports) {
-				templ_7745c5c3_Err = adminLink("/admin/reports", "Reports", "quarterly and custom stats").Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = dashboardCard("/admin/reports", "Reports", "quarterly and custom stats",
+					"Generate quarterly reports and custom statistics.").Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 			if me.Can(db.PermUsers) {
-				templ_7745c5c3_Err = adminLink("/admin/users", "Accounts", "who can sign in here").Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = dashboardCard("/admin/users", "Accounts", "who can sign in here",
+					"Manage user accounts and access permissions.").Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -382,7 +395,7 @@ func AdminDashboard(c db.Counts, me db.User) templ.Component {
 	})
 }
 
-func adminLink(href, title, meta string) templ.Component {
+func dashboardCard(href, title, meta, desc string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -410,39 +423,52 @@ func adminLink(href, title, meta string) templ.Component {
 		var templ_7745c5c3_Var18 templ.SafeURL
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(href))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_dashboard.templ`, Line: 103, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_dashboard.templ`, Line: 116, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\" class=\"event-item\"><div><div class=\"event-title\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\" class=\"dashboard-card\"><div class=\"dashboard-card-header\"><div class=\"dashboard-card-title\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_dashboard.templ`, Line: 105, Col: 35}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_dashboard.templ`, Line: 118, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</div><div class=\"event-meta mono\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</div><div class=\"dashboard-card-meta mono\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(meta)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_dashboard.templ`, Line: 106, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_dashboard.templ`, Line: 119, Col: 47}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</div></div></a>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</div></div><p class=\"dashboard-card-desc\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var21 string
+		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(desc)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_dashboard.templ`, Line: 121, Col: 39}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</p></a>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

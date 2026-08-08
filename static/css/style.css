@@ -1320,6 +1320,66 @@ a {
   padding: 0 20px;
 }
 
+/* Dashboard cards --------------------------------------------------- */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.dashboard-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 2px solid #111;
+  padding: 18px;
+  background: var(--surface);
+  text-decoration: none;
+  color: #111;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.dashboard-card:hover {
+  background: #111;
+  color: var(--on-ink);
+}
+
+.dashboard-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dashboard-card-title {
+  font-weight: 900;
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.dashboard-card-meta {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.dashboard-card:hover .dashboard-card-meta {
+  color: var(--on-ink);
+}
+
+.dashboard-card-desc {
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+  color: #111;
+}
+
+.dashboard-card:hover .dashboard-card-desc {
+  color: var(--on-ink);
+}
+
 /* Reports ------------------------------------------------------------- */
 
 /* A heading with an action button parked on the right of the same line. */
