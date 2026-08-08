@@ -433,7 +433,7 @@ func Footer() templ.Component {
 			templ_7745c5c3_Var20 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<footer class=\"site-footer\"><div class=\"footer-column footer-info\"><img src=\"/static/img/logo.png\" alt=\"DECAY\"> <span class=\"mono\">Washington nonprofit &middot; est. 2024</span> <span class=\"mono\">402 Washington St NE, Olympia WA</span></div><nav class=\"footer-column footer-links mono\"><a href=\"/support\">Support</a> <a href=\"https://instagram.com/decay_olympia\" target=\"_blank\" rel=\"noopener\">Instagram</a> <a href=\"/contact\">Contact</a></nav><span class=\"footer-column footer-copyright mono\">&copy; 2026 DECAY Olympia. All rights reserved.</span></footer>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<footer class=\"site-footer\"><span class=\"mono\">Washington nonprofit &middot; est. 2024</span> <span class=\"mono\">402 Washington St NE, Olympia WA</span> <span class=\"footer-copyright mono\">&copy; 2026 DECAY Olympia. All rights reserved.</span></footer>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
