@@ -13,8 +13,9 @@ import (
 var eventsSeed []byte
 
 // products.json is DECAY's real merch, generated from the shop export by
-// `go run ./cmd/importshop`. The photos it names live in uploads/, which
-// isn't committed — a fresh checkout falls back to placeholder text.
+// `go run ./cmd/importshop`. Unlike the flyers, the photos it names are
+// committed (uploads/products/), so a fresh checkout renders the real shop
+// rather than falling back to placeholder text.
 //
 //go:embed products.json
 var productsSeed []byte
@@ -131,6 +132,33 @@ func Seed(conn *sql.DB) error {
 			}
 		}
 	}
+	if err := backfillProductVariants(conn); err != nil {
+		return err
+	}
 
+	return nil
+}
+
+// backfillProductVariants fills in the seed's variant text on databases
+// that were populated before it was written — the block above only runs on
+// an empty table, so an existing shop would never see it otherwise. Like
+// backfillGroupMatchTerms it only touches rows still left blank, so an
+// admin's own wording stands.
+func backfillProductVariants(conn *sql.DB) error {
+	var products []seedProduct
+	if err := json.Unmarshal(productsSeed, &products); err != nil {
+		return err
+	}
+	for _, p := range products {
+		if p.Variants == "" {
+			continue
+		}
+		if _, err := conn.Exec(
+			`UPDATE products SET variants = ? WHERE name = ? AND variants = ''`,
+			p.Variants, p.Name,
+		); err != nil {
+			return err
+		}
+	}
 	return nil
 }

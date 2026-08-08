@@ -20,7 +20,8 @@
   {
     "name": "Bandana",
     "price_cents": 1000,
-    "image": "Bandana-BKBU.png"
+    "image": "Bandana-BKBU.png",
+    "variants": "Color: Black/White, Beige/Gold, Black/Blue, Black/Peach, Checker/Gold, Checker/Yellow, Cow/Blue, Lime/Pink, Pink/Pink"
   },
   {
     "name": "Canvas Tote",

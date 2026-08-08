@@ -14,8 +14,14 @@
 *.db
 *.db-journal
 
-# Runtime photo uploads (not embedded — written at runtime by /admin/photos)
-/uploads/
+# Runtime uploads (not embedded — written at runtime by the admin panel).
+# Flyers and gallery photos run to ~400MB, so they stay on the host only.
+# Product shots are the exception: they're a small, slow-moving set that the
+# shop can't render without, so they ship in the repo and reach the server
+# with an ordinary deploy. The re-include needs /uploads/* rather than
+# /uploads/, since git won't look inside an excluded directory.
+/uploads/*
+!/uploads/products/
 
 # air (live reload)
 /tmp/
