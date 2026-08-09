@@ -45,7 +45,7 @@ func ContactForm(v db.ContactMessage, sent bool, errorMsg string) templ.Componen
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"about\"><p class=\"about-statement\">Get in touch</p><p class=\"about-body\">Got a question or want to get involved? Whether you're an artist, a local, or just curious about our events, reach out. Looking to put on an event here instead? Use the <a href=\"/book\">booking form</a>.</p></section><section class=\"events\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"about\"><p class=\"about-statement\">Get in touch</p><p class=\"about-body\">Got a question or want to get involved? Whether you're an artist, a local, or just curious about our events, reach out.</p><p class=\"about-body\">Looking to put on an event here instead?</p><a href=\"/book\" class=\"btn-outline mono\">Book the space &rarr;</a></section><section class=\"events\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -63,7 +63,7 @@ func ContactForm(v db.ContactMessage, sent bool, errorMsg string) templ.Componen
 					var templ_7745c5c3_Var3 string
 					templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(errorMsg)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/contact.templ`, Line: 26, Col: 63}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/contact.templ`, Line: 29, Col: 63}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 					if templ_7745c5c3_Err != nil {
@@ -81,7 +81,7 @@ func ContactForm(v db.ContactMessage, sent bool, errorMsg string) templ.Componen
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(v.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/contact.templ`, Line: 29, Col: 66}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/contact.templ`, Line: 32, Col: 66}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 				if templ_7745c5c3_Err != nil {
@@ -94,7 +94,7 @@ func ContactForm(v db.ContactMessage, sent bool, errorMsg string) templ.Componen
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(v.Email)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/contact.templ`, Line: 30, Col: 70}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/contact.templ`, Line: 33, Col: 70}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 				if templ_7745c5c3_Err != nil {
@@ -107,7 +107,7 @@ func ContactForm(v db.ContactMessage, sent bool, errorMsg string) templ.Componen
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(v.Subject)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/contact.templ`, Line: 31, Col: 70}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/contact.templ`, Line: 34, Col: 70}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 				if templ_7745c5c3_Err != nil {
@@ -120,7 +120,7 @@ func ContactForm(v db.ContactMessage, sent bool, errorMsg string) templ.Componen
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(v.Message)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/contact.templ`, Line: 32, Col: 90}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/contact.templ`, Line: 35, Col: 90}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
