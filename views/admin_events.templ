@@ -75,6 +75,8 @@ templ AdminEvents(events []db.Event, page db.Page, users []db.User, prefill *db.
 					<option value={ u.Name() }/>
 				}
 			</datalist>
+			<label>Organizer's name<input type="text" name="contact_name" value={ contactNamePrefill(prefill) }/></label>
+			<label>Organizer's email<input type="email" name="email" value={ contactEmailPrefill(prefill) }/></label>
 			<fieldset class="admin-fieldset">
 				<legend>Volunteers needed</legend>
 				for _, role := range db.VolunteerRoles {
@@ -118,6 +120,20 @@ func descriptionPrefill(prefill *db.BookingRequest) string {
 		return ""
 	}
 	return prefill.Description
+}
+
+func contactNamePrefill(prefill *db.BookingRequest) string {
+	if prefill == nil {
+		return ""
+	}
+	return prefill.Name
+}
+
+func contactEmailPrefill(prefill *db.BookingRequest) string {
+	if prefill == nil {
+		return ""
+	}
+	return prefill.Email
 }
 
 // adminPager is the pager for admin tables, which sit inside a narrower

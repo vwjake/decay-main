@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -11,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"decay-main/bookingmail"
 	"decay-main/db"
 	"decay-main/images"
 	"decay-main/views"
@@ -35,16 +37,18 @@ var pacific = func() *time.Location {
 	return loc
 }()
 
-func registerEventRoutes(g *echo.Group, conn *sql.DB, uploadsDir string) {
+func registerEventRoutes(g *echo.Group, conn *sql.DB, uploadsDir string, bookingMailer *bookingmail.Handler, venue *time.Location) {
 	g.GET("/events", listEvents(conn))
 	g.POST("/events", createEvent(conn))
 	g.POST("/events/:id/delete", deleteEvent(conn))
-	g.GET("/events/:id", editEvent(conn))
-	g.POST("/events/:id", saveEvent(conn))
-	g.POST("/events/:id/flyer", uploadFlyer(conn, uploadsDir))
+	g.GET("/events/:id", editEvent(conn, bookingMailer, venue))
+	g.POST("/events/:id", saveEvent(conn, bookingMailer, venue))
+	g.POST("/events/:id/flyer", uploadFlyer(conn, uploadsDir, bookingMailer, venue))
 	g.POST("/events/:id/volunteers", saveVolunteers(conn))
-	g.POST("/events/:id/repeat", repeatEvent(conn))
+	g.POST("/events/:id/repeat", repeatEvent(conn, bookingMailer, venue))
 	g.POST("/events/:id/signups/:signupID/delete", deleteSignup(conn))
+	g.POST("/events/:id/reply/preview", previewEventReply(conn, bookingMailer))
+	g.POST("/events/:id/reply/send", sendEventReply(conn, bookingMailer))
 }
 
 // deleteSignup removes a volunteer offer once it's been handled.
@@ -93,22 +97,53 @@ func renderEvents(c echo.Context, conn *sql.DB, msg string) error {
 	return views.AdminEvents(events, page, users, prefill, currentUser(c), msg).Render(c.Request().Context(), c.Response())
 }
 
-// editEvent is the per-event page where the flyer and volunteer roles are
-// managed — the two things that don't fit in the create form.
-func editEvent(conn *sql.DB) echo.HandlerFunc {
+// eventDetailData bundles an event for AdminEventEdit, looking up its email
+// correspondence the same way viewBooking does for a booking. refresh
+// forces a fresh IMAP read past the cache.
+func eventDetailData(bookingMailer *bookingmail.Handler, venue *time.Location, ev db.Event, volunteers []db.EventVolunteer, signups []db.VolunteerSignup, users []db.User, refresh bool) views.EventDetailData {
+	var thread bookingmail.Thread
+	if ev.Email != "" {
+		thread = bookingMailer.Thread([]string{ev.Email}, refresh)
+	}
+	return views.EventDetailData{
+		Event:          ev,
+		Volunteers:     volunteers,
+		Signups:        signups,
+		Users:          users,
+		Thread:         thread,
+		CanSend:        bookingMailer.CanSend(),
+		MailboxAddress: bookingMailer.Address(),
+		Venue:          venue,
+	}
+}
+
+// editEvent is the per-event page where the flyer, volunteer roles, and
+// organizer correspondence are managed — the things that don't fit in the
+// create form.
+func editEvent(conn *sql.DB, bookingMailer *bookingmail.Handler, venue *time.Location) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ev, volunteers, signups, users, err := loadEvent(conn, c.Param("id"))
 		if err != nil {
 			return err
 		}
-		return views.AdminEventEdit(ev, volunteers, signups, users, currentUser(c), "").Render(c.Request().Context(), c.Response())
+		data := eventDetailData(bookingMailer, venue, ev, volunteers, signups, users, c.QueryParam("refresh") == "1")
+		if c.QueryParam("sent") == "1" {
+			data.FlashNotice = "Reply sent."
+			if c.QueryParam("warn") == "1" {
+				data.FlashNotice += " It may take a moment to show up below — the copy couldn't be filed in Sent right away."
+			}
+		}
+		if c.QueryParam("send_error") != "" {
+			data.FlashError = replyErrorMessage(c.QueryParam("send_error"))
+		}
+		return views.AdminEventEdit(data, currentUser(c)).Render(c.Request().Context(), c.Response())
 	}
 }
 
 // saveEvent applies edits to an event's details. The event keeps its id
 // and uid throughout, so a correction reaches subscribed calendars as an
 // update to the event they already have rather than as a new one.
-func saveEvent(conn *sql.DB) echo.HandlerFunc {
+func saveEvent(conn *sql.DB, bookingMailer *bookingmail.Handler, venue *time.Location) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ev, volunteers, signups, users, err := loadEvent(conn, c.Param("id"))
 		if err != nil {
@@ -116,7 +151,9 @@ func saveEvent(conn *sql.DB) echo.HandlerFunc {
 		}
 
 		rerender := func(msg string) error {
-			return views.AdminEventEdit(ev, volunteers, signups, users, currentUser(c), msg).Render(c.Request().Context(), c.Response())
+			data := eventDetailData(bookingMailer, venue, ev, volunteers, signups, users, false)
+			data.ErrorMsg = msg
+			return views.AdminEventEdit(data, currentUser(c)).Render(c.Request().Context(), c.Response())
 		}
 
 		title := strings.TrimSpace(c.FormValue("title"))
@@ -171,6 +208,8 @@ func saveEvent(conn *sql.DB) echo.HandlerFunc {
 			Link:        link,
 			Slug:        slug,
 			Keyholder:   strings.TrimSpace(c.FormValue("keyholder")),
+			ContactName: strings.TrimSpace(c.FormValue("contact_name")),
+			Email:       strings.TrimSpace(c.FormValue("email")),
 		}
 		if err := db.UpdateEvent(conn, updated); err != nil {
 			return err
@@ -179,7 +218,7 @@ func saveEvent(conn *sql.DB) echo.HandlerFunc {
 	}
 }
 
-func uploadFlyer(conn *sql.DB, uploadsDir string) echo.HandlerFunc {
+func uploadFlyer(conn *sql.DB, uploadsDir string, bookingMailer *bookingmail.Handler, venue *time.Location) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ev, volunteers, signups, users, err := loadEvent(conn, c.Param("id"))
 		if err != nil {
@@ -187,7 +226,9 @@ func uploadFlyer(conn *sql.DB, uploadsDir string) echo.HandlerFunc {
 		}
 
 		rerender := func(msg string) error {
-			return views.AdminEventEdit(ev, volunteers, signups, users, currentUser(c), msg).Render(c.Request().Context(), c.Response())
+			data := eventDetailData(bookingMailer, venue, ev, volunteers, signups, users, false)
+			data.ErrorMsg = msg
+			return views.AdminEventEdit(data, currentUser(c)).Render(c.Request().Context(), c.Response())
 		}
 
 		fileHeader, err := c.FormFile("flyer")
@@ -312,6 +353,8 @@ func createEvent(conn *sql.DB) echo.HandlerFunc {
 			Description: c.FormValue("description"),
 			Link:        link,
 			Keyholder:   strings.TrimSpace(c.FormValue("keyholder")),
+			ContactName: strings.TrimSpace(c.FormValue("contact_name")),
+			Email:       strings.TrimSpace(c.FormValue("email")),
 		}
 		if ev.Title == "" || ev.EventType == "" {
 			return rerenderEventsError(c, conn, "Title and type are required.")
@@ -346,14 +389,16 @@ func createEvent(conn *sql.DB) echo.HandlerFunc {
 // repeatEvent stamps out copies of an event on a schedule — a lightweight
 // stand-in for calendar recurrence. Each copy is an ordinary, independently
 // editable event, so there's no recurrence rule to maintain.
-func repeatEvent(conn *sql.DB) echo.HandlerFunc {
+func repeatEvent(conn *sql.DB, bookingMailer *bookingmail.Handler, venue *time.Location) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ev, volunteers, signups, users, err := loadEvent(conn, c.Param("id"))
 		if err != nil {
 			return err
 		}
 		rerender := func(msg string) error {
-			return views.AdminEventEdit(ev, volunteers, signups, users, currentUser(c), msg).Render(c.Request().Context(), c.Response())
+			data := eventDetailData(bookingMailer, venue, ev, volunteers, signups, users, false)
+			data.ErrorMsg = msg
+			return views.AdminEventEdit(data, currentUser(c)).Render(c.Request().Context(), c.Response())
 		}
 
 		freq := c.FormValue("frequency")
@@ -396,4 +441,117 @@ func parseAdminTime(raw string) (time.Time, error) {
 
 func rerenderEventsError(c echo.Context, conn *sql.DB, msg string) error {
 	return renderEvents(c, conn, msg)
+}
+
+func eventPath(id int64) string {
+	return "/admin/events/" + strconv.FormatInt(id, 10)
+}
+
+// previewEventReply shows the admin the exact message a send will produce
+// and issues a single-use confirmation token, mirroring the booking reply
+// flow (see admin/bookings.go) for an event's organizer contact instead.
+func previewEventReply(conn *sql.DB, bookingMailer *bookingmail.Handler) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest)
+		}
+		ev, err := db.EventByID(conn, id)
+		if errors.Is(err, sql.ErrNoRows) {
+			return echo.NewHTTPError(http.StatusNotFound)
+		}
+		if err != nil {
+			return err
+		}
+
+		subject := strings.TrimSpace(c.FormValue("subject"))
+		body := strings.TrimSpace(c.FormValue("body"))
+		if subject == "" || body == "" {
+			return c.Redirect(http.StatusSeeOther, eventPath(ev.ID)+"?send_error=empty")
+		}
+
+		// Reply into the existing thread when there is one, so the
+		// recipient's mail client keeps it in the same conversation.
+		inReplyTo := ""
+		if ev.Email != "" {
+			thread := bookingMailer.Thread([]string{ev.Email}, false)
+			if len(thread.Messages) > 0 {
+				inReplyTo = thread.Messages[len(thread.Messages)-1].MessageID
+			}
+		}
+
+		nonce, err := newNonce()
+		if err != nil {
+			return err
+		}
+		sess := getSession(c)
+		sess.Values["event_reply_nonce"] = nonce
+		if err := sess.Save(c.Request(), c.Response()); err != nil {
+			return err
+		}
+
+		data := views.ReplyPreviewData{
+			Kind:           "events",
+			ID:             ev.ID,
+			RecipientName:  ev.ContactName,
+			RecipientEmail: ev.Email,
+			MailboxAddress: bookingMailer.Address(),
+			FromName:       "DECAY Events",
+			Subject:        subject,
+			Body:           body,
+			SenderName:     currentUser(c).Name(),
+			InReplyTo:      inReplyTo,
+			Nonce:          nonce,
+		}
+		return views.AdminEmailReplyPreview(data, currentUser(c)).Render(c.Request().Context(), c.Response())
+	}
+}
+
+// sendEventReply performs the actual send. The nonce is single-use, same as
+// sendBookingReply, and kept under its own session key so an event reply
+// and a booking reply open in different tabs can't confirm one another's.
+func sendEventReply(conn *sql.DB, bookingMailer *bookingmail.Handler) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest)
+		}
+		ev, err := db.EventByID(conn, id)
+		if errors.Is(err, sql.ErrNoRows) {
+			return echo.NewHTTPError(http.StatusNotFound)
+		}
+		if err != nil {
+			return err
+		}
+
+		sess := getSession(c)
+		expected, _ := sess.Values["event_reply_nonce"].(string)
+		delete(sess.Values, "event_reply_nonce")
+		_ = sess.Save(c.Request(), c.Response())
+
+		supplied := c.FormValue("nonce")
+		if expected == "" || supplied == "" || expected != supplied {
+			return c.Redirect(http.StatusSeeOther, eventPath(ev.ID)+"?send_error=expired")
+		}
+
+		res, err := bookingMailer.Send(bookingmail.ReplyInput{
+			To:         ev.Email,
+			ToName:     ev.ContactName,
+			Subject:    c.FormValue("subject"),
+			Body:       c.FormValue("body"),
+			SenderName: currentUser(c).Name(),
+			InReplyTo:  c.FormValue("in_reply_to"),
+		})
+		if err != nil {
+			log.Printf("event #%d reply to %s failed: %v", ev.ID, ev.Email, err)
+			return c.Redirect(http.StatusSeeOther, eventPath(ev.ID)+"?send_error=1")
+		}
+		log.Printf("event #%d reply sent to %s by %s", ev.ID, ev.Email, currentUser(c).Name())
+
+		redirect := eventPath(ev.ID) + "?sent=1"
+		if res.Warning != "" {
+			redirect += "&warn=1"
+		}
+		return c.Redirect(http.StatusSeeOther, redirect)
+	}
 }

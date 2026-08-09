@@ -42,7 +42,7 @@ func Register(e *echo.Echo, conn *sql.DB, sessionSecret []byte, uploadsDir strin
 	// Each section is gated on its own permission, so a role that grants
 	// only some of them reaches only those pages.
 	events := g.Group("", requirePermission(db.PermEvents))
-	registerEventRoutes(events, conn, uploadsDir)
+	registerEventRoutes(events, conn, uploadsDir, bookingMailer, venue)
 
 	products := g.Group("", requirePermission(db.PermShop))
 	registerProductRoutes(products, conn, uploadsDir)

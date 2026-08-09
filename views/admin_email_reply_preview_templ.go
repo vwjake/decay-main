@@ -18,10 +18,14 @@ import (
 // ReplyPreviewData is what's shown before a reply actually sends — the exact
 // text a Send call will produce, plus everything the confirm POST needs to
 // carry forward. The recipient itself is deliberately not part of this: the
-// send handler re-derives it from the booking record by ID, never from a
-// form field, so a tampered form can't redirect the mail to someone else.
+// send handler re-derives it from the booking or event record by ID, never
+// from a form field, so a tampered form can't redirect the mail to someone
+// else. Kind ("bookings" or "events") and ID build this page's own routes.
 type ReplyPreviewData struct {
-	Booking        db.BookingRequest
+	Kind           string
+	ID             int64
+	RecipientName  string
+	RecipientEmail string
 	MailboxAddress string
 	FromName       string
 	Subject        string
@@ -31,7 +35,15 @@ type ReplyPreviewData struct {
 	Nonce          string
 }
 
-func AdminBookingReplyPreview(d ReplyPreviewData, me db.User) templ.Component {
+func (d ReplyPreviewData) cancelPath() string {
+	return fmt.Sprintf("/admin/%s/%d", d.Kind, d.ID)
+}
+
+func (d ReplyPreviewData) sendPath() string {
+	return fmt.Sprintf("/admin/%s/%d/reply/send", d.Kind, d.ID)
+}
+
+func AdminEmailReplyPreview(d ReplyPreviewData, me db.User) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -69,9 +81,9 @@ func AdminBookingReplyPreview(d ReplyPreviewData, me db.User) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 templ.SafeURL
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/bookings/%d", d.Booking.ID)))
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(d.cancelPath()))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_booking_reply_preview.templ`, Line: 29, Col: 71}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_email_reply_preview.templ`, Line: 41, Col: 38}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -84,7 +96,7 @@ func AdminBookingReplyPreview(d ReplyPreviewData, me db.User) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(d.FromName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_booking_reply_preview.templ`, Line: 34, Col: 19}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_email_reply_preview.templ`, Line: 46, Col: 19}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -97,7 +109,7 @@ func AdminBookingReplyPreview(d ReplyPreviewData, me db.User) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(d.MailboxAddress)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_booking_reply_preview.templ`, Line: 34, Col: 44}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_email_reply_preview.templ`, Line: 46, Col: 44}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -107,11 +119,11 @@ func AdminBookingReplyPreview(d ReplyPreviewData, me db.User) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if d.Booking.Name != "" {
+			if d.RecipientName != "" {
 				var templ_7745c5c3_Var6 string
-				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(d.Booking.Name)
+				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(d.RecipientName)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_booking_reply_preview.templ`, Line: 38, Col: 21}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_email_reply_preview.templ`, Line: 50, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
@@ -122,9 +134,9 @@ func AdminBookingReplyPreview(d ReplyPreviewData, me db.User) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var7 string
-				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs("<" + d.Booking.Email + ">")
+				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs("<" + d.RecipientEmail + ">")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_booking_reply_preview.templ`, Line: 38, Col: 53}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_email_reply_preview.templ`, Line: 50, Col: 55}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
@@ -132,9 +144,9 @@ func AdminBookingReplyPreview(d ReplyPreviewData, me db.User) templ.Component {
 				}
 			} else {
 				var templ_7745c5c3_Var8 string
-				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(d.Booking.Email)
+				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(d.RecipientEmail)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_booking_reply_preview.templ`, Line: 40, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_email_reply_preview.templ`, Line: 52, Col: 23}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
@@ -148,7 +160,7 @@ func AdminBookingReplyPreview(d ReplyPreviewData, me db.User) templ.Component {
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(d.Subject)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_booking_reply_preview.templ`, Line: 44, Col: 18}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_email_reply_preview.templ`, Line: 56, Col: 18}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
@@ -161,20 +173,20 @@ func AdminBookingReplyPreview(d ReplyPreviewData, me db.User) templ.Component {
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(bookingmail.SignBody(d.Body, d.SenderName))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_booking_reply_preview.templ`, Line: 46, Col: 101}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_email_reply_preview.templ`, Line: 58, Col: 101}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</pre><p class=\"admin-sub mono\">This goes out as the shared booking address, signed with your name. Replies come back to the booking mailbox and appear in the history.</p><form method=\"post\" action=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</pre><p class=\"admin-sub mono\">This goes out from the shared mailbox, signed with your name. Replies come back to it and appear in the history.</p><form method=\"post\" action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var11 templ.SafeURL
-			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/bookings/%d/reply/send", d.Booking.ID)))
+			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(d.sendPath()))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_booking_reply_preview.templ`, Line: 48, Col: 100}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_email_reply_preview.templ`, Line: 60, Col: 54}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
@@ -187,7 +199,7 @@ func AdminBookingReplyPreview(d ReplyPreviewData, me db.User) templ.Component {
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(d.Subject)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_booking_reply_preview.templ`, Line: 49, Col: 56}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_email_reply_preview.templ`, Line: 61, Col: 56}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 			if templ_7745c5c3_Err != nil {
@@ -200,7 +212,7 @@ func AdminBookingReplyPreview(d ReplyPreviewData, me db.User) templ.Component {
 			var templ_7745c5c3_Var13 string
 			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(d.Body)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_booking_reply_preview.templ`, Line: 50, Col: 50}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_email_reply_preview.templ`, Line: 62, Col: 50}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
 			if templ_7745c5c3_Err != nil {
@@ -213,7 +225,7 @@ func AdminBookingReplyPreview(d ReplyPreviewData, me db.User) templ.Component {
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(d.InReplyTo)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_booking_reply_preview.templ`, Line: 51, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_email_reply_preview.templ`, Line: 63, Col: 62}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
 			if templ_7745c5c3_Err != nil {
@@ -226,7 +238,7 @@ func AdminBookingReplyPreview(d ReplyPreviewData, me db.User) templ.Component {
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue(d.Nonce)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_booking_reply_preview.templ`, Line: 52, Col: 52}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_email_reply_preview.templ`, Line: 64, Col: 52}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
 			if templ_7745c5c3_Err != nil {

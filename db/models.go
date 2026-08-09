@@ -11,7 +11,7 @@ import (
 
 // eventColumns is the select list every event query shares, so scanEvents
 // stays in step with it.
-const eventColumns = `id, title, event_type, starts_at, ends_at, location, description, link, uid, flyer, slug, keyholder`
+const eventColumns = `id, title, event_type, starts_at, ends_at, location, description, link, uid, flyer, slug, keyholder, contact_name, email`
 
 const timeLayout = "2006-01-02T15:04:05-07:00"
 
@@ -34,6 +34,11 @@ type Event struct {
 	// Keyholder is who's covering the space for this event — an
 	// existing account's name or free text, empty if unassigned.
 	Keyholder string
+	// ContactName and Email identify the organizer, usually carried over
+	// from a booking request when the event is converted from one. Email
+	// is what the admin page's correspondence lookup keys on.
+	ContactName string
+	Email       string
 }
 
 // Slug builds an event's URL segment from its date and title, e.g.
@@ -313,7 +318,7 @@ func scanEvents(rows *sql.Rows) ([]Event, error) {
 		var ev Event
 		var startsAt string
 		var endsAt sql.NullString
-		if err := rows.Scan(&ev.ID, &ev.Title, &ev.EventType, &startsAt, &endsAt, &ev.Location, &ev.Description, &ev.Link, &ev.UID, &ev.Flyer, &ev.Slug, &ev.Keyholder); err != nil {
+		if err := rows.Scan(&ev.ID, &ev.Title, &ev.EventType, &startsAt, &endsAt, &ev.Location, &ev.Description, &ev.Link, &ev.UID, &ev.Flyer, &ev.Slug, &ev.Keyholder, &ev.ContactName, &ev.Email); err != nil {
 			return nil, err
 		}
 		var err error

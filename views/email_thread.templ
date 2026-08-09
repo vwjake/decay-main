@@ -1,0 +1,147 @@
+package views
+
+import (
+	"fmt"
+	"strings"
+	"time"
+
+	"decay-main/bookingmail"
+)
+
+// EmailThreadData is the correspondence panel shared by the booking and
+// event admin pages: a running history with whoever's email is on file,
+// and a reply form when the mailbox can send. Kind ("bookings" or
+// "events") and ID build this record's own admin routes, so the panel
+// itself doesn't need to know which section it's rendered from.
+type EmailThreadData struct {
+	Kind           string
+	ID             int64
+	Email          string
+	Thread         bookingmail.Thread
+	CanSend        bool
+	MailboxAddress string
+	Venue          *time.Location
+}
+
+func (d EmailThreadData) basePath() string {
+	return fmt.Sprintf("/admin/%s/%d", d.Kind, d.ID)
+}
+
+templ emailThreadPanel(d EmailThreadData) {
+	<div class="admin-heading-row" style="margin-top:1.6em;">
+		<p class="admin-heading">Email history</p>
+		if d.Thread.Configured {
+			<a href={ templ.URL(d.basePath() + "?refresh=1") } class="admin-btn admin-btn-small">Refresh</a>
+		}
+	</div>
+	if d.Email == "" {
+		<p class="admin-sub mono">No email address on file, so there is nothing to look up.</p>
+	} else if !d.Thread.Configured {
+		<p class="admin-sub mono">The booking mailbox is not connected on this server yet. Set BOOKING_IMAP_HOST to enable it.</p>
+	} else if d.Thread.Err != nil {
+		<p class="admin-sub mono">Couldn't read the booking mailbox: { d.Thread.Err.Error() }</p>
+	} else if len(d.Thread.Messages) == 0 {
+		<p class="admin-sub mono">No emails to or from { d.Email } in the booking mailbox yet.</p>
+	} else {
+		{{ received, sent := d.Thread.Counts() }}
+		<p class="admin-sub mono">
+			{ fmt.Sprintf("%s — %d received, %d sent", plural(len(d.Thread.Messages), "message", "messages"), received, sent) }
+			if d.Thread.Cached {
+				{ " (cached)" }
+			}
+		</p>
+		for i, m := range d.Thread.Messages {
+			@emailMessage(m, d.Venue, i == len(d.Thread.Messages)-1)
+		}
+	}
+
+	if d.CanSend && d.Email != "" {
+		@replyForm(d)
+	}
+}
+
+templ emailMessage(m bookingmail.Message, venue *time.Location, open bool) {
+	<details class={ "email-msg", templ.KV("email-msg-sent", m.IsSent()), templ.KV("email-msg-received", !m.IsSent()) } open?={ open }>
+		<summary>
+			<span class="email-dir mono">
+				if m.IsSent() {
+					{ "→ Sent" }
+				} else {
+					{ "← Received" }
+				}
+			</span>
+			<span class="email-date mono">{ m.When(venue) }</span>
+			<span class="email-subject">
+				if m.Subject != "" {
+					{ m.Subject }
+				} else {
+					{ "(no subject)" }
+				}
+			</span>
+			if s := m.Snippet(120); s != "" {
+				<span class="email-snippet">{ s }</span>
+			}
+		</summary>
+		<div class="email-headers mono">
+			<div><strong>From:</strong>
+				if m.FromName != "" {
+					{ m.FromName } { "<" + m.FromEmail + ">" }
+				} else {
+					{ m.FromEmail }
+				}
+			</div>
+			if m.To != "" {
+				<div><strong>To:</strong> { m.To }</div>
+			}
+			if m.CC != "" {
+				<div><strong>Cc:</strong> { m.CC }</div>
+			}
+			if len(m.Attachments) > 0 {
+				<div><strong>Attachments:</strong> { strings.Join(m.Attachments, ", ") }</div>
+			}
+		</div>
+		if m.Body == "" {
+			<p class="admin-sub mono">(no readable text in this message)</p>
+		} else {
+			<pre class="email-body">{ m.DisplayBody() }</pre>
+		}
+		if m.Quoted != "" {
+			<details class="email-quoted">
+				<summary>Show quoted text</summary>
+				<pre class="email-body email-quoted-body">{ m.Quoted }</pre>
+			</details>
+		}
+	</details>
+}
+
+templ replyForm(d EmailThreadData) {
+	<details class="email-compose">
+		<summary>Write a reply</summary>
+		<form method="post" action={ templ.URL(d.basePath() + "/reply/preview") }>
+			<label>Subject
+				<input type="text" name="subject" required value={ replySubject(d.Thread) }/>
+			</label>
+			<label>Message
+				<textarea name="body" rows="8" required placeholder="Your reply. Your name is added at the end automatically."></textarea>
+			</label>
+			<p class="admin-sub mono">Goes out from { d.MailboxAddress }, signed with your name. You'll see a preview before anything sends.</p>
+			<button type="submit" class="admin-btn admin-btn-small">Preview &amp; send</button>
+		</form>
+	</details>
+}
+
+// replySubject prefills Re: <last subject> when there's a thread to reply
+// into, so the recipient's mail client keeps it in the same conversation.
+func replySubject(t bookingmail.Thread) string {
+	if len(t.Messages) == 0 {
+		return ""
+	}
+	last := t.Messages[len(t.Messages)-1]
+	if last.Subject == "" {
+		return ""
+	}
+	if len(last.Subject) >= 3 && (last.Subject[:3] == "Re:" || last.Subject[:3] == "RE:") {
+		return last.Subject
+	}
+	return "Re: " + last.Subject
+}

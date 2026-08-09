@@ -30,8 +30,8 @@ func CreateEvent(conn *sql.DB, e Event) (int64, error) {
 		e.Slug = slug
 	}
 	res, err := conn.Exec(
-		`INSERT INTO events (title, event_type, starts_at, ends_at, location, description, link, uid, flyer, slug, keyholder) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		e.Title, e.EventType, e.StartsAt.Format(timeLayout), endsAt, e.Location, e.Description, e.Link, e.UID, e.Flyer, e.Slug, e.Keyholder,
+		`INSERT INTO events (title, event_type, starts_at, ends_at, location, description, link, uid, flyer, slug, keyholder, contact_name, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		e.Title, e.EventType, e.StartsAt.Format(timeLayout), endsAt, e.Location, e.Description, e.Link, e.UID, e.Flyer, e.Slug, e.Keyholder, e.ContactName, e.Email,
 	)
 	if err != nil {
 		return 0, err
@@ -50,8 +50,8 @@ func UpdateEvent(conn *sql.DB, e Event) error {
 		endsAt = e.EndsAt.Format(timeLayout)
 	}
 	_, err := conn.Exec(
-		`UPDATE events SET title = ?, event_type = ?, starts_at = ?, ends_at = ?, location = ?, description = ?, link = ?, slug = ?, keyholder = ? WHERE id = ?`,
-		e.Title, e.EventType, e.StartsAt.Format(timeLayout), endsAt, e.Location, e.Description, e.Link, e.Slug, e.Keyholder, e.ID,
+		`UPDATE events SET title = ?, event_type = ?, starts_at = ?, ends_at = ?, location = ?, description = ?, link = ?, slug = ?, keyholder = ?, contact_name = ?, email = ? WHERE id = ?`,
+		e.Title, e.EventType, e.StartsAt.Format(timeLayout), endsAt, e.Location, e.Description, e.Link, e.Slug, e.Keyholder, e.ContactName, e.Email, e.ID,
 	)
 	return err
 }

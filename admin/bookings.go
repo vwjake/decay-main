@@ -168,7 +168,10 @@ func previewBookingReply(conn *sql.DB, bookingMailer *bookingmail.Handler) echo.
 		}
 
 		data := views.ReplyPreviewData{
-			Booking:        b,
+			Kind:           "bookings",
+			ID:             b.ID,
+			RecipientName:  b.Name,
+			RecipientEmail: b.Email,
 			MailboxAddress: bookingMailer.Address(),
 			FromName:       "DECAY Booking",
 			Subject:        subject,
@@ -177,7 +180,7 @@ func previewBookingReply(conn *sql.DB, bookingMailer *bookingmail.Handler) echo.
 			InReplyTo:      inReplyTo,
 			Nonce:          nonce,
 		}
-		return views.AdminBookingReplyPreview(data, currentUser(c)).Render(c.Request().Context(), c.Response())
+		return views.AdminEmailReplyPreview(data, currentUser(c)).Render(c.Request().Context(), c.Response())
 	}
 }
 

@@ -19,7 +19,12 @@ CREATE TABLE IF NOT EXISTS events (
     -- link to users.id: the admin form suggests existing accounts but
     -- also accepts anyone without one, and a name should stay attached
     -- to the event even if that account is later removed.
-    keyholder TEXT NOT NULL DEFAULT ''
+    keyholder TEXT NOT NULL DEFAULT '',
+    -- The organizer's contact info, carried over automatically when an
+    -- event is converted from a booking request. Lets the admin event page
+    -- show the same email correspondence lookup the booking page has.
+    contact_name TEXT NOT NULL DEFAULT '',
+    email TEXT NOT NULL DEFAULT ''
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS events_slug ON events(slug) WHERE slug <> '';

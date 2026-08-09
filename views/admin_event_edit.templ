@@ -2,13 +2,50 @@ package views
 
 import (
 	"fmt"
+	"time"
 
+	"decay-main/bookingmail"
 	"decay-main/db"
 )
 
+// EventDetailData bundles an event with its volunteer/signup context and
+// its correspondence, the same way BookingDetailData does for a booking.
+// Thread is the zero value when the mailbox isn't configured or the event
+// has no contact email on file.
+type EventDetailData struct {
+	Event          db.Event
+	Volunteers     []db.EventVolunteer
+	Signups        []db.VolunteerSignup
+	Users          []db.User
+	Thread         bookingmail.Thread
+	CanSend        bool
+	MailboxAddress string
+	Venue          *time.Location
+	// ErrorMsg is a validation error from the details/flyer/repeat forms
+	// on this page. FlashNotice/FlashError report the outcome of sending
+	// a reply, same as the booking page.
+	ErrorMsg    string
+	FlashNotice string
+	FlashError  string
+}
+
+func (d EventDetailData) emailThread() EmailThreadData {
+	return EmailThreadData{
+		Kind:           "events",
+		ID:             d.Event.ID,
+		Email:          d.Event.Email,
+		Thread:         d.Thread,
+		CanSend:        d.CanSend,
+		MailboxAddress: d.MailboxAddress,
+		Venue:          d.Venue,
+	}
+}
+
 // AdminEventEdit manages the parts of an event that don't fit the create
-// form: its flyer image and which volunteer roles it needs covered.
-templ AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, signups []db.VolunteerSignup, users []db.User, me db.User, errorMsg string) {
+// form: its flyer image, which volunteer roles it needs covered, and its
+// correspondence with whoever organized it.
+templ AdminEventEdit(d EventDetailData, me db.User) {
+	{{ ev := d.Event }}
 	@AdminLayout(ev.Title+" · DECAY Admin", me) {
 		<a href="/admin/events" class="admin-back">&larr; All events</a>
 		<p class="admin-heading">{ ev.Title }</p>
@@ -18,12 +55,18 @@ templ AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, signups []db.V
 		<p class="admin-sub mono">
 			Public page: <a href={ templ.URL(ev.Path()) } target="_blank" rel="noopener">{ ev.Path() }</a>
 		</p>
-		if errorMsg != "" {
-			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+		if d.FlashNotice != "" {
+			<div class="admin-flash mono">{ d.FlashNotice }</div>
+		}
+		if d.FlashError != "" {
+			<div class="admin-flash admin-flash-error mono">{ d.FlashError }</div>
+		}
+		if d.ErrorMsg != "" {
+			<div class="admin-flash admin-flash-error mono">{ d.ErrorMsg }</div>
 		}
 
 		<p class="admin-heading">Volunteer signups</p>
-		if len(signups) == 0 {
+		if len(d.Signups) == 0 {
 			<p class="admin-sub mono">No one has signed up through the site yet.</p>
 		} else {
 			<p class="admin-sub mono">People who offered to help through the public page. Reach out, then clear them once handled.</p>
@@ -36,7 +79,7 @@ templ AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, signups []db.V
 					<th>When</th>
 					<th></th>
 				</tr>
-				for _, s := range signups {
+				for _, s := range d.Signups {
 					<tr>
 						<td>{ s.Name }</td>
 						<td class="mono">{ s.Contact }</td>
@@ -82,10 +125,23 @@ templ AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, signups []db.V
 				<input type="text" name="keyholder" value={ ev.Keyholder } list="keyholder-options" placeholder="Pick an account or type a name"/>
 			</label>
 			<datalist id="keyholder-options">
-				for _, u := range users {
+				for _, u := range d.Users {
 					<option value={ u.Name() }/>
 				}
 			</datalist>
+			<label>
+				Organizer's name
+				<input type="text" name="contact_name" value={ ev.ContactName }/>
+			</label>
+			<label>
+				Organizer's email
+				<input type="email" name="email" value={ ev.Email }/>
+			</label>
+			<p class="admin-sub mono">
+				Carried over automatically when this event started as a
+				booking request. Set here so the email history below can
+				look up correspondence with anyone else.
+			</p>
 			<button type="submit" class="admin-btn">Save details</button>
 		</form>
 
@@ -126,7 +182,7 @@ templ AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, signups []db.V
 								type="checkbox"
 								name={ "needed_" + role }
 								value="1"
-								checked?={ hasRole(volunteers, role) }
+								checked?={ hasRole(d.Volunteers, role) }
 							/>
 						</td>
 						<td>{ db.RoleLabel(role) }</td>
@@ -134,7 +190,7 @@ templ AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, signups []db.V
 							<input
 								type="text"
 								name={ "name_" + role }
-								value={ volunteerName(volunteers, role) }
+								value={ volunteerName(d.Volunteers, role) }
 								placeholder="Still open"
 							/>
 						</td>
@@ -172,6 +228,8 @@ templ AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, signups []db.V
 		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/events/%d/delete", ev.ID)) } onsubmit="return confirm('Delete this event? This cannot be undone.')" class="admin-form">
 			<button type="submit" class="admin-btn admin-btn-danger">Delete event</button>
 		</form>
+
+		@emailThreadPanel(d.emailThread())
 	}
 }
 

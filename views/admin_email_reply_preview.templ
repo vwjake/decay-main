@@ -10,10 +10,14 @@ import (
 // ReplyPreviewData is what's shown before a reply actually sends — the exact
 // text a Send call will produce, plus everything the confirm POST needs to
 // carry forward. The recipient itself is deliberately not part of this: the
-// send handler re-derives it from the booking record by ID, never from a
-// form field, so a tampered form can't redirect the mail to someone else.
+// send handler re-derives it from the booking or event record by ID, never
+// from a form field, so a tampered form can't redirect the mail to someone
+// else. Kind ("bookings" or "events") and ID build this page's own routes.
 type ReplyPreviewData struct {
-	Booking        db.BookingRequest
+	Kind           string
+	ID             int64
+	RecipientName  string
+	RecipientEmail string
 	MailboxAddress string
 	FromName       string
 	Subject        string
@@ -23,10 +27,18 @@ type ReplyPreviewData struct {
 	Nonce          string
 }
 
-templ AdminBookingReplyPreview(d ReplyPreviewData, me db.User) {
+func (d ReplyPreviewData) cancelPath() string {
+	return fmt.Sprintf("/admin/%s/%d", d.Kind, d.ID)
+}
+
+func (d ReplyPreviewData) sendPath() string {
+	return fmt.Sprintf("/admin/%s/%d/reply/send", d.Kind, d.ID)
+}
+
+templ AdminEmailReplyPreview(d ReplyPreviewData, me db.User) {
 	@AdminLayout("Send this reply? · DECAY Admin", me) {
 		<div class="admin-heading-row">
-			<a href={ templ.URL(fmt.Sprintf("/admin/bookings/%d", d.Booking.ID)) } class="admin-btn admin-btn-small">← Cancel</a>
+			<a href={ templ.URL(d.cancelPath()) } class="admin-btn admin-btn-small">← Cancel</a>
 		</div>
 		<p class="admin-heading">Send this reply?</p>
 		<dl class="send-preview mono">
@@ -34,18 +46,18 @@ templ AdminBookingReplyPreview(d ReplyPreviewData, me db.User) {
 			<dd>{ d.FromName } &lt;{ d.MailboxAddress }&gt;</dd>
 			<dt>To</dt>
 			<dd>
-				if d.Booking.Name != "" {
-					{ d.Booking.Name } { "<" + d.Booking.Email + ">" }
+				if d.RecipientName != "" {
+					{ d.RecipientName } { "<" + d.RecipientEmail + ">" }
 				} else {
-					{ d.Booking.Email }
+					{ d.RecipientEmail }
 				}
 			</dd>
 			<dt>Subject</dt>
 			<dd>{ d.Subject }</dd>
 		</dl>
 		<pre class="email-body" style="border:2px solid #111;">{ bookingmail.SignBody(d.Body, d.SenderName) }</pre>
-		<p class="admin-sub mono">This goes out as the shared booking address, signed with your name. Replies come back to the booking mailbox and appear in the history.</p>
-		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/bookings/%d/reply/send", d.Booking.ID)) }>
+		<p class="admin-sub mono">This goes out from the shared mailbox, signed with your name. Replies come back to it and appear in the history.</p>
+		<form method="post" action={ templ.URL(d.sendPath()) }>
 			<input type="hidden" name="subject" value={ d.Subject }/>
 			<input type="hidden" name="body" value={ d.Body }/>
 			<input type="hidden" name="in_reply_to" value={ d.InReplyTo }/>
