@@ -18,6 +18,28 @@ templ Calendar(month db.CalendarMonth) {
 				<a href={ templ.URL(db.MonthURL(month.Next)) } class="pager-link">Next &rarr;</a>
 			</nav>
 
+			<input type="checkbox" id="cal-view-toggle" class="cal-view-toggle"/>
+			<label for="cal-view-toggle" class="btn-outline mono cal-view-btn cal-view-btn-calendar">Calendar view</label>
+			<label for="cal-view-toggle" class="btn-outline mono cal-view-btn cal-view-btn-list">List view</label>
+
+			<div class="cal-agenda">
+				if month.Count == 0 {
+					<p class="subscribe-note mono">Nothing scheduled this month.</p>
+				} else {
+					<div class="event-list">
+						for _, week := range month.Weeks {
+							for _, day := range week {
+								if day.InMonth {
+									for _, ev := range day.Events {
+										@eventRow(ev)
+									}
+								}
+							}
+						}
+					</div>
+				}
+			</div>
+
 			<div class="calendar-scroll">
 				<table class="calendar">
 					<thead>
