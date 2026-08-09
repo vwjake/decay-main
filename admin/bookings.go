@@ -21,7 +21,7 @@ import (
 func registerBookingRoutes(g *echo.Group, conn *sql.DB, bookingMailer *bookingmail.Handler, venue *time.Location) {
 	g.GET("/bookings", listBookings(conn))
 	g.GET("/bookings/:id", viewBooking(conn, bookingMailer, venue))
-	g.POST("/bookings/:id/status", setBookingStatus(conn))
+	g.POST("/bookings/:id/notes", saveBookingNotes(conn))
 	g.POST("/bookings/:id/delete", deleteBooking(conn))
 	g.POST("/bookings/:id/reply/preview", previewBookingReply(conn, bookingMailer))
 	g.POST("/bookings/:id/reply/send", sendBookingReply(conn, bookingMailer))
@@ -29,35 +29,25 @@ func registerBookingRoutes(g *echo.Group, conn *sql.DB, bookingMailer *bookingma
 
 func listBookings(conn *sql.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		showArchived := c.QueryParam("archived") != ""
-		requests, err := db.ListBookingRequests(conn, showArchived)
+		requests, err := db.ListBookingRequests(conn)
 		if err != nil {
 			return err
 		}
-		return views.AdminBookings(requests, showArchived, currentUser(c), "").Render(c.Request().Context(), c.Response())
+		return views.AdminBookings(requests, currentUser(c), "").Render(c.Request().Context(), c.Response())
 	}
 }
 
-// validBookingStatuses guards the status write to the known set, so a
-// hand-crafted form can't set an arbitrary value.
-var validBookingStatuses = map[string]bool{
-	db.BookingNew: true, db.BookingReviewed: true, db.BookingArchived: true,
-}
-
-func setBookingStatus(conn *sql.DB) echo.HandlerFunc {
+// saveBookingNotes updates a request's private admin notes.
+func saveBookingNotes(conn *sql.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest)
 		}
-		status := c.FormValue("status")
-		if !validBookingStatuses[status] {
-			return echo.NewHTTPError(http.StatusBadRequest)
-		}
-		if err := db.SetBookingStatus(conn, id, status); err != nil {
+		if err := db.SetBookingNotes(conn, id, strings.TrimSpace(c.FormValue("notes"))); err != nil {
 			return err
 		}
-		return c.Redirect(http.StatusSeeOther, "/admin/bookings")
+		return c.Redirect(http.StatusSeeOther, bookingPath(id))
 	}
 }
 

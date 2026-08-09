@@ -25,7 +25,7 @@ func TestBookingRequests(t *testing.T) {
 		t.Fatalf("CountNewBookings = %d (%v), want 2", n, err)
 	}
 
-	list, err := ListBookingRequests(conn, false)
+	list, err := ListBookingRequests(conn)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -33,20 +33,31 @@ func TestBookingRequests(t *testing.T) {
 		t.Fatalf("list = %+v", list)
 	}
 
-	// Archiving drops it from the default list and the new count.
-	if err := SetBookingStatus(conn, list[0].ID, BookingArchived); err != nil {
+	// Notes are private admin context, round-tripped through the same row.
+	if err := SetBookingNotes(conn, list[0].ID, "Confirmed for Sept 20, waiting on deposit."); err != nil {
 		t.Fatal(err)
 	}
-	list, _ = ListBookingRequests(conn, false)
-	if len(list) != 1 {
-		t.Errorf("after archive, active list = %d, want 1", len(list))
+	updated, err := BookingByID(conn, list[0].ID)
+	if err != nil {
+		t.Fatal(err)
 	}
-	withArchived, _ := ListBookingRequests(conn, true)
-	if len(withArchived) != 2 {
-		t.Errorf("with archived = %d, want 2", len(withArchived))
+	if updated.Notes != "Confirmed for Sept 20, waiting on deposit." {
+		t.Errorf("notes = %q", updated.Notes)
+	}
+
+	// Deleting is the only way a request leaves the queue now.
+	if err := DeleteBookingRequest(conn, list[0].ID); err != nil {
+		t.Fatal(err)
+	}
+	remaining, err := ListBookingRequests(conn)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(remaining) != 1 {
+		t.Errorf("after delete, list = %d, want 1", len(remaining))
 	}
 	if n, _ := CountNewBookings(conn); n != 1 {
-		t.Errorf("new count after archive = %d, want 1", n)
+		t.Errorf("new count after delete = %d, want 1", n)
 	}
 }
 

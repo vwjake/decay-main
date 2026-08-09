@@ -5,12 +5,10 @@ import (
 	"time"
 )
 
-// Booking request statuses.
-const (
-	BookingNew      = "new"
-	BookingReviewed = "reviewed"
-	BookingArchived = "archived"
-)
+// BookingNew is the only status a booking request carries — there's no
+// reviewed/archived workflow, just a queue worked through with notes and
+// deletion. See the comment on booking_requests in schema.sql.
+const BookingNew = "new"
 
 // BookingRequest is a public request to use the space for an event.
 type BookingRequest struct {
@@ -23,16 +21,18 @@ type BookingRequest struct {
 	PreferredDate      string
 	ExpectedAttendance string
 	Status             string
-	CreatedAt          time.Time
+	// Notes are the admin's own, private context on a request — never shown
+	// to the requester.
+	Notes     string
+	CreatedAt time.Time
 }
 
-func (b BookingRequest) IsNew() bool      { return b.Status == BookingNew }
-func (b BookingRequest) IsArchived() bool { return b.Status == BookingArchived }
+func (b BookingRequest) IsNew() bool { return b.Status == BookingNew }
 
 // When renders the submission time for the queue.
 func (b BookingRequest) When() string { return b.CreatedAt.Format("Jan 2, 2006 · 3:04 PM") }
 
-const bookingColumns = `id, name, email, phone, event_name, description, preferred_date, expected_attendance, status, created_at`
+const bookingColumns = `id, name, email, phone, event_name, description, preferred_date, expected_attendance, status, notes, created_at`
 
 func scanBookings(rows *sql.Rows) ([]BookingRequest, error) {
 	var out []BookingRequest
@@ -40,7 +40,7 @@ func scanBookings(rows *sql.Rows) ([]BookingRequest, error) {
 		var b BookingRequest
 		var created string
 		if err := rows.Scan(&b.ID, &b.Name, &b.Email, &b.Phone, &b.EventName, &b.Description,
-			&b.PreferredDate, &b.ExpectedAttendance, &b.Status, &created); err != nil {
+			&b.PreferredDate, &b.ExpectedAttendance, &b.Status, &b.Notes, &created); err != nil {
 			return nil, err
 		}
 		t, err := time.Parse("2006-01-02 15:04:05", created)
@@ -63,15 +63,10 @@ func CreateBookingRequest(conn *sql.DB, b BookingRequest) error {
 	return err
 }
 
-// ListBookingRequests returns requests for the admin queue, newest first.
-// Archived ones are included only when includeArchived is set.
-func ListBookingRequests(conn *sql.DB, includeArchived bool) ([]BookingRequest, error) {
-	query := `SELECT ` + bookingColumns + ` FROM booking_requests`
-	if !includeArchived {
-		query += ` WHERE status <> '` + BookingArchived + `'`
-	}
-	query += ` ORDER BY created_at DESC`
-	rows, err := conn.Query(query)
+// ListBookingRequests returns every request for the admin queue, newest
+// first.
+func ListBookingRequests(conn *sql.DB) ([]BookingRequest, error) {
+	rows, err := conn.Query(`SELECT ` + bookingColumns + ` FROM booking_requests ORDER BY created_at DESC`)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +80,7 @@ func BookingByID(conn *sql.DB, id int64) (BookingRequest, error) {
 	var b BookingRequest
 	var created string
 	if err := row.Scan(&b.ID, &b.Name, &b.Email, &b.Phone, &b.EventName, &b.Description,
-		&b.PreferredDate, &b.ExpectedAttendance, &b.Status, &created); err != nil {
+		&b.PreferredDate, &b.ExpectedAttendance, &b.Status, &b.Notes, &created); err != nil {
 		return BookingRequest{}, err
 	}
 	t, err := time.Parse("2006-01-02 15:04:05", created)
@@ -96,9 +91,10 @@ func BookingByID(conn *sql.DB, id int64) (BookingRequest, error) {
 	return b, nil
 }
 
-// SetBookingStatus moves a request between new, reviewed, and archived.
-func SetBookingStatus(conn *sql.DB, id int64, status string) error {
-	_, err := conn.Exec(`UPDATE booking_requests SET status = ? WHERE id = ?`, status, id)
+// SetBookingNotes saves the admin's own context on a request — never shown
+// to the requester, just a place to jot what's been discussed or decided.
+func SetBookingNotes(conn *sql.DB, id int64, notes string) error {
+	_, err := conn.Exec(`UPDATE booking_requests SET notes = ? WHERE id = ?`, notes, id)
 	return err
 }
 

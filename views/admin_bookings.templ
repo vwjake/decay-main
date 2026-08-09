@@ -6,16 +6,9 @@ import (
 	"decay-main/db"
 )
 
-templ AdminBookings(requests []db.BookingRequest, showingArchived bool, me db.User, msg string) {
+templ AdminBookings(requests []db.BookingRequest, me db.User, msg string) {
 	@AdminLayout("Bookings · DECAY Admin", me) {
-		<div class="admin-heading-row">
-			<p class="admin-heading">Booking requests</p>
-			if showingArchived {
-				<a href="/admin/bookings" class="admin-btn admin-btn-small">Hide archived</a>
-			} else {
-				<a href="/admin/bookings?archived=1" class="admin-btn admin-btn-small">Show archived</a>
-			}
-		</div>
+		<p class="admin-heading">Booking requests</p>
 		if msg != "" {
 			<div class="admin-flash mono">{ msg }</div>
 		}
@@ -26,12 +19,6 @@ templ AdminBookings(requests []db.BookingRequest, showingArchived bool, me db.Us
 				<div class="booking-card">
 					<div class="booking-head">
 						<strong><a href={ templ.URL(fmt.Sprintf("/admin/bookings/%d", b.ID)) }>{ b.Name }</a></strong>
-						if b.IsNew() {
-							<span class="booking-badge mono">New</span>
-						}
-						if b.IsArchived() {
-							<span class="booking-badge booking-badge-muted mono">Archived</span>
-						}
 						<span class="mono booking-when">{ b.When() }</span>
 					</div>
 					<dl class="booking-fields mono">
@@ -53,14 +40,6 @@ templ AdminBookings(requests []db.BookingRequest, showingArchived bool, me db.Us
 						<p class="booking-desc">{ b.Description }</p>
 					}
 					<div class="booking-actions">
-						if b.IsNew() {
-							@bookingAction(b.ID, db.BookingReviewed, "Mark reviewed", "admin-btn-small")
-						}
-						if !b.IsArchived() {
-							@bookingAction(b.ID, db.BookingArchived, "Archive", "admin-btn-small")
-						} else {
-							@bookingAction(b.ID, db.BookingNew, "Restore", "admin-btn-small")
-						}
 						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/bookings/%d/delete", b.ID)) } onsubmit="return confirm('Delete this request for good?')">
 							<button type="submit" class="admin-btn admin-btn-small admin-btn-danger">Delete</button>
 						</form>
@@ -82,11 +61,4 @@ templ bookingContact(b db.BookingRequest) {
 		<dt>Phone</dt>
 		<dd>{ b.Phone }</dd>
 	}
-}
-
-templ bookingAction(id int64, status, label, cls string) {
-	<form method="post" action={ templ.URL(fmt.Sprintf("/admin/bookings/%d/status", id)) }>
-		<input type="hidden" name="status" value={ status }/>
-		<button type="submit" class={ "admin-btn", cls }>{ label }</button>
-	</form>
 }

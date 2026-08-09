@@ -23,16 +23,15 @@ func TestBookingViewsRender(t *testing.T) {
 		t.Fatalf("BookingForm sent: %v", err)
 	}
 
-	// Admin queue: a new, a reviewed, and an archived request.
+	// Admin queue: a plain request and one with notes on file.
 	reqs := []db.BookingRequest{
 		{ID: 1, Name: "Ada", Email: "ada@x.com", EventName: "Synth Night", Description: "A show.", Status: db.BookingNew, CreatedAt: time.Now()},
-		{ID: 2, Name: "Bo", Phone: "555-1212", Status: db.BookingReviewed, CreatedAt: time.Now()},
-		{ID: 3, Name: "Cy", Status: db.BookingArchived, CreatedAt: time.Now()},
+		{ID: 2, Name: "Bo", Phone: "555-1212", Status: db.BookingNew, Notes: "Called back, waiting to hear on a date.", CreatedAt: time.Now()},
 	}
-	if err := AdminBookings(reqs, false, me, "").Render(context.Background(), io.Discard); err != nil {
+	if err := AdminBookings(reqs, me, "").Render(context.Background(), io.Discard); err != nil {
 		t.Fatalf("AdminBookings: %v", err)
 	}
-	if err := AdminBookings(nil, true, me, "").Render(context.Background(), io.Discard); err != nil {
+	if err := AdminBookings(nil, me, "").Render(context.Background(), io.Discard); err != nil {
 		t.Fatalf("AdminBookings empty: %v", err)
 	}
 }

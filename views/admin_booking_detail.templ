@@ -37,12 +37,6 @@ templ AdminBookingDetail(d BookingDetailData, me db.User) {
 		<div class="booking-card">
 			<div class="booking-head">
 				<strong>{ d.Booking.Name }</strong>
-				if d.Booking.IsNew() {
-					<span class="booking-badge mono">New</span>
-				}
-				if d.Booking.IsArchived() {
-					<span class="booking-badge booking-badge-muted mono">Archived</span>
-				}
 				<span class="mono booking-when">{ d.Booking.When() }</span>
 			</div>
 			<dl class="booking-fields mono">
@@ -64,19 +58,23 @@ templ AdminBookingDetail(d BookingDetailData, me db.User) {
 				<p class="booking-desc">{ d.Booking.Description }</p>
 			}
 			<div class="booking-actions">
-				if d.Booking.IsNew() {
-					@bookingAction(d.Booking.ID, db.BookingReviewed, "Mark reviewed", "admin-btn-small")
-				}
-				if !d.Booking.IsArchived() {
-					@bookingAction(d.Booking.ID, db.BookingArchived, "Archive", "admin-btn-small")
-				} else {
-					@bookingAction(d.Booking.ID, db.BookingNew, "Restore", "admin-btn-small")
-				}
+				<a href={ templ.URL(fmt.Sprintf("/admin/events?from_booking=%d#add-event", d.Booking.ID)) } class="admin-btn admin-btn-small">Convert to event</a>
 				<form method="post" action={ templ.URL(fmt.Sprintf("/admin/bookings/%d/delete", d.Booking.ID)) } onsubmit="return confirm('Delete this request for good?')">
 					<button type="submit" class="admin-btn admin-btn-small admin-btn-danger">Delete</button>
 				</form>
 			</div>
 		</div>
+
+		<div class="admin-heading-row" style="margin-top:1.6em;">
+			<p class="admin-heading">Notes</p>
+		</div>
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/bookings/%d/notes", d.Booking.ID)) } class="admin-form">
+			<label>
+				Private — never shown to the requester
+				<textarea name="notes" rows="4" placeholder="What's been discussed, decided, or still needs to happen.">{ d.Booking.Notes }</textarea>
+			</label>
+			<button type="submit" class="admin-btn admin-btn-small">Save notes</button>
+		</form>
 
 		@emailThreadPanel(d)
 	}
