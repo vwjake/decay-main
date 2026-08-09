@@ -78,10 +78,12 @@ templ ogTags(title string, meta Meta) {
 templ Header() {
 	<header class="site-header">
 		<a href="/"><img src="/static/img/logo.png" alt="DECAY"/></a>
+		<input type="checkbox" id="nav-toggle" class="nav-toggle"/>
+		<label for="nav-toggle" class="nav-toggle-btn" aria-label="Menu">&#9776;</label>
 		<nav class="site-nav mono">
 			<a href="/events">Events</a>
 			<a href="/calendar">Calendar</a>
-			<a href="/groups">Groups</a>
+			<a href="/groups">Categories</a>
 			<a href="/about">About</a>
 			<a href="/blog">Blog</a>
 			<a href="/media">Media</a>

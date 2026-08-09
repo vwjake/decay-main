@@ -21,6 +21,8 @@ templ AdminLayout(title string, me db.User) {
 			<div class="page page-admin">
 				<header class="site-header admin-header">
 					<a href="/admin">DECAY Admin</a>
+					<input type="checkbox" id="admin-nav-toggle" class="nav-toggle"/>
+					<label for="admin-nav-toggle" class="nav-toggle-btn" aria-label="Menu">&#9776;</label>
 					<nav class="site-nav admin-nav mono">
 						if me.Can(db.PermEvents) {
 							<a href="/admin/events">Events</a>

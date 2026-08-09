@@ -133,6 +133,55 @@ a {
   padding: 3px 7px;
 }
 
+/* The hamburger toggle is a checkbox hack: no JS needed, and the nav is
+   still a plain list of links if CSS fails to load. The checkbox itself
+   is never shown — the label is what people see and click. */
+.nav-toggle {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.nav-toggle-btn {
+  display: none;
+  border: 1px solid var(--ink);
+  background: var(--bg);
+  padding: 4px 10px;
+  font-size: 18px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.nav-toggle:focus-visible ~ .nav-toggle-btn {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* Below this width the nav collapses behind the hamburger button instead
+   of wrapping onto several lines. */
+@media (max-width: 700px) {
+  .nav-toggle-btn {
+    display: block;
+  }
+
+  .site-nav {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    margin-top: 12px;
+  }
+
+  .nav-toggle:checked ~ .site-nav {
+    display: flex;
+  }
+
+  .site-nav a {
+    text-align: center;
+  }
+}
+
 /* Hero */
 
 .hero {
@@ -371,6 +420,19 @@ a {
   margin: 12px 0 0;
 }
 
+/* Share and download sit side by side, unlike the full-width buttons below
+   them (More info, Full calendar) which each get a row to themselves. */
+.event-detail-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.event-detail-actions .btn-outline {
+  flex: 1;
+  margin-top: 0;
+}
+
 /* Calendar grid */
 
 /* Below a certain width a day cell can't hold a legible event, so the
@@ -457,6 +519,54 @@ a {
   display: block;
   font-weight: 700;
   overflow-wrap: anywhere;
+}
+
+/* Below 700px the grid is cramped even with the horizontal scroll, so
+   mobile gets the agenda list by default with a button to switch to the
+   grid — the reverse of desktop, where the grid is what you land on. Same
+   checkbox-driven toggle as the nav hamburger: no JS needed. */
+.cal-view-toggle {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cal-view-btn {
+  display: none;
+}
+
+.cal-agenda {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .calendar-scroll {
+    display: none;
+  }
+
+  .cal-agenda {
+    display: block;
+  }
+
+  .cal-view-btn-calendar {
+    display: block;
+  }
+
+  .cal-view-toggle:checked ~ .calendar-scroll {
+    display: block;
+  }
+
+  .cal-view-toggle:checked ~ .cal-agenda {
+    display: none;
+  }
+
+  .cal-view-toggle:checked ~ .cal-view-btn-calendar {
+    display: none;
+  }
+
+  .cal-view-toggle:checked ~ .cal-view-btn-list {
+    display: block;
+  }
 }
 
 /* Prose pages (about, support, policies) */
@@ -1021,6 +1131,22 @@ button.merch-item {
 .admin-nav > span,
 .admin-nav > form {
   align-self: center;
+}
+
+@media (max-width: 700px) {
+  .admin-nav > a,
+  .admin-nav > span,
+  .admin-nav > form {
+    align-self: stretch;
+  }
+
+  .admin-nav > form {
+    display: flex;
+  }
+
+  .admin-whoami {
+    justify-content: center;
+  }
 }
 
 
@@ -1773,15 +1899,6 @@ button.merch-item {
   padding: 4px;
   font-family: 'Space Mono', monospace;
   font-size: 12px;
-}
-
-/* Booking form honeypot: off-screen, so people never see it but bots fill it. */
-.hp-field {
-  position: absolute;
-  left: -9999px;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
 }
 
 /* Booking request queue -------------------------------------------------- */
