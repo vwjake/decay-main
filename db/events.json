@@ -3950,7 +3950,7 @@
   },
   {
     "source": "031826-activateol.json",
-    "uid": "74979d5e-788a-1f69-9c57-aa77ccac5119",
+    "uid": "fefbf0e5-c2e9-4075-ac57-a9f31fc9effd",
     "title": "Activate Olympia",
     "event_type": "Activism",
     "starts_at": "2026-03-18T16:00:00-07:00",
@@ -3962,7 +3962,7 @@
   },
   {
     "source": "031826-queerfigur.json",
-    "uid": "28965d41-13da-6c5f-ac47-33bf950736d9",
+    "uid": "0e4b9c7f-8c50-441b-9364-dbf88613591b",
     "title": "Queer Figure Drawing",
     "event_type": "Music",
     "starts_at": "2026-03-18T19:00:00-07:00",
@@ -3973,7 +3973,7 @@
   },
   {
     "source": "031926-notape.json",
-    "uid": "32b52759-530c-75a6-a5a7-3fb8292df0fc",
+    "uid": "d4ad51f3-6b76-4e70-a874-0d26e5ad00c4",
     "title": "NO_TAPE",
     "event_type": "Workshop",
     "starts_at": "2026-03-19T19:30:00-07:00",
@@ -3983,15 +3983,16 @@
   },
   {
     "source": "032026-mypetfossi.json",
-    "uid": "77bd48c9-9735-7a5d-7571-742ef833d09d",
+    "uid": "251dc45e-2621-4989-a7a6-d1fe4a49b108",
     "title": "My Pet Fossil \u0026 Slugfeast PNW Tour 2026 with support from DOWNSIZE \u0026 Will Rosener",
-    "event_type": "Event",
+    "event_type": "Live Show",
     "starts_at": "2026-03-20T19:00:00-07:00",
     "ends_at": "2026-03-20T23:00:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
     "description": "My Pet Fossil \u0026 Slugfeast PNW Tour 2026 with support from DOWNSIZE \u0026 Will Rosener\n\nDownsize, Slugfeast, My Pet Fossil, Will Rosener",
     "link": "https://youtu.be/TXZWupz-B3U?si=Pmng08CIqACHGZ5m",
     "slug": "2026-03-20-my-pet-fossil-slugfeast-pnw-tour-2026-with-support-from-downsize-will-rosener",
+    "flyer": "flyer-1773947161.jpg",
     "volunteers": [
       {
         "role": "door"
@@ -4006,7 +4007,7 @@
   },
   {
     "source": "032126-gamedevstu.json",
-    "uid": "00b7bd73-4b4f-dd81-1a49-4835adb8cc6c",
+    "uid": "f5fb1363-c4de-40cd-883a-57089c29d97f",
     "title": "Game Dev Study Hall",
     "event_type": "Event",
     "starts_at": "2026-03-21T12:00:00-07:00",
@@ -4018,7 +4019,7 @@
   },
   {
     "source": "032126-covidsafer.json",
-    "uid": "fdde1144-09eb-e683-8396-f4c8ca6d0057",
+    "uid": "8237b172-767c-4427-ae52-14427a0c2dff",
     "title": "Covid Safer Fiber Arts Meetup",
     "event_type": "Meetup",
     "starts_at": "2026-03-21T15:00:00-07:00",
@@ -4031,9 +4032,9 @@
   },
   {
     "source": "032126-spacerave.json",
-    "uid": "15cab371-e9fa-de51-e7af-de4df3f43199",
+    "uid": "23c67c60-371c-43b8-8b8a-697ddd385834",
     "title": "3,2,1...CONTACT",
-    "event_type": "Event",
+    "event_type": "Live Show",
     "starts_at": "2026-03-21T21:00:00-07:00",
     "ends_at": "2026-03-22T01:00:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
@@ -4059,7 +4060,7 @@
   },
   {
     "source": "032426-opendraw.json",
-    "uid": "d7420608-6fa1-7242-01ec-6471236d22c5",
+    "uid": "b441d63f-8442-46d9-8d23-882ce1eed3c3",
     "title": "Open Draw",
     "event_type": "Drawing",
     "starts_at": "2026-03-24T14:00:00-07:00",
@@ -4071,7 +4072,7 @@
   },
   {
     "source": "032426-movieclub.json",
-    "uid": "a0c2a015-a25a-565f-3d18-7b022415c339",
+    "uid": "d47f9097-c93e-4012-aaaa-af2fe99882ef",
     "title": "Movie Club",
     "event_type": "Film",
     "starts_at": "2026-03-24T19:00:00-07:00",
@@ -4082,7 +4083,7 @@
   },
   {
     "source": "032526-olympiaimp.json",
-    "uid": "d8dadb65-864d-03ec-7cd4-52fa1c4671b7",
+    "uid": "36676fbe-47d2-497b-a19e-e9fea91c446d",
     "title": "Olympia Improvisors Orchestra",
     "event_type": "Workshop",
     "starts_at": "2026-03-25T19:00:00-07:00",
@@ -4244,7 +4245,9 @@
     "starts_at": "2026-03-31T19:00:00-07:00",
     "ends_at": "2026-03-31T21:00:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
-    "slug": "2026-03-31-time-travel-tuesday"
+    "description": "Encino Man",
+    "slug": "2026-03-31-time-travel-tuesday",
+    "flyer": "flyer-1774565037.jpg"
   },
   {
     "source": "040126-decentrali.json",
@@ -4519,13 +4522,13 @@
   {
     "source": "041526-queerfigur.json",
     "uid": "400ecede-dcb4-4047-894d-0dfd732614b7",
-    "title": "Queer Figure Drawing",
+    "title": "*cancelled* Queer Figure Drawing",
     "event_type": "Music",
     "starts_at": "2026-04-15T19:00:00-07:00",
     "ends_at": "2026-04-15T21:00:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
     "description": "Monthly queer figure drawing! For LGBTQ artists of ALL skill levels. $5-25 suggested donation, goes towards paying models. Bring your own art supplies. 18+, masks required. Event 7-9 but set up at 6:30.",
-    "slug": "2026-04-15-queer-figure-drawing"
+    "slug": "2026-04-15-cancelled-queer-figure-drawing"
   },
   {
     "source": "041626-notape.json",
@@ -4648,14 +4651,14 @@
   {
     "source": "041526-activateol.json",
     "uid": "6c93c4c5-47ab-4310-ab57-adbf25f36dc5",
-    "title": "Activate Olympia",
+    "title": "*CANCELLED* Activate Olympia",
     "event_type": "Activism",
     "starts_at": "2026-04-22T16:00:00-07:00",
     "ends_at": "2026-04-22T18:00:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
     "description": "Come join members of our community to activate and share your skills and energy to raise our voices and create lasting impact!\n\nBring your own or use shared supplies for letter writing, poster \u0026 flyer making, direct calls to representatives, collaborating and brainstorming to take action within our Olympia \u0026 greater regional political landscape.\n\nHosted by abe \u0026 larissa\n\nN/A",
-    "slug": "2026-04-22-activate-olympia",
-    "flyer": "flyer-1771463449.png"
+    "slug": "2026-04-22-cancelled-activate-olympia",
+    "flyer": "flyer-1775877957.jpg"
   },
   {
     "source": "042226-olympiaimp.json",
@@ -4747,9 +4750,10 @@
     "starts_at": "2026-04-25T19:30:00-07:00",
     "ends_at": "2026-04-25T23:30:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
-    "description": "Pacific Northwest Noise Exchange is a project aimed at hosting CAN/US cross-border noise/experimental artists. YMGER and _hollowskull_ are both from Vancouver BC.\n\nYMGER, _hollowskull_, Handheld Simpleton, Veinfucker, Undine Noise",
+    "description": "Pacific Northwest Noise Exchange is a project aimed at hosting CAN/US cross-border noise/experimental artists. YMGER is from Vancouver BC.\n\nYMGER, Handheld Simpleton, Veinfucker, Undine Noise",
     "link": "https://www.instagram.com/veinfucker/?hl=en",
     "slug": "2026-04-25-pnw-noise-exchange-aural-experiments-ii",
+    "flyer": "flyer-1777138364.jpg",
     "volunteers": [
       {
         "role": "door"
@@ -4786,13 +4790,13 @@
   {
     "source": "042626-circuitbend.json",
     "uid": "b11cd244-dfc7-4491-8e12-617dba1cfd8b",
-    "title": "Circuit Bending Workshop",
+    "title": "cancelled* Circuit Bending Workshop",
     "event_type": "Tech",
     "starts_at": "2026-04-26T15:00:00-07:00",
     "ends_at": "2026-04-26T18:00:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
     "description": "Open meetup for electronics, soldering, and circuit bending toys.",
-    "slug": "2026-04-26-circuit-bending-workshop"
+    "slug": "2026-04-26-cancelled-circuit-bending-workshop"
   },
   {
     "source": "042826-opendraw.json",
@@ -4809,12 +4813,14 @@
   {
     "source": "042826-timetravel.json",
     "uid": "053b56b9-dfa2-426e-80d5-7f1bb6e675b1",
-    "title": "Time Travel Tuesday",
-    "event_type": "Movie Club",
+    "title": "Time Travel Tuesday - Millennium (1989)",
+    "event_type": "Movie",
     "starts_at": "2026-04-28T19:00:00-07:00",
     "ends_at": "2026-04-28T21:00:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
-    "slug": "2026-04-28-time-travel-tuesday"
+    "description": "April 28 at 7pm we're watching Millennium! Two airplanes crash in midair and Kris Kristopherson thinks that Cheryl Ladd (a chain smoking time traveler from the future with a robot boyfriend) might have had something to do with it. Wrist watches run backwards inexplicably and time waves are destroying the future of humanity. It's a tragically underrated sci-fi with great practical effects from 1989. Don't miss it!\n\n1h 48m\nPG-13",
+    "slug": "2026-04-28-time-travel-tuesday-millennium-1989",
+    "flyer": "flyer-1777335549.jpg"
   },
   {
     "source": "042926-olywhistle.json",
@@ -4937,13 +4943,14 @@
   {
     "source": "050526-girlmoviet.json",
     "uid": "06069454-e6bf-48f6-8ea4-e7ade1ef73b8",
-    "title": "Girl Movie Tuesday",
+    "title": "Girl Movie Tuesday - Glitter (2001)",
     "event_type": "Movie Club",
     "starts_at": "2026-05-05T19:00:00-07:00",
     "ends_at": "2026-05-05T21:00:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
-    "description": "Part of Tuesday Night Movie Club",
-    "slug": "2026-05-05-girl-movie-tuesday"
+    "description": "Part of Tuesday Night Movie Club\n\nGlitter (2001)",
+    "slug": "2026-05-05-girl-movie-tuesday-glitter-2001",
+    "flyer": "flyer-1777335778.png"
   },
   {
     "source": "050626-decentrali.json",
@@ -4984,11 +4991,13 @@
     "source": "050826-thisisnota.json",
     "uid": "6e3e1877-93d7-4ec7-9887-983f61194e95",
     "title": "This is Not a Drum Circle",
-    "event_type": "Event",
+    "event_type": "Workshop",
     "starts_at": "2026-05-08T19:00:00-07:00",
     "ends_at": "2026-05-08T21:00:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
-    "slug": "2026-05-08-this-is-not-a-drum-circle"
+    "description": "A workshop focusing on the fundamentals of spontaneous and experimental group rhythms.\nNo experience necessary, instruments will be provided.",
+    "slug": "2026-05-08-this-is-not-a-drum-circle",
+    "flyer": "flyer-1777612962.jpg"
   },
   {
     "source": "050926-olylabblen.json",
@@ -5094,7 +5103,7 @@
     "starts_at": "2026-05-12T19:00:00-07:00",
     "ends_at": "2026-05-12T21:00:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
-    "description": "Hosted by Reid Urban",
+    "description": "Hosted by Reid Urban\n\nChina Star - Collage Smattering",
     "slug": "2026-05-12-local-video-artist-retrospective",
     "flyer": "flyer-1771459947.png"
   },
@@ -5243,23 +5252,24 @@
   {
     "source": "051926-timetravel.json",
     "uid": "08af2ed9-f438-4de3-8522-961f352b3fa3",
-    "title": "Time Travel Tuesday",
+    "title": "Time Travel Tuesday - A Sound of Thunder",
     "event_type": "Movie Club",
     "starts_at": "2026-05-19T19:00:00-07:00",
     "ends_at": "2026-05-19T21:00:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
-    "slug": "2026-05-19-time-travel-tuesday"
+    "slug": "2026-05-19-time-travel-tuesday-a-sound-of-thunder",
+    "flyer": "flyer-1778527157.jpg"
   },
   {
     "source": "052026-activateol.json",
     "uid": "aeed35cd-fb1f-4169-bb1e-d0354332fbed",
-    "title": "Activate Olympia",
+    "title": "*CANCELLED* Activate Olympia",
     "event_type": "Activism",
     "starts_at": "2026-05-20T16:00:00-07:00",
     "ends_at": "2026-05-20T18:00:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
     "description": "Come join members of our community to activate and share your skills and energy to raise our voices and create lasting impact!\n\nBring your own or use shared supplies for letter writing, poster \u0026 flyer making, direct calls to representatives, collaborating and brainstorming to take action within our Olympia \u0026 greater regional political landscape.\n\nHosted by abe \u0026 larissa\n\nN/A",
-    "slug": "2026-05-20-activate-olympia",
+    "slug": "2026-05-20-cancelled-activate-olympia",
     "flyer": "flyer-1771463449.png"
   },
   {
@@ -5331,15 +5341,15 @@
   {
     "source": "052426-indiegamed.json",
     "uid": "01793068-7f91-4c4f-9aeb-63066c6338e5",
-    "title": "Indie Game Dev Study Hall",
+    "title": "Indie Game Expo",
     "event_type": "Workshop",
-    "starts_at": "2026-05-24T12:00:00-07:00",
+    "starts_at": "2026-05-24T11:00:00-07:00",
     "ends_at": "2026-05-24T14:00:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
-    "description": "Bring in your project, in whatever stage it may be in, and work with others to troubleshoot, debug and collaborate game elements. Join our Discord below!",
+    "description": "Drop in and play some video games made by local programmers and artists!",
     "link": "https://discord.gg/npjeuyuKUR",
-    "slug": "2026-05-24-indie-game-dev-study-hall",
-    "flyer": "flyer-1774126777.png"
+    "slug": "2026-05-24-indie-game-expo",
+    "flyer": "flyer-1779645699.png"
   },
   {
     "source": "052426-circuitbend.json",
@@ -5392,13 +5402,23 @@
   {
     "source": "052626-rubberceme.json",
     "uid": "0cdfce4c-91fc-4534-a9da-682b2001d9bf",
-    "title": "Rubber (() Cement (SF) \u0026\u0026 Mephitick Ooze (MA)",
+    "title": "Rubber (() Cement (SF) \u0026\u0026 Mephitick Ooze (MA) w/ Ion King",
     "event_type": "Event",
     "starts_at": "2026-05-26T20:00:00-07:00",
     "ends_at": "2026-05-26T23:00:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
-    "description": "Coalescing into a specific burning vision in 1994 Rubber (() Cement was put together as a direct idea for a super science future that will happen. The next technological breakthroughs are realized in a zero-tech way with the emulation of the unrealized 'next step' with the actual \"vision\" existing in the Ape Canaveral present (picture a cargo cult with stats on NASA industries).\nFor more than 30 years, the Cimevox \u0026 Genetic Slub noise anomaly known as Rubber (() Cement has been the mutant poster child of the San Francisco Bay Area's bizarro music community. In that time, Rubber (() Cement has toured Europe, Japan 13 times, and the USA as the Ape Canaveral freaked-out flagship act, having shared the stage with such acts as: Wolf Eyes, Nautical Almanac, Boredoms, Runzelstirn \u0026 Gurgelstock, Solmania, Andrew W.K., Masonna, Smegma, Boredoms, Speculum Fight, Comets on Fire,  ALSO playing live collaboration together with Karla LaVey (First Satanic Church), Violent Onsen Geisha, CCCC, James Twig Harper, Keiji Heino, Hado Ho, Hair Stylistics, and many more.\" Two LPs \u0026 dozens of CDs make them fresh veterans skin removal and skeletroning for the top high speed electronic cardboard or entertainment events in your neck of the Errth\n\nvid:\nhttps://www.youtube.com/watch?v=8r6nFhMeOAQ\n\nBandcamp:\nhttps://rubber0cement.bandcamp.com/\n--------------------------------\n\nThe Mephitick Ooze (MA) is prophesied to again emerge and emit the unholy signal.  Coming off an explosive 2025 desecration in which it fouled the temples of the eastern seaboard, it now has its eyestalk focused on defiling those of the west! Bad trip visuals on tap set to blasts of synthetic noise. Ex Hogwind \u0026 Metalux.\nvid:\nhttps://www.bitchute.com/video/7D7T1jkuJXLz\n\nBandcamp:\nhttps://mephitickooze.bandcamp.com/",
-    "slug": "2026-05-26-rubber-cement-sf-mephitick-ooze-ma"
+    "description": "Coalescing into a specific burning vision in 1994 Rubber (() Cement was put together as a direct idea for a super science future that will happen. The next technological breakthroughs are realized in a zero-tech way with the emulation of the unrealized 'next step' with the actual \"vision\" existing in the Ape Canaveral present (picture a cargo cult with stats on NASA industries).\nFor more than 30 years, the Cimevox \u0026 Genetic Slub noise anomaly known as Rubber (() Cement has been the mutant poster child of the San Francisco Bay Area's bizarro music community. In that time, Rubber (() Cement has toured Europe, Japan 13 times, and the USA as the Ape Canaveral freaked-out flagship act, having shared the stage with such acts as: Wolf Eyes, Nautical Almanac, Boredoms, Runzelstirn \u0026 Gurgelstock, Solmania, Andrew W.K., Masonna, Smegma, Boredoms, Speculum Fight, Comets on Fire,  ALSO playing live collaboration together with Karla LaVey (First Satanic Church), Violent Onsen Geisha, CCCC, James Twig Harper, Keiji Heino, Hado Ho, Hair Stylistics, and many more.\" Two LPs \u0026 dozens of CDs make them fresh veterans skin removal and skeletroning for the top high speed electronic cardboard or entertainment events in your neck of the Errth\n\n--------------------------------\n\nThe Mephitick Ooze (MA) is prophesied to again emerge and emit the unholy signal.  Coming off an explosive 2025 desecration in which it fouled the temples of the eastern seaboard, it now has its eyestalk focused on defiling those of the west! Bad trip visuals on tap set to blasts of synthetic noise. Ex Hogwind \u0026 Metalux.",
+    "link": "https://www.youtube.com/watch?v=8r6nFhMeOAQ",
+    "slug": "2026-05-26-rubber-cement-sf-mephitick-ooze-ma-w-ion-king",
+    "flyer": "flyer-1779288677.png",
+    "volunteers": [
+      {
+        "role": "door"
+      },
+      {
+        "role": "sound"
+      }
+    ]
   },
   {
     "source": "052726-olympiaimp.json",
@@ -5555,6 +5575,16 @@
     "flyer": "flyer-1773106022.png"
   },
   {
+    "source": "052926-southpuget.json",
+    "uid": "c771ca5a-7dc0-4fa5-b1cf-8b5f9fccff9a",
+    "title": "SOUTHPUGETSOUNDZ",
+    "event_type": "Event",
+    "starts_at": "2026-06-06T20:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "@infinitiii360 on instagram\n\nFBLMILITiiiA",
+    "slug": "2026-06-06-southpugetsoundz"
+  },
+  {
     "source": "060726-olywhistle.json",
     "uid": "cfdb8dc8-93ce-49d2-a5b8-b5dbbb13e73a",
     "title": "Oly Whistles Work Party",
@@ -5627,14 +5657,14 @@
   {
     "source": "060926-localvideo.json",
     "uid": "8a7eecdc-b276-47be-ab84-ed9c899b441c",
-    "title": "Local Video Artist Retrospective",
+    "title": "China Star: A Local Video Artist Retrospective",
     "event_type": "Movie Club",
     "starts_at": "2026-06-09T19:00:00-07:00",
     "ends_at": "2026-06-09T21:00:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
     "description": "Hosted by Reid Urban",
-    "slug": "2026-06-09-local-video-artist-retrospective",
-    "flyer": "flyer-1771459947.png"
+    "slug": "2026-06-09-china-star-a-local-video-artist-retrospective",
+    "flyer": "flyer-1780448271.jpg"
   },
   {
     "source": "060926-movieclub.json",
@@ -5681,14 +5711,23 @@
   {
     "source": "061226-jenerikchi.json",
     "uid": "f13b31c2-63d5-4196-b305-66f77475cf27",
-    "title": "Jenerik/Chida/Meanstreetz+Nordile/tba",
+    "title": "Shin Chida, Open Structure duo, Discount World, Mars Slower",
     "event_type": "Live Show",
     "starts_at": "2026-06-12T19:00:00-07:00",
     "ends_at": "2026-06-12T22:00:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
     "description": "Scot Jenerik (portland)\nShin Chida (japan)\nMike Meanstreetz (la)/ Max Nordile duo\n\nScot Jenerik, Shin Chida, Mike Meanstreetz/Max Nordile, tba",
     "link": "https://scotjenerik.bandcamp.com/music",
-    "slug": "2026-06-12-jenerik-chida-meanstreetz-nordile-tba"
+    "slug": "2026-06-12-shin-chida-open-structure-duo-discount-world-mars-slower",
+    "flyer": "flyer-1780950256.jpg",
+    "volunteers": [
+      {
+        "role": "door"
+      },
+      {
+        "role": "sound"
+      }
+    ]
   },
   {
     "source": "061326-olylabblen.json",
@@ -6245,6 +6284,16 @@
     "slug": "2026-07-12-mesh-network-workshop"
   },
   {
+    "source": "071226-noise.json",
+    "uid": "1ce69b0e-cbce-494a-bb0b-fd64c3d0ada2",
+    "title": "Noise",
+    "event_type": "Event",
+    "starts_at": "2026-07-12T19:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "Music noise, performance\n\nDavid weingburg, reid urban",
+    "slug": "2026-07-12-noise"
+  },
+  {
     "source": "071326-olympiaimp.json",
     "uid": "090c2b87-4073-48db-9c48-016de4dce8b8",
     "title": "Olympia Improvisors Orchestra",
@@ -6327,6 +6376,18 @@
     "flyer": "flyer-6844126340ad7.jpg"
   },
   {
+    "source": "071726-thisisnota.json",
+    "uid": "20ac23fa-0a0c-45eb-bc4c-5cacd129977d",
+    "title": "This Is Not A Drum Circle",
+    "event_type": "Workshop",
+    "starts_at": "2026-07-17T19:00:00-07:00",
+    "ends_at": "2026-07-17T21:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "A workshop focusing on the fundamentals of spontaneous and experimental group rhythms",
+    "slug": "2026-07-17-this-is-not-a-drum-circle",
+    "flyer": "flyer-1780414921.jpg"
+  },
+  {
     "source": "071826-olylabblen.json",
     "uid": "6f1e3e38-c5a7-4ed9-bca2-d08ff751bbdc",
     "title": "OlyLAB Blender Cohort",
@@ -6351,6 +6412,39 @@
     "flyer": "flyer-1766091738.jpg"
   },
   {
+    "source": "071826-strangebea.json",
+    "uid": "fe5bd96b-32e7-4d80-a290-10b43464094e",
+    "title": "Strange \u0026 Beautiful: a mixed bill",
+    "event_type": "Live Show",
+    "starts_at": "2026-07-18T19:00:00-07:00",
+    "ends_at": "2026-07-18T23:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "Genre is a landscape but the feelings are the same. Each artist weaves their relationship to sound into the tapestry of the night. We are an intimate and powerful crescendo.\n\nSmouldering Rain, jonny's boy band, Noctoran, Pegasus IV",
+    "link": "https://smoulderingrain.bandcamp.com/",
+    "slug": "2026-07-18-strange-beautiful-a-mixed-bill",
+    "volunteers": [
+      {
+        "role": "sound"
+      },
+      {
+        "role": "cleanup"
+      },
+      {
+        "role": "promote"
+      }
+    ]
+  },
+  {
+    "source": "071926-decayvolun.json",
+    "uid": "bab3b36b-ff84-472c-89c5-fcb99febd778",
+    "title": "DECAY Volunteer Work Party",
+    "event_type": "Event",
+    "starts_at": "2026-07-19T12:00:00-07:00",
+    "ends_at": "2026-07-19T16:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "slug": "2026-07-19-decay-volunteer-work-party"
+  },
+  {
     "source": "071926-secularmen.json",
     "uid": "50fc1730-33f0-409c-bfaa-a13fd641beaf",
     "title": "Secular Men's Support Group",
@@ -6358,6 +6452,17 @@
     "starts_at": "2026-07-19T15:15:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
     "slug": "2026-07-19-secular-men-s-support-group",
+    "flyer": "flyer-1751093574.jpg"
+  },
+  {
+    "source": "072026-secularmen.json",
+    "uid": "005ed159-904f-4d33-ad08-c02277099e9c",
+    "title": "Secular Men's Support Group",
+    "event_type": "Meeting",
+    "starts_at": "2026-07-20T19:00:00-07:00",
+    "ends_at": "2026-07-20T21:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "slug": "2026-07-20-secular-men-s-support-group",
     "flyer": "flyer-1751093574.jpg"
   },
   {
@@ -6375,26 +6480,26 @@
   {
     "source": "072126-movieclub.json",
     "uid": "61ca5032-6517-4b23-960f-0b2f6d56bccc",
-    "title": "Movie Club",
+    "title": "Time Travel Tuesday - Time Cop (1994)",
     "event_type": "Film",
     "starts_at": "2026-07-21T19:00:00-07:00",
     "ends_at": "2026-07-21T21:00:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
     "description": "Tuesday Night Movie Club",
-    "slug": "2026-07-21-movie-club"
+    "slug": "2026-07-21-time-travel-tuesday-time-cop-1994",
+    "flyer": "flyer-1782376969.jpg"
   },
   {
-    "source": "072226-olympiaimp.json",
-    "uid": "f1bf2bab-6bbe-4b44-9249-7bfe2be45c0a",
-    "title": "Olympia Improvisors Orchestra",
+    "source": "072326-selfhostin.json",
+    "uid": "418a9f95-ffbf-4ddd-ad5d-a14a0e9c308d",
+    "title": "Self Hosting with Zuexs",
     "event_type": "Workshop",
-    "starts_at": "2026-07-22T19:00:00-07:00",
-    "ends_at": "2026-07-22T22:00:00-07:00",
+    "starts_at": "2026-07-23T17:00:00-07:00",
+    "ends_at": "2026-07-23T19:00:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
-    "description": "MUSICIANS OF ALL LEVELS ARE INVITED TO BRING YOUR INSTRUMENT AND INVENT MUSIC ON THE SPOT TOGETHER AS A GROUP",
-    "link": "https://ofirklemperer.org/lessons/improvisers-orchestra-workshop/",
-    "slug": "2026-07-22-olympia-improvisors-orchestra",
-    "flyer": "flyer-1767917197.jpg"
+    "description": "Learn ways to self host network services for many types of needs on old hardware you have laying around :)",
+    "slug": "2026-07-23-self-hosting-with-zuexs",
+    "flyer": "flyer-1784610822.png"
   },
   {
     "source": "072326-notape.json",
@@ -6406,6 +6511,32 @@
     "description": "video audio tech skillshare",
     "slug": "2026-07-23-no-tape",
     "flyer": "flyer-6844126340ad7.jpg"
+  },
+  {
+    "source": "072426-newwaveand.json",
+    "uid": "e57330ae-dbfe-426b-ba17-eb1586e55307",
+    "title": "New Wave and Bat Cave",
+    "event_type": "Live Show",
+    "starts_at": "2026-07-24T20:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "Dance night by Goth Hole Productions DJs, focusing on 70's and 80's Goth and New Wave tracks, spinning the both the hits every bat loves and deep cuts dug up from their graves. Door worker being provided by Goth Hole. In process of currently scheduling 3rd DJ\n\nGoth Hole Productions DJs, Pain System, Liz the Jester, TBD",
+    "link": "https://www.instagram.com/goth_hole_collective?igsh=N3Z0MmQ0eXFuaG85",
+    "slug": "2026-07-24-new-wave-and-bat-cave",
+    "flyer": "flyer-1783566317.png",
+    "volunteers": [
+      {
+        "role": "door"
+      },
+      {
+        "role": "sound"
+      },
+      {
+        "role": "cleanup"
+      },
+      {
+        "role": "promote"
+      }
+    ]
   },
   {
     "source": "072526-olylabblen.json",
@@ -6431,6 +6562,30 @@
     "flyer": "flyer-1751089074.jpg"
   },
   {
+    "source": "072626-sabotmedia.json",
+    "uid": "0cb51835-f7ee-40bc-9c5f-ab9b83ce6eb3",
+    "title": "SAbot Media Road Trip",
+    "event_type": "Event",
+    "starts_at": "2026-07-26T10:00:00-07:00",
+    "ends_at": "2026-07-26T12:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "Rural and Urban Solidarity",
+    "link": "https://kolektiva.social/@AberdeenLocal1312/116973479137633527",
+    "slug": "2026-07-26-sabot-media-road-trip",
+    "flyer": "flyer-1784927077.png"
+  },
+  {
+    "source": "072626-symbiosis.json",
+    "uid": "a6e3d537-d49c-48f8-8677-e921bd14acd0",
+    "title": "Symbiosis",
+    "event_type": "Event",
+    "starts_at": "2026-07-26T12:00:00-07:00",
+    "ends_at": "2026-07-26T15:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "an open draw/skill share event",
+    "slug": "2026-07-26-symbiosis"
+  },
+  {
     "source": "072626-circuitbend.json",
     "uid": "11db6dde-286c-400d-86fb-511d5fb4194c",
     "title": "Circuit Bending Workshop",
@@ -6440,6 +6595,19 @@
     "location": "402 Washington St NE, Olympia WA",
     "description": "Open meetup for electronics, soldering, and circuit bending toys.",
     "slug": "2026-07-26-circuit-bending-workshop"
+  },
+  {
+    "source": "072226-olympiaimp.json",
+    "uid": "f1bf2bab-6bbe-4b44-9249-7bfe2be45c0a",
+    "title": "Olympia Improvisors Orchestra",
+    "event_type": "Workshop",
+    "starts_at": "2026-07-27T19:00:00-07:00",
+    "ends_at": "2026-07-27T22:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "MUSICIANS OF ALL LEVELS ARE INVITED TO BRING YOUR INSTRUMENT AND INVENT MUSIC ON THE SPOT TOGETHER AS A GROUP",
+    "link": "https://ofirklemperer.org/lessons/improvisers-orchestra-workshop/",
+    "slug": "2026-07-27-olympia-improvisors-orchestra",
+    "flyer": "flyer-1767917197.jpg"
   },
   {
     "source": "072826-opendraw.json",
@@ -6465,6 +6633,29 @@
     "slug": "2026-07-28-movie-club"
   },
   {
+    "source": "072926-nightcrawl.json",
+    "uid": "1f82e74a-1b4f-4eb6-87de-8fc9baeaa4b3",
+    "title": "Night Crawl: A Queer Performance Workshop",
+    "event_type": "Event",
+    "starts_at": "2026-07-29T17:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "Night Crawl: A Drag Workshop is a workshop for drag, burlesque, and queer performers of all kinds. Come try out your sets, practice your makeup/build costumes, and learn from fellow performers in a community oriented space!",
+    "slug": "2026-07-29-night-crawl-a-queer-performance-workshop",
+    "flyer": "flyer-1783729291.png"
+  },
+  {
+    "source": "073026-selfhostin.json",
+    "uid": "9b58eb49-1af7-4405-b42c-33634451d4d5",
+    "title": "Self Hosting with Zuexs",
+    "event_type": "Workshop",
+    "starts_at": "2026-07-30T17:00:00-07:00",
+    "ends_at": "2026-07-30T19:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "Learn ways to self host network services for many types of needs on old hardware you have laying around :)",
+    "slug": "2026-07-30-self-hosting-with-zuexs",
+    "flyer": "flyer-1784667407.png"
+  },
+  {
     "source": "073026-notape.json",
     "uid": "ef3fbef2-4581-417f-b0ff-a6fb7e9109ba",
     "title": "NO_TAPE",
@@ -6488,6 +6679,17 @@
     "flyer": "flyer-1773106158.png"
   },
   {
+    "source": "080226-olywhistle.json",
+    "uid": "2ba86d9c-b9d0-485a-929d-e1e013ddb183",
+    "title": "Oly Whistles Work Party",
+    "event_type": "Community",
+    "starts_at": "2026-08-02T13:00:00-07:00",
+    "ends_at": "2026-08-02T16:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "Monthly Whistle Party at DECAY\n1-4pm First Sunday",
+    "slug": "2026-08-02-oly-whistles-work-party"
+  },
+  {
     "source": "080226-secularmen.json",
     "uid": "31e81df2-8f30-482a-a042-e53873eee427",
     "title": "Secular Men's Support Group",
@@ -6495,6 +6697,17 @@
     "starts_at": "2026-08-02T15:15:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
     "slug": "2026-08-02-secular-men-s-support-group",
+    "flyer": "flyer-1751093574.jpg"
+  },
+  {
+    "source": "080326-secularmen.json",
+    "uid": "50ec7935-48fc-4b53-89d2-ba3cc02c14a3",
+    "title": "Secular Men's Support Group",
+    "event_type": "Meeting",
+    "starts_at": "2026-08-03T19:00:00-07:00",
+    "ends_at": "2026-08-03T21:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "slug": "2026-08-03-secular-men-s-support-group",
     "flyer": "flyer-1751093574.jpg"
   },
   {
@@ -6609,9 +6822,9 @@
     "starts_at": "2026-08-11T19:00:00-07:00",
     "ends_at": "2026-08-11T21:00:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
-    "description": "Hosted by Reid Urban",
+    "description": "Hosted by Reid Urban\n\nJolie M-A",
     "slug": "2026-08-11-local-video-artist-retrospective",
-    "flyer": "flyer-1771459947.png"
+    "flyer": "flyer-1786149481.jpg"
   },
   {
     "source": "081126-movieclub.json",
@@ -6625,6 +6838,43 @@
     "slug": "2026-08-11-movie-club"
   },
   {
+    "source": "081226-nightcrawl.json",
+    "uid": "dd7432ed-a038-46b7-abc7-c007d134f4c2",
+    "title": "Night Crawl: A Queer Performance Workshop",
+    "event_type": "Event",
+    "starts_at": "2026-08-12T17:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "Night Crawl: A Drag Workshop is a workshop for drag, burlesque, and queer performers of all kinds. Come try out your sets, practice your makeup/build costumes, and learn from fellow performers in a community oriented space!",
+    "slug": "2026-08-12-night-crawl-a-queer-performance-workshop",
+    "flyer": "flyer-1783729291.png"
+  },
+  {
+    "source": "081226-leatherfor.json",
+    "uid": "13eb1d48-11ef-4e16-8619-88c2d0dc50b1",
+    "title": "Leather Forever:An EBM leather and kink gear dance night and music spectacular",
+    "event_type": "Live Act",
+    "starts_at": "2026-08-12T20:00:00-07:00",
+    "ends_at": "2026-08-12T23:59:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "18+ Goth Hole Collective dance night and live music concert focusing on EBM and dank dance music of the erotic persuasion to make you work up a sweat in celebration of Pain System's 30th birthday! All Bodies Welcome, Leather and Kink apparel enthusiatically encouraged, not a play party but a dance night and social event! Snacks provided and concessions available.Bands TBA but awaiting confirmation. Poster will be posted before end of July.\n\nGoth Hole Productions DJs, DJ Excelsia, Bands TBA (awaiting confirmation)",
+    "link": "https://www.instagram.com/goth_hole_collective?igsh=N3Z0MmQ0eXFuaG85",
+    "slug": "2026-08-12-leather-forever-an-ebm-leather-and-kink-gear-dance-night-and-music-spectacular",
+    "volunteers": [
+      {
+        "role": "door"
+      },
+      {
+        "role": "sound"
+      },
+      {
+        "role": "cleanup"
+      },
+      {
+        "role": "promote"
+      }
+    ]
+  },
+  {
     "source": "081326-notape.json",
     "uid": "b710026f-d406-4885-8ee3-56604e67e57e",
     "title": "NO_TAPE",
@@ -6634,6 +6884,16 @@
     "description": "video audio tech skillshare",
     "slug": "2026-08-13-no-tape",
     "flyer": "flyer-6844126340ad7.jpg"
+  },
+  {
+    "source": "081426-anarchistm.json",
+    "uid": "e29dd98c-a94c-4860-8742-ddc769353375",
+    "title": "Anarchist Movie Night: Land and Freedom",
+    "event_type": "Event",
+    "starts_at": "2026-08-14T19:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "Showing the movie Land and Freedom by Ken Loach, about the Spanish Civil War, to commemorate the 90th anniversary of the war.",
+    "slug": "2026-08-14-anarchist-movie-night-land-and-freedom"
   },
   {
     "source": "081526-olylabblen.json",
@@ -6660,6 +6920,42 @@
     "flyer": "flyer-1766091738.jpg"
   },
   {
+    "source": "081526-livehiphop.json",
+    "uid": "a1f87141-27eb-4302-91a4-f4fcdf828cab",
+    "title": "Live Hip Hop with INFINITiii",
+    "event_type": "Live Show",
+    "starts_at": "2026-08-15T19:30:00-07:00",
+    "ends_at": "2026-08-15T22:03:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "Local hip hop artists, more info TBD",
+    "link": "https://www.instagram.com/infinitiii360?utm_source=ig_web_button_share_sheet\u0026igsh=ZDNlZDc0MzIxNw==",
+    "slug": "2026-08-15-live-hip-hop-with-infinitiii",
+    "volunteers": [
+      {
+        "role": "door"
+      },
+      {
+        "role": "sound"
+      },
+      {
+        "role": "cleanup"
+      },
+      {
+        "role": "promote"
+      }
+    ]
+  },
+  {
+    "source": "081626-decayvolun.json",
+    "uid": "dab246be-701f-4dbc-9a99-eba0dd6980b4",
+    "title": "DECAY Volunteer Work Party",
+    "event_type": "Event",
+    "starts_at": "2026-08-16T12:00:00-07:00",
+    "ends_at": "2026-08-16T16:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "slug": "2026-08-16-decay-volunteer-work-party"
+  },
+  {
     "source": "081626-secularmen.json",
     "uid": "82b4ece1-79c5-4998-861b-c97a86a23053",
     "title": "Secular Men's Support Group",
@@ -6667,6 +6963,17 @@
     "starts_at": "2026-08-16T15:15:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
     "slug": "2026-08-16-secular-men-s-support-group",
+    "flyer": "flyer-1751093574.jpg"
+  },
+  {
+    "source": "081726-secularmen.json",
+    "uid": "1a29704b-8b05-41a9-977e-1839ca53d1fb",
+    "title": "Secular Men's Support Group",
+    "event_type": "Meeting",
+    "starts_at": "2026-08-17T19:00:00-07:00",
+    "ends_at": "2026-08-17T21:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "slug": "2026-08-17-secular-men-s-support-group",
     "flyer": "flyer-1751093574.jpg"
   },
   {
@@ -6727,6 +7034,23 @@
     "flyer": "flyer-6844126340ad7.jpg"
   },
   {
+    "source": "082126-coopdecay.json",
+    "uid": "61c457d7-9c11-42f3-a702-0b87b7172c45",
+    "title": "SEVEN NIGHTS OF SUMMER WITH COOP \u0026 Friiiends",
+    "event_type": "Music",
+    "starts_at": "2026-08-21T18:30:00-07:00",
+    "ends_at": "2026-08-21T23:30:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "Hip Hop Ft local artists COOP, Fed Soul, Thirtysixhunnid, and INFINITiii\n\nCOOP, FED SOUL, THIRTYSIXHUNNID, INFINITiii",
+    "slug": "2026-08-21-seven-nights-of-summer-with-coop-friiiends",
+    "flyer": "flyer-1784846585.jpg",
+    "volunteers": [
+      {
+        "role": "door"
+      }
+    ]
+  },
+  {
     "source": "082226-freemaskdi.json",
     "uid": "08cc2bbd-130f-4fb3-8cf3-e2d4038055bd",
     "title": "Free Mask Distro!",
@@ -6747,6 +7071,17 @@
     "location": "402 Washington St NE, Olympia WA",
     "description": "Open meetup for electronics, soldering, and circuit bending toys.",
     "slug": "2026-08-23-circuit-bending-workshop"
+  },
+  {
+    "source": "081026-analogmedi.json",
+    "uid": "ac8244eb-275c-4026-8337-d1c04f0cfbcd",
+    "title": "ANALOG MEDIA SWAP (BUT RETRO DVDS AND OTHER STUFF IS COOL TOO)",
+    "event_type": "Swap Meet",
+    "starts_at": "2026-08-24T17:00:00-07:00",
+    "ends_at": "2026-08-24T19:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "Bring any unwanted or used vhs,dvds, and some art to come sell and swap out. 5-7pm",
+    "slug": "2026-08-24-analog-media-swap-but-retro-dvds-and-other-stuff-is-cool-too"
   },
   {
     "source": "082526-opendraw.json",
@@ -6796,6 +7131,41 @@
     "flyer": "flyer-6844126340ad7.jpg"
   },
   {
+    "source": "082826-thisisnota.json",
+    "uid": "2ae8e188-accd-43ec-919b-c56e1fec0ce7",
+    "title": "This Is Not A Drum Circle",
+    "event_type": "Workshop",
+    "starts_at": "2026-08-28T19:00:00-07:00",
+    "ends_at": "2026-08-28T21:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "A workshop focusing on the fundamentals of spontaneous and experimental group rhythms",
+    "slug": "2026-08-28-this-is-not-a-drum-circle",
+    "flyer": "flyer-1780415089.jpg"
+  },
+  {
+    "source": "083126-blueherons.json",
+    "uid": "90bd5f2e-cedf-4c37-9663-679810b2d2a4",
+    "title": "Blue Heron Staff Meeting \u0026 Party",
+    "event_type": "Event",
+    "starts_at": "2026-08-31T02:00:00-07:00",
+    "ends_at": "2026-08-31T18:30:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "BHCC staff-only event. Blue Heron Community Cooperative staff gathering for internal updates, training \u0026 socializing. We will set up a potluck table and likely use main projectors (both rooms) and a microphone for presentations, and abckground music.",
+    "link": "https://www.blueheronbakery.com/",
+    "slug": "2026-08-31-blue-heron-staff-meeting-party"
+  },
+  {
+    "source": "083126-secularmen.json",
+    "uid": "9bb8c9ab-2c41-47c7-aa3d-5bc57d7b8826",
+    "title": "Secular Men's Support Group",
+    "event_type": "Meeting",
+    "starts_at": "2026-08-31T19:00:00-07:00",
+    "ends_at": "2026-08-31T21:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "slug": "2026-08-31-secular-men-s-support-group",
+    "flyer": "flyer-1751093574.jpg"
+  },
+  {
     "source": "090126-opendraw.json",
     "uid": "e3d1d8c0-782f-4a7d-8981-3028df912b3d",
     "title": "Open Draw",
@@ -6841,6 +7211,17 @@
     "flyer": "flyer-6844126340ad7.jpg"
   },
   {
+    "source": "090626-olywhistle.json",
+    "uid": "84e1f211-f518-4156-a1f7-a042c1351dfb",
+    "title": "Oly Whistles Work Party",
+    "event_type": "Community",
+    "starts_at": "2026-09-06T13:00:00-07:00",
+    "ends_at": "2026-09-06T16:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "Monthly Whistle Party at DECAY\n1-4pm First Sunday",
+    "slug": "2026-09-06-oly-whistles-work-party"
+  },
+  {
     "source": "090626-secularmen.json",
     "uid": "2db06c97-5205-4ecd-88fd-c26bf589c102",
     "title": "Secular Men's Support Group",
@@ -6849,6 +7230,19 @@
     "location": "402 Washington St NE, Olympia WA",
     "slug": "2026-09-06-secular-men-s-support-group",
     "flyer": "flyer-1751093574.jpg"
+  },
+  {
+    "source": "091426-olympiaimp.json",
+    "uid": "5cb774cd-ee7f-4def-b40f-bcb7b2838317",
+    "title": "Olympia Improvisers Orchestra",
+    "event_type": "Workshop",
+    "starts_at": "2026-09-07T19:00:00-07:00",
+    "ends_at": "2026-09-07T22:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "MUSICIANS OF ALL LEVELS ARE INVITED TO BRING YOUR INSTRUMENT AND INVENT MUSIC ON THE SPOT TOGETHER AS A GROUP",
+    "link": "https://ofirklemperer.org/lessons/improvisers-orchestra-workshop/",
+    "slug": "2026-09-07-olympia-improvisers-orchestra",
+    "flyer": "flyer-1767917197.jpg"
   },
   {
     "source": "090826-opendraw.json",
@@ -6886,6 +7280,28 @@
     "slug": "2026-09-08-movie-club"
   },
   {
+    "source": "090926-nightcrawl.json",
+    "uid": "b70c7f55-70e3-4bbf-b23e-ea6864a0c477",
+    "title": "Night Crawl: A Queer Performance Workshop",
+    "event_type": "Event",
+    "starts_at": "2026-09-09T17:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "Night Crawl: A Drag Workshop is a workshop for drag, burlesque, and queer performers of all kinds. Come try out your sets, practice your makeup/build costumes, and learn from fellow performers in a community oriented space!",
+    "slug": "2026-09-09-night-crawl-a-queer-performance-workshop",
+    "flyer": "flyer-1783729291.png"
+  },
+  {
+    "source": "090926-liveshowfo.json",
+    "uid": "aeec39cf-0f46-47ec-bb0c-d504b5088c02",
+    "title": "Live Show Folk + Bluegrass",
+    "event_type": "Event",
+    "starts_at": "2026-09-09T19:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "More artists TBD\n\nBagladies",
+    "link": "https://www.instagram.com/bag.ladies.band/",
+    "slug": "2026-09-09-live-show-folk-bluegrass"
+  },
+  {
     "source": "091026-notape.json",
     "uid": "5ebf50da-4b4c-4df3-bc11-70096b03babf",
     "title": "NO_TAPE",
@@ -6895,6 +7311,30 @@
     "description": "video audio tech skillshare",
     "slug": "2026-09-10-no-tape",
     "flyer": "flyer-6844126340ad7.jpg"
+  },
+  {
+    "source": "091126-ismfestiva.json",
+    "uid": "a9265667-e418-4212-bb56-e59a6e37169e",
+    "title": "ISM Festival",
+    "event_type": "Event",
+    "starts_at": "2026-09-11T15:00:00-07:00",
+    "ends_at": "2026-09-11T20:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "ismoly.art",
+    "slug": "2026-09-11-ism-festival",
+    "flyer": "flyer-1784874823.png"
+  },
+  {
+    "source": "091226-ismfestiva.json",
+    "uid": "71c353ab-cf3b-447c-934a-5c620fb70c7e",
+    "title": "ISM Festival",
+    "event_type": "Event",
+    "starts_at": "2026-09-12T15:00:00-07:00",
+    "ends_at": "2026-09-12T20:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "ismoly.art",
+    "slug": "2026-09-12-ism-festival",
+    "flyer": "flyer-1784874823.png"
   },
   {
     "source": "091226-freemaskdi.json",
@@ -6908,6 +7348,18 @@
     "flyer": "flyer-1751089074.jpg"
   },
   {
+    "source": "091326-ismfestiva.json",
+    "uid": "418e5a93-3b8d-412b-bb53-1ad7afe35d31",
+    "title": "ISM Festival",
+    "event_type": "Event",
+    "starts_at": "2026-09-13T15:00:00-07:00",
+    "ends_at": "2026-09-13T20:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "ismoly.art",
+    "slug": "2026-09-13-ism-festival",
+    "flyer": "flyer-1784874823.png"
+  },
+  {
     "source": "091326-mesh.json",
     "uid": "dd55f5d7-b18c-4128-96f7-9d8957d25361",
     "title": "Mesh Network Workshop",
@@ -6917,19 +7369,6 @@
     "location": "402 Washington St NE, Olympia WA",
     "description": "Open meetup for mesh networking and community tech.",
     "slug": "2026-09-13-mesh-network-workshop"
-  },
-  {
-    "source": "091426-olympiaimp.json",
-    "uid": "5cb774cd-ee7f-4def-b40f-bcb7b2838317",
-    "title": "Olympia Improvisors Orchestra",
-    "event_type": "Workshop",
-    "starts_at": "2026-09-14T19:00:00-07:00",
-    "ends_at": "2026-09-14T22:00:00-07:00",
-    "location": "402 Washington St NE, Olympia WA",
-    "description": "MUSICIANS OF ALL LEVELS ARE INVITED TO BRING YOUR INSTRUMENT AND INVENT MUSIC ON THE SPOT TOGETHER AS A GROUP",
-    "link": "https://ofirklemperer.org/lessons/improvisers-orchestra-workshop/",
-    "slug": "2026-09-14-olympia-improvisors-orchestra",
-    "flyer": "flyer-1767917197.jpg"
   },
   {
     "source": "091526-opendraw.json",
@@ -6989,6 +7428,18 @@
     "flyer": "flyer-6844126340ad7.jpg"
   },
   {
+    "source": "091826-biogirlfar.json",
+    "uid": "c973dafc-c75e-4c54-ad36-6f876223de45",
+    "title": "BIO GIRL: Far from Home West Coast Tour",
+    "event_type": "Event",
+    "starts_at": "2026-09-18T19:00:00-07:00",
+    "ends_at": "2026-09-18T22:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "Drugstore Lipstick is a queer darkwave/electro band from New Orleans touring their Sci Fy Rock Opera Bio Girl with explosive indie rock Chicago act DMB the Etymology.\n\nDrugstore Lipstick, DMB the Etymology",
+    "link": "https://drugstorelipstick.bandcamp.com/",
+    "slug": "2026-09-18-bio-girl-far-from-home-west-coast-tour"
+  },
+  {
     "source": "091926-covidsafer.json",
     "uid": "d664806f-0de6-45a0-89be-177661147032",
     "title": "Covid Safer Fiber Arts Meetup",
@@ -6999,6 +7450,27 @@
     "description": "Third Saturdays, 3-5 PM at DECAY :) Covid Safer Fiber Arts Meetup! Bring a project and hang out with other covid conscious folks. Free, all ages, ADA accessible. Check out covidsaferoly.com for more covid conscious events.\n\nPrecautions: Masks required (KN95+), Clean Air Kits Tower of Power + Smart Air Blast Mini MKII air purifiers running for over 100% 5 ACH coverage of the space, CO2 monitoring to adjust ventilation as needed, Far-UVC.\n\nAccess: Single story, step-free entryway + interior, no inclines/declines in the space. The front door is light and opens in or out. One gender neutral, single-stall restroom with grab bars, roll-under sink. Two access points to the back room, one is just shy of 3ft wide, the other one has ample space for wheelchairs to pass through.\n\nStreet parking is free on weekends. DECAY is located a couple blocks from the downtown transit center.",
     "slug": "2026-09-19-covid-safer-fiber-arts-meetup",
     "flyer": "flyer-1766091738.jpg"
+  },
+  {
+    "source": "091826-flytrapano.json",
+    "uid": "64ded827-ecfe-481e-bb2f-6b38864ef111",
+    "title": "Flytrap, anomaly and impulsed",
+    "event_type": "Event",
+    "starts_at": "2026-09-19T19:30:00-07:00",
+    "ends_at": "2026-09-19T22:30:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "Flytrap, anomaly, impulse",
+    "slug": "2026-09-19-flytrap-anomaly-and-impulsed"
+  },
+  {
+    "source": "092026-decayvolun.json",
+    "uid": "15aa909e-e149-410c-aad6-59ea6bf2e9de",
+    "title": "DECAY Volunteer Work Party",
+    "event_type": "Event",
+    "starts_at": "2026-09-20T12:00:00-07:00",
+    "ends_at": "2026-09-20T16:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "slug": "2026-09-20-decay-volunteer-work-party"
   },
   {
     "source": "092026-secularmen.json",
@@ -7056,6 +7528,18 @@
     "description": "video audio tech skillshare",
     "slug": "2026-09-24-no-tape",
     "flyer": "flyer-6844126340ad7.jpg"
+  },
+  {
+    "source": "092526-thisisnota.json",
+    "uid": "b3449b28-c0f5-4339-98ff-4d3f78910d4d",
+    "title": "This Is Not A Drum Circle",
+    "event_type": "Workshop",
+    "starts_at": "2026-09-25T19:00:00-07:00",
+    "ends_at": "2026-09-25T21:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "A workshop focusing on the fundamentals of spontaneous and experimental group rhythms",
+    "slug": "2026-09-25-this-is-not-a-drum-circle",
+    "flyer": "flyer-1785275267.jpg"
   },
   {
     "source": "092626-freemaskdi.json",
@@ -7122,6 +7606,19 @@
     "location": "402 Washington St NE, Olympia WA",
     "slug": "2026-10-04-secular-men-s-support-group",
     "flyer": "flyer-1751093574.jpg"
+  },
+  {
+    "source": "101226-olympiaimp.json",
+    "uid": "ea34e321-64eb-468e-8b9c-289b8637da5e",
+    "title": "Olympia Improvisers Orchestra",
+    "event_type": "Workshop",
+    "starts_at": "2026-10-05T19:00:00-07:00",
+    "ends_at": "2026-10-05T22:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "MUSICIANS OF ALL LEVELS ARE INVITED TO BRING YOUR INSTRUMENT AND INVENT MUSIC ON THE SPOT TOGETHER AS A GROUP",
+    "link": "https://ofirklemperer.org/lessons/improvisers-orchestra-workshop/",
+    "slug": "2026-10-05-olympia-improvisers-orchestra",
+    "flyer": "flyer-1767917197.jpg"
   },
   {
     "source": "100626-opendraw.json",
@@ -7191,17 +7688,15 @@
     "slug": "2026-10-11-mesh-network-workshop"
   },
   {
-    "source": "101226-olympiaimp.json",
-    "uid": "ea34e321-64eb-468e-8b9c-289b8637da5e",
-    "title": "Olympia Improvisors Orchestra",
-    "event_type": "Workshop",
-    "starts_at": "2026-10-12T19:00:00-07:00",
-    "ends_at": "2026-10-12T22:00:00-07:00",
+    "source": "101126-sparklergl.json",
+    "uid": "665ddc6e-f29b-4894-9e97-291cd5858b79",
+    "title": "Sparkler, Glia, As Above, TBD",
+    "event_type": "Event",
+    "starts_at": "2026-10-11T19:00:00-07:00",
     "location": "402 Washington St NE, Olympia WA",
-    "description": "MUSICIANS OF ALL LEVELS ARE INVITED TO BRING YOUR INSTRUMENT AND INVENT MUSIC ON THE SPOT TOGETHER AS A GROUP",
-    "link": "https://ofirklemperer.org/lessons/improvisers-orchestra-workshop/",
-    "slug": "2026-10-12-olympia-improvisors-orchestra",
-    "flyer": "flyer-1767917197.jpg"
+    "description": "Shoegaze/noise pop band from Houston with Sparkler from San Diego + TBD Olympia act\n\nSparkler, Glia, As Above, TBD",
+    "link": "https://gliatx.bandcamp.com/album/happens-all-the-time",
+    "slug": "2026-10-11-sparkler-glia-as-above-tbd"
   },
   {
     "source": "101326-opendraw.json",
@@ -7250,6 +7745,18 @@
     "flyer": "flyer-6844126340ad7.jpg"
   },
   {
+    "source": "101626-thisisnota.json",
+    "uid": "187b02d7-8ece-494a-913f-5efd9f86c6e4",
+    "title": "This Is Not A Drum Circle",
+    "event_type": "Event",
+    "starts_at": "2026-10-16T19:00:00-07:00",
+    "ends_at": "2026-10-16T21:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "A workshop focusing on the fundamentals of spontaneous and experimental group rhythms",
+    "slug": "2026-10-16-this-is-not-a-drum-circle",
+    "flyer": "flyer-1785275408.jpg"
+  },
+  {
     "source": "101726-covidsafer.json",
     "uid": "8c2f1281-1a39-4a38-8c05-14781394b71b",
     "title": "Covid Safer Fiber Arts Meetup",
@@ -7262,6 +7769,16 @@
     "flyer": "flyer-1766091738.jpg"
   },
   {
+    "source": "101826-decayvolun.json",
+    "uid": "8f601f7d-c898-4b77-a538-d63d781fb31c",
+    "title": "DECAY Volunteer Work Party",
+    "event_type": "Event",
+    "starts_at": "2026-10-18T12:00:00-07:00",
+    "ends_at": "2026-10-18T16:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "slug": "2026-10-18-decay-volunteer-work-party"
+  },
+  {
     "source": "101826-secularmen.json",
     "uid": "de2a81a6-390c-413b-829e-2cd3be471618",
     "title": "Secular Men's Support Group",
@@ -7270,6 +7787,19 @@
     "location": "402 Washington St NE, Olympia WA",
     "slug": "2026-10-18-secular-men-s-support-group",
     "flyer": "flyer-1751093574.jpg"
+  },
+  {
+    "source": "102826-olympiaimp.json",
+    "uid": "008b5abf-b8c7-47c2-ae2b-469b278695d0",
+    "title": "Olympia Improvisers Orchestra",
+    "event_type": "Workshop",
+    "starts_at": "2026-10-19T19:00:00-07:00",
+    "ends_at": "2026-10-19T22:00:00-07:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "MUSICIANS OF ALL LEVELS ARE INVITED TO BRING YOUR INSTRUMENT AND INVENT MUSIC ON THE SPOT TOGETHER AS A GROUP",
+    "link": "https://ofirklemperer.org/lessons/improvisers-orchestra-workshop/",
+    "slug": "2026-10-19-olympia-improvisers-orchestra",
+    "flyer": "flyer-1767917197.jpg"
   },
   {
     "source": "102026-opendraw.json",
@@ -7374,19 +7904,6 @@
     "slug": "2026-10-27-movie-club"
   },
   {
-    "source": "102826-olympiaimp.json",
-    "uid": "008b5abf-b8c7-47c2-ae2b-469b278695d0",
-    "title": "Olympia Improvisors Orchestra",
-    "event_type": "Workshop",
-    "starts_at": "2026-10-28T19:00:00-07:00",
-    "ends_at": "2026-10-28T22:00:00-07:00",
-    "location": "402 Washington St NE, Olympia WA",
-    "description": "MUSICIANS OF ALL LEVELS ARE INVITED TO BRING YOUR INSTRUMENT AND INVENT MUSIC ON THE SPOT TOGETHER AS A GROUP",
-    "link": "https://ofirklemperer.org/lessons/improvisers-orchestra-workshop/",
-    "slug": "2026-10-28-olympia-improvisors-orchestra",
-    "flyer": "flyer-1767917197.jpg"
-  },
-  {
     "source": "102926-notape.json",
     "uid": "72cc314a-bb23-4aa4-b932-fd11c80f3122",
     "title": "NO_TAPE",
@@ -7442,6 +7959,19 @@
     "slug": "2026-11-04-decentralized-tech"
   },
   {
+    "source": "110926-olympiaimp.json",
+    "uid": "dac6339a-357e-414d-a08a-c8657cd668c1",
+    "title": "Olympia Improvisers Orchestra",
+    "event_type": "Workshop",
+    "starts_at": "2026-11-04T19:00:00-08:00",
+    "ends_at": "2026-11-04T22:00:00-08:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "MUSICIANS OF ALL LEVELS ARE INVITED TO BRING YOUR INSTRUMENT AND INVENT MUSIC ON THE SPOT TOGETHER AS A GROUP",
+    "link": "https://ofirklemperer.org/lessons/improvisers-orchestra-workshop/",
+    "slug": "2026-11-04-olympia-improvisers-orchestra",
+    "flyer": "flyer-1767917197.jpg"
+  },
+  {
     "source": "110526-notape.json",
     "uid": "bc3d324c-4852-4e04-8a0d-b0bd2ce16bc5",
     "title": "NO_TAPE",
@@ -7462,19 +7992,6 @@
     "location": "402 Washington St NE, Olympia WA",
     "description": "Open meetup for mesh networking and community tech.",
     "slug": "2026-11-08-mesh-network-workshop"
-  },
-  {
-    "source": "110926-olympiaimp.json",
-    "uid": "dac6339a-357e-414d-a08a-c8657cd668c1",
-    "title": "Olympia Improvisors Orchestra",
-    "event_type": "Workshop",
-    "starts_at": "2026-11-09T19:00:00-08:00",
-    "ends_at": "2026-11-09T22:00:00-08:00",
-    "location": "402 Washington St NE, Olympia WA",
-    "description": "MUSICIANS OF ALL LEVELS ARE INVITED TO BRING YOUR INSTRUMENT AND INVENT MUSIC ON THE SPOT TOGETHER AS A GROUP",
-    "link": "https://ofirklemperer.org/lessons/improvisers-orchestra-workshop/",
-    "slug": "2026-11-09-olympia-improvisors-orchestra",
-    "flyer": "flyer-1767917197.jpg"
   },
   {
     "source": "111026-opendraw.json",
@@ -7534,6 +8051,16 @@
     "flyer": "flyer-1751089074.jpg"
   },
   {
+    "source": "111526-decayvolun.json",
+    "uid": "eff5d4c2-116b-46a7-8c81-1327c5fed037",
+    "title": "DECAY Volunteer Work Party",
+    "event_type": "Event",
+    "starts_at": "2026-11-15T12:00:00-08:00",
+    "ends_at": "2026-11-15T16:00:00-08:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "slug": "2026-11-15-decay-volunteer-work-party"
+  },
+  {
     "source": "111526-secularmen.json",
     "uid": "fa608cfa-ac19-4cb0-bfc8-b1b01d347a40",
     "title": "Secular Men's Support Group",
@@ -7542,6 +8069,19 @@
     "location": "402 Washington St NE, Olympia WA",
     "slug": "2026-11-15-secular-men-s-support-group",
     "flyer": "flyer-1751093574.jpg"
+  },
+  {
+    "source": "112526-olympiaimp.json",
+    "uid": "2675aa37-f072-4e71-8f82-94f5476428e6",
+    "title": "Olympia Improvisers Orchestra",
+    "event_type": "Workshop",
+    "starts_at": "2026-11-16T19:00:00-08:00",
+    "ends_at": "2026-11-16T22:00:00-08:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "MUSICIANS OF ALL LEVELS ARE INVITED TO BRING YOUR INSTRUMENT AND INVENT MUSIC ON THE SPOT TOGETHER AS A GROUP",
+    "link": "https://ofirklemperer.org/lessons/improvisers-orchestra-workshop/",
+    "slug": "2026-11-16-olympia-improvisers-orchestra",
+    "flyer": "flyer-1767917197.jpg"
   },
   {
     "source": "111726-opendraw.json",
@@ -7601,6 +8141,18 @@
     "flyer": "flyer-6844126340ad7.jpg"
   },
   {
+    "source": "112026-acousmatic.json",
+    "uid": "50f47b9c-bf19-4d2c-83a9-86d0affdec94",
+    "title": "Acousmatic Music with Kamran Shafii and CAEN (Gordon Ashworth)",
+    "event_type": "Music Concert",
+    "starts_at": "2026-11-20T20:00:00-08:00",
+    "ends_at": "2026-11-20T23:30:00-08:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "Kamran Shafii\n\nKamran Shafii (Persian: کامران شفیعی) is an Iranian sound artist working in the field of electroacoustic music. His recent work is characterized by its concern with anthropogenic sound and complex auditory experiences, drawing from his interest in psychoacoustics and acousmatic theory. \n\nA primary focus of his practice is the study of acoustic ecologies through measurement devices and piezoelectric accelerometers, asking how infrastructure, distributed systems, and physical matter produce emergent, site-specific sounds with shifting morphologies.\n\nShafii has produced multichannel installations and performed internationally alongside artists including Lea Bertucci, Kevin Drumm, RM Francis, Daniel Menche, and Marcus Schmickler.\n\nhttps://kamranshafii.com/\n\nCAEN\n\nGordon Ashworth is an American musician and visual artist whose primary field is experimental composition for string instruments, field recordings and magnetic tape. He has been heavily involved in the experimental music underground since 2002, and has released dozens of drone, noise, folk and musique concrete recordings under the names Concern, Oscillating Innards, CAEN, Riverbed Mausoleum, and his given name. He was a guitarist and vocalist in Knelt Rote and member of the group Vile Horrendous Aerial Bombardment. \n\nAshworth has performed in over 30 countries, often during extensive and self-organized tours. His tour of Europe in late 2015 included 47 solo performances, with the majority of travel done alone by public transportation. His live performances focus on tape and speaker manipulation of electro-acoustic drones, string instruments, and field recordings, creating rich textures from contrasting elements of intimate musical sounds and social environments. His debut full-length “S.T.L.A.” (Orindal Records) is a deep exploration of the fundamental elements of American folk music, musique concrete, modern classical and abstract noise. \n\nGordon Ashworth is the head of the archival record label Olvido Records, which has released compilations of seminal musicians Markos Vamvakaris, Marika Politissa, Alexis Zoumbas, George Mukabi, Kalama’s Quartet, and others, and has presented the work of Greek guitarist Kostas Bezos (A. Kostis) in Athens and Thessaloniki. From 2019 to 2022, Gordon was co-owner of the Mississippi Records label, then based in Chicago, co-producing and designing roughly 30 LP and cassette releases, as well as running the distribution and warehouse. He has also run the cassette label Iatrogenesis Tapes since 2003, with over 70 releases focusing on underground noise and drone artists. He is also the brother of musician Owen Ashworth (Advance Base, ex-Casiotone for the Painfully Alone, Orindal Records). Gordon Ashworth also runs the Sun Ra 7” reissue label SPACE KEY, and cassette label Illusophone.\n\nhttps://olvidorecords.com/gordon-ashworth\nhttps://gordon-ashworth-5b2p.squarespace.com/gordon-ashworth\n\nLocal support TBA",
+    "link": "https://kamranshafii.com/",
+    "slug": "2026-11-20-acousmatic-music-with-kamran-shafii-and-caen-gordon-ashworth"
+  },
+  {
     "source": "112126-covidsafer.json",
     "uid": "fba24aab-aee2-4b0a-9825-db269787c855",
     "title": "Covid Safer Fiber Arts Meetup",
@@ -7655,19 +8207,6 @@
     "location": "402 Washington St NE, Olympia WA",
     "description": "Tuesday Night Movie Club",
     "slug": "2026-11-24-movie-club"
-  },
-  {
-    "source": "112526-olympiaimp.json",
-    "uid": "2675aa37-f072-4e71-8f82-94f5476428e6",
-    "title": "Olympia Improvisors Orchestra",
-    "event_type": "Workshop",
-    "starts_at": "2026-11-25T19:00:00-08:00",
-    "ends_at": "2026-11-25T22:00:00-08:00",
-    "location": "402 Washington St NE, Olympia WA",
-    "description": "MUSICIANS OF ALL LEVELS ARE INVITED TO BRING YOUR INSTRUMENT AND INVENT MUSIC ON THE SPOT TOGETHER AS A GROUP",
-    "link": "https://ofirklemperer.org/lessons/improvisers-orchestra-workshop/",
-    "slug": "2026-11-25-olympia-improvisors-orchestra",
-    "flyer": "flyer-1767917197.jpg"
   },
   {
     "source": "112626-notape.json",
@@ -7737,6 +8276,19 @@
     "slug": "2026-12-02-decentralized-tech"
   },
   {
+    "source": "121426-olympiaimp.json",
+    "uid": "85ecff96-bd66-4750-adf3-932288057384",
+    "title": "Olympia Improvisers Orchestra",
+    "event_type": "Workshop",
+    "starts_at": "2026-12-02T19:00:00-08:00",
+    "ends_at": "2026-12-02T22:00:00-08:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "MUSICIANS OF ALL LEVELS ARE INVITED TO BRING YOUR INSTRUMENT AND INVENT MUSIC ON THE SPOT TOGETHER AS A GROUP",
+    "link": "https://ofirklemperer.org/lessons/improvisers-orchestra-workshop/",
+    "slug": "2026-12-02-olympia-improvisers-orchestra",
+    "flyer": "flyer-1767917197.jpg"
+  },
+  {
     "source": "120326-notape.json",
     "uid": "f42b738a-0aff-43c1-a7a3-4323c751b46a",
     "title": "NO_TAPE",
@@ -7746,6 +8298,18 @@
     "description": "video audio tech skillshare",
     "slug": "2026-12-03-no-tape",
     "flyer": "flyer-6844126340ad7.jpg"
+  },
+  {
+    "source": "120426-winterblue.json",
+    "uid": "2b09ef5e-d3c6-40f4-b223-37c89ab0ea7c",
+    "title": "Winter Blues",
+    "event_type": "Event",
+    "starts_at": "2026-12-04T18:00:00-08:00",
+    "ends_at": "2026-12-04T22:30:00-08:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "Shoegaze/indie rock!\n\nElla Rae, Parker London, Windzer, Prickly Paranoia",
+    "link": "https://www.instagram.com/parkerlondon__/",
+    "slug": "2026-12-04-winter-blues"
   },
   {
     "source": "120526-secularmen.json",
@@ -7836,16 +8400,16 @@
     "slug": "2026-12-13-mesh-network-workshop"
   },
   {
-    "source": "121426-olympiaimp.json",
-    "uid": "85ecff96-bd66-4750-adf3-932288057384",
-    "title": "Olympia Improvisors Orchestra",
+    "source": "122326-olympiaimp.json",
+    "uid": "8e758b3a-bdcf-4a24-9098-1d18389e23e3",
+    "title": "Olympia Improvisers Orchestra",
     "event_type": "Workshop",
     "starts_at": "2026-12-14T19:00:00-08:00",
     "ends_at": "2026-12-14T22:00:00-08:00",
     "location": "402 Washington St NE, Olympia WA",
     "description": "MUSICIANS OF ALL LEVELS ARE INVITED TO BRING YOUR INSTRUMENT AND INVENT MUSIC ON THE SPOT TOGETHER AS A GROUP",
     "link": "https://ofirklemperer.org/lessons/improvisers-orchestra-workshop/",
-    "slug": "2026-12-14-olympia-improvisors-orchestra",
+    "slug": "2026-12-14-olympia-improvisers-orchestra",
     "flyer": "flyer-1767917197.jpg"
   },
   {
@@ -7928,6 +8492,16 @@
     "slug": "2026-12-19-secular-men-s-support-group"
   },
   {
+    "source": "122026-decayvolun.json",
+    "uid": "41b24163-7ac2-41be-a910-5d913c43f779",
+    "title": "DECAY Volunteer Work Party",
+    "event_type": "Event",
+    "starts_at": "2026-12-20T12:00:00-08:00",
+    "ends_at": "2026-12-20T16:00:00-08:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "slug": "2026-12-20-decay-volunteer-work-party"
+  },
+  {
     "source": "122026-secularmen.json",
     "uid": "54cf680f-e788-4d43-b92b-bd0783a7ab32",
     "title": "Secular Men's Support Group",
@@ -7936,6 +8510,17 @@
     "location": "402 Washington St NE, Olympia WA",
     "slug": "2026-12-20-secular-men-s-support-group",
     "flyer": "flyer-1751093574.jpg"
+  },
+  {
+    "source": "122126-nyxiatwili.json",
+    "uid": "ab3dead2-2470-4a1e-a30a-acd2f8c97152",
+    "title": "Nyxia Twilight's Yuletide Birthday Bash",
+    "event_type": "Live Show",
+    "starts_at": "2026-12-21T18:30:00-08:00",
+    "ends_at": "2026-12-22T12:30:00-08:00",
+    "location": "402 Washington St NE, Olympia WA",
+    "description": "A birthday drag show/dance party with a dvd swap, tarot readings, and potluck\n\nNyxia Twilight, Nova Nast3, Orville Pecs, Louisa Sumay, Bowler \u0026 Spoons, DJ Mother Mercy",
+    "slug": "2026-12-21-nyxia-twilight-s-yuletide-birthday-bash"
   },
   {
     "source": "122226-opendraw.json",
@@ -7959,19 +8544,6 @@
     "location": "402 Washington St NE, Olympia WA",
     "description": "Tuesday Night Movie Club",
     "slug": "2026-12-22-movie-club"
-  },
-  {
-    "source": "122326-olympiaimp.json",
-    "uid": "8e758b3a-bdcf-4a24-9098-1d18389e23e3",
-    "title": "Olympia Improvisors Orchestra",
-    "event_type": "Workshop",
-    "starts_at": "2026-12-23T19:00:00-08:00",
-    "ends_at": "2026-12-23T22:00:00-08:00",
-    "location": "402 Washington St NE, Olympia WA",
-    "description": "MUSICIANS OF ALL LEVELS ARE INVITED TO BRING YOUR INSTRUMENT AND INVENT MUSIC ON THE SPOT TOGETHER AS A GROUP",
-    "link": "https://ofirklemperer.org/lessons/improvisers-orchestra-workshop/",
-    "slug": "2026-12-23-olympia-improvisors-orchestra",
-    "flyer": "flyer-1767917197.jpg"
   },
   {
     "source": "122426-notape.json",
