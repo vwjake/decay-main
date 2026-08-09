@@ -721,6 +721,17 @@ func ListPhotos(conn *sql.DB) ([]Photo, error) {
 	return scanPhotos(rows)
 }
 
+// ListRecentPhotos returns the newest photos, capped at limit in SQL rather
+// than fetched in full and trimmed in Go.
+func ListRecentPhotos(conn *sql.DB, limit int) ([]Photo, error) {
+	rows, err := conn.Query(`SELECT id, filename, caption, group_id FROM photos ORDER BY id DESC LIMIT ?`, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	return scanPhotos(rows)
+}
+
 // PhotosForGroup returns the photos tagged to a group, newest first.
 func PhotosForGroup(conn *sql.DB, groupID int64) ([]Photo, error) {
 	rows, err := conn.Query(`SELECT id, filename, caption, group_id FROM photos WHERE group_id = ? ORDER BY id DESC`, groupID)

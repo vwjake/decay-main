@@ -38,7 +38,7 @@ templ Media(p MediaPage) {
 				<div class="gallery">
 					for i, photo := range p.Photos {
 						<figure class="gallery-item" hidden?={ i > 0 }>
-							<a href={ templ.URL(photo.Path()) } target="_blank" rel="noopener">
+							<a href={ templ.URL(photo.WebPath()) } target="_blank" rel="noopener">
 								<img src={ photo.WebPath() } alt={ photo.Alt() } loading="lazy"/>
 							</a>
 							if photo.Caption != "" {

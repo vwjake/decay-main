@@ -442,13 +442,9 @@ func main() {
 	})
 
 	e.GET("/media", func(c echo.Context) error {
-		photos, err := db.ListPhotos(conn)
+		photos, err := db.ListRecentPhotos(conn, 4)
 		if err != nil {
 			return err
-		}
-		// Limit to 4 most recent photos
-		if len(photos) > 4 {
-			photos = photos[:4]
 		}
 		featured, err := db.ListVideos(conn)
 		if err != nil {

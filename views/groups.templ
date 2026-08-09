@@ -88,7 +88,7 @@ templ GroupPage(g db.Group, upcoming []db.Event, photos []db.Photo) {
 					<div class="gallery">
 						for _, photo := range photos {
 							<figure class="gallery-item">
-								<a href={ templ.URL(photo.Path()) } target="_blank" rel="noopener">
+								<a href={ templ.URL(photo.WebPath()) } target="_blank" rel="noopener">
 									<img src={ photo.WebPath() } alt={ photo.Alt() } loading="lazy"/>
 								</a>
 								if photo.Caption != "" {

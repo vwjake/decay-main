@@ -350,9 +350,9 @@ func GroupPage(g db.Group, upcoming []db.Event, photos []db.Photo) templ.Compone
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var14 templ.SafeURL
-					templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(photo.Path()))
+					templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(photo.WebPath()))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/groups.templ`, Line: 91, Col: 41}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/groups.templ`, Line: 91, Col: 44}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 					if templ_7745c5c3_Err != nil {
