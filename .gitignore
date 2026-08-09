@@ -16,12 +16,19 @@
 
 # Runtime uploads (not embedded — written at runtime by the admin panel).
 # Flyers and gallery photos run to ~400MB, so they stay on the host only.
-# Product shots are the exception: they're a small, slow-moving set that the
-# shop can't render without, so they ship in the repo and reach the server
-# with an ordinary deploy. The re-include needs /uploads/* rather than
-# /uploads/, since git won't look inside an excluded directory.
+# Product shots are an exception: a small, slow-moving set the shop can't
+# render without, so they ship in the repo and reach the server with an
+# ordinary deploy. The default flyer (events with no real one) is the same
+# case. The re-include needs /uploads/* rather than /uploads/, since git
+# won't look inside an excluded directory.
 /uploads/*
 !/uploads/products/
+!/uploads/flyers/
+/uploads/flyers/*
+!/uploads/flyers/flyer-default.png
+!/uploads/flyers/web/
+/uploads/flyers/web/*
+!/uploads/flyers/web/flyer-default.jpg
 
 # air (live reload)
 /tmp/

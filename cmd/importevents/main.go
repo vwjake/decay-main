@@ -88,6 +88,11 @@ type SeedVolunteer struct {
 
 const venueAddress = "402 Washington St NE, Olympia WA"
 
+// defaultFlyer is the image on the DECAY building's mural, used for any
+// event the old site never got a real flyer for. It ships in the repo
+// (see .gitignore) rather than coming from the old site's upload pools.
+const defaultFlyer = "flyer-default.png"
+
 // eventFile matches the old site's naming, MMDDYY-slug.json. Anything
 // else in the directory (draft `entry-*.json`, the archive/ and backup/
 // subdirectories) is not a live event.
@@ -235,7 +240,7 @@ func copyFlyers(events []SeedEvent, src, archive, dest string) (int, error) {
 	done := map[string]bool{}
 	for i := range events {
 		name := events[i].Flyer
-		if name == "" {
+		if name == "" || name == defaultFlyer {
 			continue
 		}
 		from, ok := index[name]
@@ -371,7 +376,7 @@ func convert(path, name string, loc *time.Location) (*SeedEvent, error) {
 		Description: description(old),
 		Link:        firstLink(old.Links),
 		Slug:        db.Slug(start, title),
-		Flyer:       strings.TrimSpace(old.Flyer),
+		Flyer:       flyer(old.Flyer),
 		Volunteers:  volunteers(old),
 	}, nil
 }
@@ -461,6 +466,14 @@ func programs(raw json.RawMessage) []string {
 		return []string{single}
 	}
 	return nil
+}
+
+// flyer falls back to defaultFlyer when the old record has none.
+func flyer(raw string) string {
+	if f := strings.TrimSpace(raw); f != "" {
+		return f
+	}
+	return defaultFlyer
 }
 
 func location(raw string) string {
