@@ -2,13 +2,13 @@ package views
 
 import "decay-main/db"
 
-// Groups is the public index of recurring programs.
+// Groups is the public index of DECAY's categories.
 templ Groups(groups []db.Group) {
-	@Layout("Groups · DECAY") {
+	@Layout("Categories · DECAY") {
 		<section class="about">
-			<p class="about-statement">Groups at DECAY</p>
+			<p class="about-statement">Categories at DECAY</p>
 			<p class="about-body">
-				Connect with recurring meetups that call DECAY home. Explore their pages to
+				Browse what happens at DECAY by category. Explore each one to
 				learn what to bring, how to plug in, and what to expect when you show up.
 			</p>
 		</section>
@@ -32,11 +32,11 @@ templ Groups(groups []db.Group) {
 templ GroupPage(g db.Group, upcoming []db.Event, photos []db.Photo) {
 	@Layout(g.Name + " · DECAY") {
 		<section class="event-detail group-detail">
-			<a href="/groups" class="event-back mono">&larr; All groups</a>
+			<a href="/groups" class="event-back mono">&larr; All categories</a>
 			if g.HasHero() {
 				<img class="group-hero" src={ g.HeroPath() } alt={ g.HeroAlt }/>
 			}
-			<span class="section-label mono">Group at DECAY</span>
+			<span class="section-label mono">Category at DECAY</span>
 			<h1 class="event-detail-title">{ g.Name }</h1>
 			if len(g.PillList()) > 0 {
 				<div class="group-pills mono">

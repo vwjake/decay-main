@@ -44,7 +44,7 @@ func NotFound() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"about\"><p class=\"about-statement mono\">404</p><p class=\"about-statement\">This page has decayed.</p><p class=\"about-body\">The page you were after isn't here — it may have moved, or the link that brought you was already crumbling. Everything below still stands.</p><nav class=\"footer-links mono\"><a href=\"/\">Home</a> <a href=\"/events\">Events</a> <a href=\"/calendar\">Calendar</a> <a href=\"/groups\">Groups</a> <a href=\"/blog\">Blog</a> <a href=\"/shop\">Shop</a></nav></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"about\"><p class=\"about-statement mono\">404</p><p class=\"about-statement\">This page has decayed.</p><p class=\"about-body\">The page you were after isn't here — it may have moved, or the link that brought you was already crumbling. Everything below still stands.</p><nav class=\"footer-links mono\"><a href=\"/\">Home</a> <a href=\"/events\">Events</a> <a href=\"/calendar\">Calendar</a> <a href=\"/groups\">Categories</a> <a href=\"/blog\">Blog</a> <a href=\"/shop\">Shop</a></nav></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

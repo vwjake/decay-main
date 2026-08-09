@@ -73,27 +73,103 @@ func TestSeedAndQueryGroups(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(all) != 5 {
-		t.Fatalf("ListGroups = %d, want 5", len(all))
+	if len(all) != 6 {
+		t.Fatalf("ListGroups = %d, want 6", len(all))
 	}
-	if all[0].Slug != "open-draw" {
-		t.Errorf("first group = %q, want open-draw", all[0].Slug)
+	if all[0].Slug != "film" {
+		t.Errorf("first group = %q, want film", all[0].Slug)
 	}
 
-	// Mutual Aid is seeded disabled, so it's absent from the public list and
-	// unreachable by slug.
+	// All six categories are seeded enabled.
 	enabled, err := EnabledGroups(conn)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(enabled) != 4 {
-		t.Errorf("EnabledGroups = %d, want 4", len(enabled))
+	if len(enabled) != 6 {
+		t.Errorf("EnabledGroups = %d, want 6", len(enabled))
 	}
-	if _, err := GroupBySlug(conn, "mutual-aid"); err == nil {
-		t.Error("disabled group reachable by slug, want ErrNoRows")
-	}
-	if _, err := GroupBySlug(conn, "open-draw"); err != nil {
+	if _, err := GroupBySlug(conn, "community"); err != nil {
 		t.Errorf("enabled group not found: %v", err)
+	}
+}
+
+func TestMigrateGroupsToCategories(t *testing.T) {
+	conn, err := Open(filepath.Join(t.TempDir(), "test.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+
+	// Simulate a database still on the old five named groups, as if it
+	// predates the switch to fixed categories: wipe the seeded categories
+	// and insert rows under the old slugs instead.
+	if _, err := conn.Exec(`DELETE FROM groups`); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := conn.Exec(
+		`INSERT INTO groups (slug, name, match_terms, position, enabled) VALUES (?, ?, ?, ?, ?)`,
+		"open-draw", "Open Draw", "Open Draw", 0, true,
+	); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := conn.Exec(
+		`INSERT INTO groups (slug, name, match_terms, position, enabled) VALUES (?, ?, ?, ?, ?)`,
+		"mutual-aid", "Mutual Aid", "Mutual Aid", 1, false,
+	); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := migrateGroupsToCategories(conn); err != nil {
+		t.Fatal(err)
+	}
+
+	// The renamed rows keep the same id (and so any hero image or tagged
+	// photos), just under the new slug and content.
+	visualArt, err := GroupBySlug(conn, "visual-art")
+	if err != nil {
+		t.Fatalf("open-draw did not become visual-art: %v", err)
+	}
+	if visualArt.Name != "Visual Art" {
+		t.Errorf("visual-art name = %q", visualArt.Name)
+	}
+	if _, err := GroupByID(conn, visualArt.ID); err != nil {
+		t.Fatal(err)
+	}
+
+	// Mutual Aid folds into Community and comes back enabled, since the
+	// category is now a top-level page rather than an unlisted group.
+	community, err := GroupBySlug(conn, "community")
+	if err != nil {
+		t.Fatalf("mutual-aid did not become community: %v", err)
+	}
+	if !community.Enabled {
+		t.Error("community should be enabled after migrating from mutual-aid")
+	}
+
+	// Live Performances has no predecessor, so it's inserted outright.
+	if _, err := GroupBySlug(conn, "live-performances"); err != nil {
+		t.Errorf("live-performances not created: %v", err)
+	}
+
+	all, err := ListGroups(conn)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(all) != 3 {
+		t.Fatalf("ListGroups = %d, want 3 (visual-art, community, live-performances)", len(all))
+	}
+
+	// Running the migration again is a no-op — the old slugs are gone, so
+	// nothing matches the WHERE clause a second time.
+	if err := migrateGroupsToCategories(conn); err != nil {
+		t.Fatal(err)
+	}
+	again, err := ListGroups(conn)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(again) != 3 {
+		t.Fatalf("second migration changed row count: %d", len(again))
 	}
 }
 

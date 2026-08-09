@@ -114,6 +114,9 @@ func Seed(conn *sql.DB) error {
 	if err := backfillGroupMatchTerms(conn); err != nil {
 		return err
 	}
+	if err := migrateGroupsToCategories(conn); err != nil {
+		return err
+	}
 
 	if err := conn.QueryRow(`SELECT count(*) FROM products`).Scan(&count); err != nil {
 		return err

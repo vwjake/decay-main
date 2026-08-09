@@ -8,18 +8,51 @@ import "database/sql"
 // paragraphs.
 type groupSeed struct {
 	slug, name, summary, description, pills, body, matchTerms, category string
-	enabled                                                              bool
+	enabled                                                             bool
 }
 
+// groupSeeds is DECAY's fixed set of six top-level categories. The site
+// used to browse by named group (Open Draw, No Tape, ...); each of those
+// folded into the category it best matches (see migrateGroupsToCategories),
+// carrying its description, pills, and body along as that category's
+// content. Live Performances has no predecessor — it starts with placeholder
+// copy for an admin to flesh out.
 var groupSeeds = []groupSeed{
 	{
-		slug:        "open-draw",
-		name:        "Open Draw",
+		slug:        "film",
+		name:        "Film",
+		summary:     "Collective film nights with rotating hosts. Expect themed lineups, post-screening chats, and an easy-going vibe.",
+		description: "Film at DECAY centers on Movie Club, which gathers people to watch films together, swap recommendations, and talk about what we just saw. Expect rotating hosts and themes.",
+		pills:       "Rotating curators\nSnacks encouraged\nDiscussion after",
+		matchTerms:  "Movie Club\nFilm",
+		category:    "Film",
+		enabled:     true,
+		body: `# How screenings work
+- Rotating curators set the lineup and handle playback
+- Short intros to frame the film and content notices
+- Casual discussion and snacks after the credits
+
+# What to bring
+- Comfortable clothing and a friend
+- Snacks or non-alcoholic drinks to share (optional)
+- Film suggestions for future nights
+
+# Participate
+- Arrive a few minutes early to settle in
+- Offer a quick intro if you picked the movie
+- Share your thoughts during the discussion or just listen in
+
+# New here?
+Movie Club is low-pressure. If you’re shy, sit near the back and enjoy. If you’re excited to host a future night, mention it during discussion and we’ll help with setup.`,
+	},
+	{
+		slug:        "visual-art",
+		name:        "Visual Art",
 		summary:     "Casual drawing hang for artists of every level. Bring your own supplies or use what’s available, share prompts, and get feedback in a low-pressure setting.",
-		description: "Open Draw is a casual drawing hang for artists of every level. Bring your own tools or use what’s on hand, swap prompts, and work alongside other people who like to make things.",
+		description: "Visual Art at DECAY centers on Open Draw, a casual drawing hang for artists of every level. Bring your own tools or use what’s on hand, swap prompts, and work alongside other people who like to make things.",
 		pills:       "Drop-in friendly\nAll skill levels\nQuiet & social corners",
-		matchTerms:  "Open Draw",
-		category:    "Visual Arts",
+		matchTerms:  "Open Draw\nVisual Art",
+		category:    "Visual Art",
 		enabled:     true,
 		body: `# What to bring
 - Sketchbook or loose paper
@@ -40,40 +73,12 @@ var groupSeeds = []groupSeed{
 Bring a friend or come solo—either way you’ll find someone to trade ideas with. If you prefer quiet, find a tucked-away corner; if you want to collaborate, ask for prompts and jump in.`,
 	},
 	{
-		slug:        "no-tape",
-		name:        "No Tape",
-		summary:     "Open practice and jam space for musicians to improvise, test ideas, and collaborate without the pressure of a formal show.",
-		description: "No Tape is an open practice space for musicians to improvise, collaborate, and workshop songs without the pressure of a formal show. Audio-video synthesis and stage lights are also practiced and experimented with.",
-		pills:       "Collaborative jams\nAmplified & acoustic\nListeners welcome",
-		matchTerms:  "No Tape",
-		category:    "Music",
-		enabled:     true,
-		body: `# Bring along
-- Instruments, pedals, laptops, or other gear you want to experiment with
-- Your own cables if you can
-- Ideas you’re willing to try out with new collaborators
-
-# The vibe
-- Rotating lineups and spontaneous pairings
-- Room for feedback, experimentation, and learning
-- All skill levels welcome—listening is participation, too
-
-# How to join
-- Drop in with your gear and introduce yourself
-- Plug in when there's space and ask for a match-up if you want one
-- Share what you're experimenting with so others can riff with you
-- Join the Discord: https://discord.gg/bEYhdenj4t
-
-# New here?
-Let folks know if you’re trying collaborative jams for the first time. Someone can help you set levels, find a partner, or just listen in until you’re ready to play.`,
-	},
-	{
-		slug:        "decentralized-tech",
-		name:        "Decentralized Tech",
+		slug:        "technology",
+		name:        "Technology",
 		summary:     "Hands-on meetups for people interested in peer-to-peer tools, self-hosting, and resilient community technology.",
-		description: "Decentralized Tech meetups explore peer-to-peer tools, self-hosting, and resilient community technology through demos and collaborative tinkering.",
+		description: "Technology at DECAY centers on Decentralized Tech meetups, which explore peer-to-peer tools, self-hosting, and resilient community technology through demos and collaborative tinkering.",
 		pills:       "Hands-on demos\nPeer learning\nBeginner friendly",
-		matchTerms:  "Decentralized Tech",
+		matchTerms:  "Decentralized Tech\nTechnology",
 		category:    "Technology",
 		enabled:     true,
 		body: `# Topics we cover
@@ -97,42 +102,14 @@ Let folks know if you’re trying collaborative jams for the first time. Someone
 Tell us what you want to learn or share—we’ll point you toward a table that matches your interest. If you’d rather observe, that’s welcome too.`,
 	},
 	{
-		slug:        "movie-club",
-		name:        "Movie Club",
-		summary:     "Collective film nights with rotating hosts. Expect themed lineups, post-screening chats, and an easy-going vibe.",
-		description: "Movie Club gathers people to watch films together, swap recommendations, and talk about what we just saw. Expect rotating hosts and themes.",
-		pills:       "Rotating curators\nSnacks encouraged\nDiscussion after",
-		matchTerms:  "Movie Club",
-		category:    "Film",
-		enabled:     true,
-		body: `# How screenings work
-- Rotating curators set the lineup and handle playback
-- Short intros to frame the film and content notices
-- Casual discussion and snacks after the credits
-
-# What to bring
-- Comfortable clothing and a friend
-- Snacks or non-alcoholic drinks to share (optional)
-- Film suggestions for future nights
-
-# Participate
-- Arrive a few minutes early to settle in
-- Offer a quick intro if you picked the movie
-- Share your thoughts during the discussion or just listen in
-
-# New here?
-Movie Club is low-pressure. If you’re shy, sit near the back and enjoy. If you’re excited to host a future night, mention it during discussion and we’ll help with setup.`,
-	},
-	{
-		slug:        "mutual-aid",
-		name:        "Mutual Aid",
+		slug:        "community",
+		name:        "Community",
 		summary:     "Neighbors supporting neighbors through skill-sharing, resource swaps, and responsive community care projects.",
-		description: "Mutual Aid at DECAY connects neighbors who want to support one another through skill-sharing, resource swaps, and rapid response when needs come up.",
+		description: "Community at DECAY centers on Mutual Aid, connecting neighbors who want to support one another through skill-sharing, resource swaps, and rapid response when needs come up.",
 		pills:       "Community care\nResource swaps\nSkill sharing",
-		matchTerms:  "Mutual Aid",
+		matchTerms:  "Mutual Aid\nCommunity",
 		category:    "Community",
-		// Disabled on the old site; kept unlisted until it's ready to run.
-		enabled: false,
+		enabled:     true,
 		body: `# How we work
 - Share needs and offers openly so the group can coordinate
 - Pool supplies for pop-up distributions and care kits
@@ -151,9 +128,60 @@ Movie Club is low-pressure. If you’re shy, sit near the back and enjoy. If you
 # New here?
 Whether you have supplies, time, or just curiosity, there’s a role for you. Let us know your comfort level and we’ll connect you with a small crew so you’re not navigating alone.`,
 	},
+	{
+		slug:        "music",
+		name:        "Music",
+		summary:     "Open practice and jam space for musicians to improvise, test ideas, and collaborate without the pressure of a formal show.",
+		description: "Music at DECAY centers on No Tape, an open practice space for musicians to improvise, collaborate, and workshop songs without the pressure of a formal show. Audio-video synthesis and stage lights are also practiced and experimented with.",
+		pills:       "Collaborative jams\nAmplified & acoustic\nListeners welcome",
+		matchTerms:  "No Tape\nMusic",
+		category:    "Music",
+		enabled:     true,
+		body: `# Bring along
+- Instruments, pedals, laptops, or other gear you want to experiment with
+- Your own cables if you can
+- Ideas you’re willing to try out with new collaborators
+
+# The vibe
+- Rotating lineups and spontaneous pairings
+- Room for feedback, experimentation, and learning
+- All skill levels welcome—listening is participation, too
+
+# How to join
+- Drop in with your gear and introduce yourself
+- Plug in when there's space and ask for a match-up if you want one
+- Share what you're experimenting with so others can riff with you
+- Join the Discord: https://discord.gg/bEYhdenj4t
+
+# New here?
+Let folks know if you’re trying collaborative jams for the first time. Someone can help you set levels, find a partner, or just listen in until you’re ready to play.`,
+	},
+	{
+		slug:        "live-performances",
+		name:        "Live Performances",
+		summary:     "Concerts, showcases, and other performance-driven nights at DECAY — check upcoming dates for what's on next.",
+		description: "Live Performances covers concerts, showcases, and other performance-driven events at DECAY, distinct from Music's open practice space.",
+		pills:       "",
+		matchTerms:  "Live Performance\nConcert\nShowcase",
+		category:    "Live Performances",
+		enabled:     true,
+		body:        "",
+	},
 }
 
-// seedGroups inserts the carried-over groups on first run only.
+// oldGroupToCategory maps the site's five original named groups to the
+// category slug their content folded into when browsing switched from
+// named groups to this fixed set of six categories. Live Performances has
+// no predecessor.
+var oldGroupToCategory = map[string]string{
+	"open-draw":          "visual-art",
+	"no-tape":            "music",
+	"decentralized-tech": "technology",
+	"movie-club":         "film",
+	"mutual-aid":         "community",
+}
+
+// seedGroups inserts the six categories on first run only.
 func seedGroups(conn *sql.DB) error {
 	var count int
 	if err := conn.QueryRow(`SELECT count(*) FROM groups`).Scan(&count); err != nil {
@@ -191,4 +219,54 @@ func backfillGroupMatchTerms(conn *sql.DB) error {
 		}
 	}
 	return nil
+}
+
+// migrateGroupsToCategories renames a database's original five named groups
+// (open-draw, no-tape, ...) into the fixed category they fold into,
+// preserving each row's id — and so its hero image and any photos already
+// tagged to it. It's idempotent: once a row carries its new slug, the WHERE
+// clause below matches nothing further, so this is safe to run on every
+// startup, including on databases that were never on the old scheme.
+func migrateGroupsToCategories(conn *sql.DB) error {
+	bySlug := make(map[string]groupSeed, len(groupSeeds))
+	position := make(map[string]int, len(groupSeeds))
+	for i, g := range groupSeeds {
+		bySlug[g.slug] = g
+		position[g.slug] = i
+	}
+
+	for oldSlug, newSlug := range oldGroupToCategory {
+		g, ok := bySlug[newSlug]
+		if !ok {
+			continue
+		}
+		if _, err := conn.Exec(
+			`UPDATE groups SET slug = ?, name = ?, summary = ?, description = ?, pills = ?, body = ?, match_terms = ?, category = ?, position = ?, enabled = ?
+			 WHERE slug = ?`,
+			g.slug, g.name, g.summary, g.description, g.pills, g.body, g.matchTerms, g.category, position[newSlug], g.enabled, oldSlug,
+		); err != nil {
+			return err
+		}
+	}
+
+	// Live Performances has no predecessor to rename, so a database that
+	// predates it (including one already migrated by the loop above) needs
+	// it inserted directly rather than renamed in.
+	g, ok := bySlug["live-performances"]
+	if !ok {
+		return nil
+	}
+	var count int
+	if err := conn.QueryRow(`SELECT count(*) FROM groups WHERE slug = ?`, g.slug).Scan(&count); err != nil {
+		return err
+	}
+	if count > 0 {
+		return nil
+	}
+	_, err := conn.Exec(
+		`INSERT INTO groups (slug, name, summary, description, pills, body, match_terms, category, position, enabled)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		g.slug, g.name, g.summary, g.description, g.pills, g.body, g.matchTerms, g.category, position[g.slug], g.enabled,
+	)
+	return err
 }

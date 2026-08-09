@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "decay-main/db"
 
-// Groups is the public index of recurring programs.
+// Groups is the public index of DECAY's categories.
 func Groups(groups []db.Group) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -44,7 +44,7 @@ func Groups(groups []db.Group) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"about\"><p class=\"about-statement\">Groups at DECAY</p><p class=\"about-body\">Connect with recurring meetups that call DECAY home. Explore their pages to learn what to bring, how to plug in, and what to expect when you show up.</p></section><section class=\"events\"><div class=\"group-list\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"about\"><p class=\"about-statement\">Categories at DECAY</p><p class=\"about-body\">Browse what happens at DECAY by category. Explore each one to learn what to bring, how to plug in, and what to expect when you show up.</p></section><section class=\"events\"><div class=\"group-list\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -99,7 +99,7 @@ func Groups(groups []db.Group) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = Layout("Groups · DECAY").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Layout("Categories · DECAY").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -142,7 +142,7 @@ func GroupPage(g db.Group, upcoming []db.Event, photos []db.Photo) templ.Compone
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<section class=\"event-detail group-detail\"><a href=\"/groups\" class=\"event-back mono\">&larr; All groups</a> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<section class=\"event-detail group-detail\"><a href=\"/groups\" class=\"event-back mono\">&larr; All categories</a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -178,7 +178,7 @@ func GroupPage(g db.Group, upcoming []db.Event, photos []db.Photo) templ.Compone
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<span class=\"section-label mono\">Group at DECAY</span><h1 class=\"event-detail-title\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<span class=\"section-label mono\">Category at DECAY</span><h1 class=\"event-detail-title\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
