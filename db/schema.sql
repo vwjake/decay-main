@@ -14,7 +14,12 @@ CREATE TABLE IF NOT EXISTS events (
     flyer TEXT NOT NULL DEFAULT '',
     -- Public URL segment. Also goes out in the calendar feed, so it
     -- shouldn't change once an event has been published.
-    slug TEXT NOT NULL DEFAULT ''
+    slug TEXT NOT NULL DEFAULT '',
+    -- Who's covering the space for this event. Free text rather than a
+    -- link to users.id: the admin form suggests existing accounts but
+    -- also accepts anyone without one, and a name should stay attached
+    -- to the event even if that account is later removed.
+    keyholder TEXT NOT NULL DEFAULT ''
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS events_slug ON events(slug) WHERE slug <> '';
@@ -116,8 +121,11 @@ CREATE TABLE IF NOT EXISTS people (
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- Public requests to book the space for an event, reviewed by organizers
--- in the admin queue. status moves new -> reviewed; archived hides it.
+-- Public requests to book the space for an event, worked through in the
+-- admin queue: read it, maybe convert it to an event, delete it once
+-- handled. status only ever holds 'new' now — there's no reviewed/archived
+-- workflow — kept as a column rather than dropped so it doesn't need a
+-- migration to remove.
 CREATE TABLE IF NOT EXISTS booking_requests (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -128,6 +136,8 @@ CREATE TABLE IF NOT EXISTS booking_requests (
     preferred_date TEXT NOT NULL DEFAULT '',
     expected_attendance TEXT NOT NULL DEFAULT '',
     status TEXT NOT NULL DEFAULT 'new',
+    -- Private admin notes — never shown to the requester.
+    notes TEXT NOT NULL DEFAULT '',
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
