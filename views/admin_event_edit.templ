@@ -8,7 +8,7 @@ import (
 
 // AdminEventEdit manages the parts of an event that don't fit the create
 // form: its flyer image and which volunteer roles it needs covered.
-templ AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, signups []db.VolunteerSignup, me db.User, errorMsg string) {
+templ AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, signups []db.VolunteerSignup, users []db.User, me db.User, errorMsg string) {
 	@AdminLayout(ev.Title+" · DECAY Admin", me) {
 		<a href="/admin/events" class="admin-back">&larr; All events</a>
 		<p class="admin-heading">{ ev.Title }</p>
@@ -20,6 +20,37 @@ templ AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, signups []db.V
 		</p>
 		if errorMsg != "" {
 			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+		}
+
+		<p class="admin-heading">Volunteer signups</p>
+		if len(signups) == 0 {
+			<p class="admin-sub mono">No one has signed up through the site yet.</p>
+		} else {
+			<p class="admin-sub mono">People who offered to help through the public page. Reach out, then clear them once handled.</p>
+			<table class="admin-table">
+				<tr>
+					<th>Name</th>
+					<th>Contact</th>
+					<th>Role</th>
+					<th>Note</th>
+					<th>When</th>
+					<th></th>
+				</tr>
+				for _, s := range signups {
+					<tr>
+						<td>{ s.Name }</td>
+						<td class="mono">{ s.Contact }</td>
+						<td>{ s.RoleLabel() }</td>
+						<td>{ s.Note }</td>
+						<td class="mono nowrap">{ s.When() }</td>
+						<td>
+							<form method="post" action={ templ.URL(fmt.Sprintf("/admin/events/%d/signups/%d/delete", ev.ID, s.ID)) } onsubmit="return confirm('Remove this signup?')">
+								<button type="submit" class="admin-btn admin-btn-small admin-btn-danger">Clear</button>
+							</form>
+						</td>
+					</tr>
+				}
+			</table>
 		}
 
 		<p class="admin-heading">Details</p>
@@ -46,6 +77,15 @@ templ AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, signups []db.V
 				The event keeps its calendar identity either way, so edits
 				reach subscribers as an update rather than a new event.
 			</p>
+			<label>
+				Keyholder
+				<input type="text" name="keyholder" value={ ev.Keyholder } list="keyholder-options" placeholder="Pick an account or type a name"/>
+			</label>
+			<datalist id="keyholder-options">
+				for _, u := range users {
+					<option value={ u.Name() }/>
+				}
+			</datalist>
 			<button type="submit" class="admin-btn">Save details</button>
 		</form>
 
@@ -123,37 +163,6 @@ templ AdminEventEdit(ev db.Event, volunteers []db.EventVolunteer, signups []db.V
 			<label>How many copies<input type="number" name="count" value="4" min="1" max="52"/></label>
 			<button type="submit" class="admin-btn">Create copies</button>
 		</form>
-
-		<p class="admin-heading">Volunteer signups</p>
-		if len(signups) == 0 {
-			<p class="admin-sub mono">No one has signed up through the site yet.</p>
-		} else {
-			<p class="admin-sub mono">People who offered to help through the public page. Reach out, then clear them once handled.</p>
-			<table class="admin-table">
-				<tr>
-					<th>Name</th>
-					<th>Contact</th>
-					<th>Role</th>
-					<th>Note</th>
-					<th>When</th>
-					<th></th>
-				</tr>
-				for _, s := range signups {
-					<tr>
-						<td>{ s.Name }</td>
-						<td class="mono">{ s.Contact }</td>
-						<td>{ s.RoleLabel() }</td>
-						<td>{ s.Note }</td>
-						<td class="mono nowrap">{ s.When() }</td>
-						<td>
-							<form method="post" action={ templ.URL(fmt.Sprintf("/admin/events/%d/signups/%d/delete", ev.ID, s.ID)) } onsubmit="return confirm('Remove this signup?')">
-								<button type="submit" class="admin-btn admin-btn-small admin-btn-danger">Clear</button>
-							</form>
-						</td>
-					</tr>
-				}
-			</table>
-		}
 
 		<p class="admin-heading">Delete</p>
 		<p class="admin-sub mono">

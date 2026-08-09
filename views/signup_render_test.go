@@ -38,10 +38,10 @@ func TestAdminEventEditSignups(t *testing.T) {
 		{ID: 1, EventID: 1, Role: "door", Name: "Ada", Contact: "ada@x.com", CreatedAt: time.Now()},
 		{ID: 2, EventID: 1, Name: "Bo", Contact: "555-1212", Note: "Can lift heavy things", CreatedAt: time.Now()},
 	}
-	if err := AdminEventEdit(ev, nil, signups, me, "").Render(context.Background(), io.Discard); err != nil {
+	if err := AdminEventEdit(ev, nil, signups, nil, me, "").Render(context.Background(), io.Discard); err != nil {
 		t.Fatalf("AdminEventEdit with signups: %v", err)
 	}
-	if err := AdminEventEdit(ev, nil, nil, me, "").Render(context.Background(), io.Discard); err != nil {
+	if err := AdminEventEdit(ev, nil, nil, nil, me, "").Render(context.Background(), io.Discard); err != nil {
 		t.Fatalf("AdminEventEdit no signups: %v", err)
 	}
 }

@@ -6,7 +6,7 @@ import (
 	"decay-main/db"
 )
 
-templ AdminEvents(events []db.Event, page db.Page, me db.User, errorMsg string) {
+templ AdminEvents(events []db.Event, page db.Page, users []db.User, prefill *db.BookingRequest, me db.User, errorMsg string) {
 	@AdminLayout("Events · DECAY Admin", me) {
 		<p class="admin-heading">Events</p>
 		if errorMsg != "" {
@@ -47,15 +47,34 @@ templ AdminEvents(events []db.Event, page db.Page, me db.User, errorMsg string) 
 		</table>
 		@adminPager(page)
 
-		<p class="admin-heading">Add event</p>
-		<form method="post" action="/admin/events" class="admin-form">
-			<label>Title<input type="text" name="title" required/></label>
+		<p class="admin-heading" id="add-event">Add event</p>
+		if prefill != nil {
+			<div class="admin-flash mono">
+				Filled in from booking request &mdash;
+				<a href={ templ.URL(fmt.Sprintf("/admin/bookings/%d", prefill.ID)) }>{ prefill.Name }</a>
+				if prefill.PreferredDate != "" {
+					{ ", wants " + prefill.PreferredDate }
+				}
+				. Starts at still needs a real date and time before this can be created.
+			</div>
+		}
+		<form method="post" action={ templ.URL(addEventAction(prefill)) } class="admin-form">
+			<label>Title<input type="text" name="title" value={ eventTitlePrefill(prefill) } required/></label>
 			<label>Type<input type="text" name="event_type" placeholder="Workshop, Film, Meetup…" required/></label>
 			<label>Starts at (Pacific time)<input type="datetime-local" name="starts_at" required/></label>
 			<label>Ends at (optional, Pacific time)<input type="datetime-local" name="ends_at"/></label>
 			<label>Location<input type="text" name="location" value="402 Washington St NE, Olympia WA"/></label>
-			<label>Description<textarea name="description"></textarea></label>
+			<label>Description<textarea name="description">{ descriptionPrefill(prefill) }</textarea></label>
 			<label>Link<input type="text" name="link" placeholder="#"/></label>
+			<label>
+				Keyholder
+				<input type="text" name="keyholder" list="keyholder-options" placeholder="Pick an account or type a name"/>
+			</label>
+			<datalist id="keyholder-options">
+				for _, u := range users {
+					<option value={ u.Name() }/>
+				}
+			</datalist>
 			<fieldset class="admin-fieldset">
 				<legend>Volunteers needed</legend>
 				for _, role := range db.VolunteerRoles {
@@ -69,6 +88,36 @@ templ AdminEvents(events []db.Event, page db.Page, me db.User, errorMsg string) 
 			<button type="submit" class="admin-btn">Create</button>
 		</form>
 	}
+}
+
+// addEventAction is the create form's target: plain "/admin/events" normally,
+// or carrying the booking id along in the query string when the form was
+// reached via "Convert to event" — createEvent reads it back off the same
+// request to mark the booking reviewed once the event exists.
+func addEventAction(prefill *db.BookingRequest) string {
+	if prefill == nil {
+		return "/admin/events"
+	}
+	return fmt.Sprintf("/admin/events?from_booking=%d", prefill.ID)
+}
+
+// eventTitlePrefill uses the booking's own event name, falling back to the
+// requester's name so the field isn't left blank when they didn't give one.
+func eventTitlePrefill(prefill *db.BookingRequest) string {
+	if prefill == nil {
+		return ""
+	}
+	if prefill.EventName != "" {
+		return prefill.EventName
+	}
+	return prefill.Name
+}
+
+func descriptionPrefill(prefill *db.BookingRequest) string {
+	if prefill == nil {
+		return ""
+	}
+	return prefill.Description
 }
 
 // adminPager is the pager for admin tables, which sit inside a narrower
