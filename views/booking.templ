@@ -34,7 +34,7 @@ templ BookingForm(v db.BookingRequest, sent bool, errorMsg string) {
 					<label>Preferred date(s)<input type="text" name="preferred_date" value={ v.PreferredDate } placeholder="e.g. a Saturday in August" maxlength="200"/></label>
 					<label>Expected attendance<input type="text" name="expected_attendance" value={ v.ExpectedAttendance } placeholder="rough headcount" maxlength="60"/></label>
 					<label>Tell us about your event<textarea name="description" rows="6" required maxlength="5000">{ v.Description }</textarea></label>
-					<label class="hp-field" aria-hidden="true">Leave this blank<input type="text" name="website" tabindex="-1" autocomplete="off"/></label>
+					<input type="hidden" name="website" value=""/>
 					<button type="submit" class="admin-btn">Send request</button>
 				</form>
 			}

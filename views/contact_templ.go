@@ -126,7 +126,7 @@ func ContactForm(v db.ContactMessage, sent bool, errorMsg string) templ.Componen
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</textarea></label> <label class=\"hp-field\" aria-hidden=\"true\">Leave this blank<input type=\"text\" name=\"website\" tabindex=\"-1\" autocomplete=\"off\"></label> <button type=\"submit\" class=\"admin-btn\">Send message</button></form>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</textarea></label> <input type=\"hidden\" name=\"website\" value=\"\"> <button type=\"submit\" class=\"admin-btn\">Send message</button></form>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

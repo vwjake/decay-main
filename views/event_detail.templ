@@ -29,6 +29,10 @@ templ EventDetail(ev db.Event, openRoles []db.EventVolunteer, signup SignupBox, 
 					<img class="event-flyer" src={ ev.FlyerWebPath() } alt={ "Flyer for " + ev.Title }/>
 				</a>
 			}
+			<div class="event-detail-actions">
+				<button type="button" class="btn-outline mono" data-share={ ev.Path() }>Share</button>
+				<a href={ templ.URL(ev.Path() + "/ics") } class="btn-outline mono">Download</a>
+			</div>
 			for _, para := range ev.Paragraphs() {
 				<p class="event-detail-body">{ para }</p>
 			}
@@ -57,7 +61,7 @@ templ EventDetail(ev db.Event, openRoles []db.EventVolunteer, signup SignupBox, 
 								</select>
 							</label>
 							<label>Anything to add?<textarea name="note" maxlength="1000"></textarea></label>
-							<label class="hp-field" aria-hidden="true">Leave this blank<input type="text" name="website" tabindex="-1" autocomplete="off"/></label>
+							<input type="hidden" name="website" value=""/>
 							<button type="submit" class="admin-btn">Sign up</button>
 						</form>
 					}

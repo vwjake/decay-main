@@ -26,9 +26,31 @@ templ Media(p MediaPage) {
 		<section class="about">
 			<p class="about-statement">Media</p>
 			<p class="about-body">Sets, sessions, and photographs from 402 Washington St NE.</p>
-			<a href="https://instagram.com/decay_olympia" class="btn-outline mono" target="_blank" rel="noopener">
-				Follow on Instagram
-			</a>
+		</section>
+
+		<section class="events">
+			if p.HasVideos() {
+				<span class="section-label mono">Photos</span>
+			}
+			if len(p.Photos) == 0 {
+				<p class="about-body">No photos yet — check back soon.</p>
+			} else {
+				<div class="gallery">
+					for i, photo := range p.Photos {
+						<figure class="gallery-item" hidden?={ i > 0 }>
+							<a href={ templ.URL(photo.Path()) } target="_blank" rel="noopener">
+								<img src={ photo.WebPath() } alt={ photo.Alt() } loading="lazy"/>
+							</a>
+							if photo.Caption != "" {
+								<figcaption class="gallery-caption mono">{ photo.Caption }</figcaption>
+							}
+						</figure>
+					}
+				</div>
+				if len(p.Photos) > 1 {
+					<button type="button" class="btn-outline mono" data-gallery-open>Check out the gallery</button>
+				}
+			}
 		</section>
 
 		if len(p.Featured) > 0 {
@@ -61,16 +83,20 @@ templ Media(p MediaPage) {
 
 		if len(p.Recent) > 0 {
 			<section class="events">
-				<span class="section-label mono">Recent uploads</span>
-				<div class="event-list">
+				<span class="section-label mono">Recent video uploads</span>
+				<div class="video-grid">
 					for _, v := range p.Recent {
-						<div class="event-row">
-							<span>
-								<a href={ templ.URL(v.WatchURL()) } target="_blank" rel="noopener">{ v.Title }</a>
-							</span>
-							if v.PublishedLabel() != "" {
-								<span class="event-date">{ v.PublishedLabel() }</span>
-							}
+						<div class="video-item">
+							<a href={ templ.URL(v.WatchURL()) } target="_blank" rel="noopener">
+								<img src={ v.ThumbURL() } alt={ v.Title } loading="lazy"/>
+								<span class="video-play">&#9654;</span>
+							</a>
+							<div class="video-caption mono">
+								<span class="video-title">{ v.Title }</span>
+								if v.PublishedLabel() != "" {
+									<span class="video-date">{ v.PublishedLabel() }</span>
+								}
+							</div>
 						</div>
 					}
 				</div>
@@ -81,27 +107,5 @@ templ Media(p MediaPage) {
 				}
 			</section>
 		}
-
-		<section class="events">
-			if p.HasVideos() {
-				<span class="section-label mono">Photos</span>
-			}
-			if len(p.Photos) == 0 {
-				<p class="about-body">No photos yet — check back soon.</p>
-			} else {
-				<div class="gallery">
-					for _, photo := range p.Photos {
-						<figure class="gallery-item">
-							<a href={ templ.URL(photo.Path()) } target="_blank" rel="noopener">
-								<img src={ photo.WebPath() } alt={ photo.Alt() } loading="lazy"/>
-							</a>
-							if photo.Caption != "" {
-								<figcaption class="gallery-caption mono">{ photo.Caption }</figcaption>
-							}
-						</figure>
-					}
-				</div>
-			}
-		</section>
 	}
 }

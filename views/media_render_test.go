@@ -18,7 +18,10 @@ func mediaFixture() MediaPage {
 			ID: "bbbbbbbbbbb", Title: "Undine Noise at ISM Festival",
 			Published: time.Date(2026, 8, 6, 8, 20, 0, 0, time.UTC),
 		}},
-		Photos:     []db.Photo{{ID: 1, Filename: "1.jpg", Caption: "Open Draw"}},
+		Photos: []db.Photo{
+			{ID: 1, Filename: "1.jpg", Caption: "Open Draw"},
+			{ID: 2, Filename: "2.jpg", Caption: "No Tape"},
+		},
 		ChannelURL: "https://www.youtube.com/@no_tape/videos",
 	}
 }
@@ -38,19 +41,25 @@ func TestMediaViewRenders(t *testing.T) {
 		"youtube-nocookie.com/embed/aaaaaaaaaaa",      // embedded, privacy-preserving
 		"Undine Noise at ISM Festival",                // recent upload
 		"https://www.youtube.com/watch?v=bbbbbbbbbbb", // links out
+		"i.ytimg.com/vi/bbbbbbbbbbb/mqdefault.jpg",    // recent upload thumbnail
 		"Aug 6, 2026",                                 // upload date
 		"Open Draw",                                   // photo caption
 		"https://www.youtube.com/@no_tape/videos",     // channel link
+		"Recent video uploads",                        // renamed section label
+		"Check out the gallery",                       // multi-photo teaser button
 	} {
 		if !strings.Contains(out, want) {
 			t.Errorf("rendered page is missing %q", want)
 		}
 	}
+	if strings.Contains(out, "instagram") {
+		t.Error("the Instagram button should be gone from /media")
+	}
 
 	// Recent uploads must not carry the gallery classes: the lightbox binds
 	// to the first .gallery on the page and these links leave the site, so
 	// sharing the class would hijack the photo viewer.
-	grid := out[strings.Index(out, "Recent uploads"):strings.Index(out, "Photos</span>")]
+	grid := out[strings.Index(out, "Recent video uploads"):]
 	if strings.Contains(grid, `class="gallery"`) || strings.Contains(grid, "gallery-item") {
 		t.Error("the video grid uses the photo gallery's classes — that breaks the lightbox")
 	}
@@ -58,10 +67,22 @@ func TestMediaViewRenders(t *testing.T) {
 	if !strings.Contains(out, `class="gallery"`) {
 		t.Error("the photo gallery lost its class")
 	}
-	// The gallery has to come after the videos for the lightbox to bind to
-	// photos rather than to video thumbnails.
-	if strings.Index(out, "video-grid") > strings.Index(out, `class="gallery"`) {
-		t.Error("the photo gallery should come after the video grid")
+	// Photos now lead the page, with the video sections following.
+	if strings.Index(out, `class="gallery"`) > strings.Index(out, "video-grid") {
+		t.Error("the photo gallery should come before the video grid now that photos lead the page")
+	}
+
+	// Only the first photo is shown; the rest stay in the DOM (for the
+	// lightbox's prev/next) but hidden until "Check out the gallery" opens it.
+	figures := strings.Split(out[strings.Index(out, `class="gallery"`):], "<figure")
+	if len(figures) < 3 {
+		t.Fatalf("expected 2 gallery figures, got %d", len(figures)-1)
+	}
+	if strings.Contains(figures[1], "hidden") {
+		t.Error("the first photo should be visible, not hidden")
+	}
+	if !strings.Contains(figures[2], "hidden") {
+		t.Error("the second photo should be hidden until the gallery is opened")
 	}
 
 	// Each section is optional, and an empty page still says something.

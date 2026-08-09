@@ -259,6 +259,20 @@ func main() {
 		return views.EventArchive(db.GroupByMonth(events), page).Render(c.Request().Context(), c.Response())
 	})
 
+	// A single event's own .ics, for the "Download" button on its page —
+	// distinct from /events.ics, which is the whole ongoing subscription.
+	e.GET("/events/:slug/ics", func(c echo.Context) error {
+		ev, err := db.EventBySlug(conn, c.Param("slug"))
+		if errors.Is(err, sql.ErrNoRows) {
+			return echo.NewHTTPError(http.StatusNotFound)
+		}
+		if err != nil {
+			return err
+		}
+		c.Response().Header().Set("Content-Disposition", `attachment; filename="`+ev.Slug+`.ics"`)
+		return c.Blob(http.StatusOK, "text/calendar; charset=utf-8", ics.Event(ev, siteURL))
+	})
+
 	e.GET("/events/:slug", func(c echo.Context) error {
 		ev, err := db.EventBySlug(conn, c.Param("slug"))
 		if errors.Is(err, sql.ErrNoRows) {
@@ -443,13 +457,20 @@ func main() {
 		page := views.MediaPage{Featured: featured, Photos: photos}
 
 		// Recent uploads are a bonus on top of what's in the database: a
-		// YouTube outage costs the page that section, not the page.
+		// YouTube outage costs the page that section, not the page. Fetch
+		// more than the display cap so filtering out anything already
+		// featured still leaves up to 4 to show, rather than starting from
+		// 4 and losing some to the overlap.
 		if tube.Configured() {
 			recent, err := tube.Recent(12)
 			if err != nil {
 				log.Printf("youtube feed: %v (showing %d cached videos)", err, len(recent))
 			}
-			page.Recent = withoutFeatured(recent, featured)
+			recent = withoutFeatured(recent, featured)
+			if len(recent) > 4 {
+				recent = recent[:4]
+			}
+			page.Recent = recent
 			page.ChannelURL = channelURL
 		}
 		return views.Media(page).Render(c.Request().Context(), c.Response())

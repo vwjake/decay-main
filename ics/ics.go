@@ -46,6 +46,24 @@ func Calendar(name, baseURL string, events []db.Event) []byte {
 	return []byte(b.String())
 }
 
+// Event renders a single event as a complete VCALENDAR document, for the
+// "download" link on its own page — a visitor grabbing one event onto their
+// calendar, as opposed to Calendar's ongoing subscription to all of them.
+func Event(ev db.Event, baseURL string) []byte {
+	var b strings.Builder
+	writeLine(&b, "BEGIN:VCALENDAR")
+	writeLine(&b, "VERSION:2.0")
+	writeLine(&b, "PRODID:-//DECAY//decay-main//EN")
+	writeLine(&b, "CALSCALE:GREGORIAN")
+	writeLine(&b, "METHOD:PUBLISH")
+
+	stamp := time.Now().UTC().Format(utcLayout)
+	writeEvent(&b, ev, stamp, strings.TrimSuffix(baseURL, "/"))
+
+	writeLine(&b, "END:VCALENDAR")
+	return []byte(b.String())
+}
+
 const utcLayout = "20060102T150405Z"
 
 func writeEvent(b *strings.Builder, ev db.Event, stamp, base string) {

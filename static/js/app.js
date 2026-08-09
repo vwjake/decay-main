@@ -52,7 +52,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
   pollOrderStatus();
   setupGallery();
+  setupShareButtons();
 });
+
+// setupShareButtons wires up "Share" buttons on event and group pages: the
+// native share sheet where the browser has one (mostly mobile), falling
+// back to copying the link since desktop browsers mostly don't.
+function setupShareButtons() {
+  document.querySelectorAll('[data-share]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const url = new URL(btn.dataset.share, window.location.origin).href;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: document.title, url });
+        } catch (e) {
+          // AbortError just means the person closed the share sheet.
+        }
+        return;
+      }
+      if (navigator.clipboard) {
+        try {
+          await navigator.clipboard.writeText(url);
+          const original = btn.textContent;
+          btn.textContent = 'Link copied!';
+          window.setTimeout(() => { btn.textContent = original; }, 2000);
+        } catch (e) {
+          window.prompt('Copy this link:', url);
+        }
+      } else {
+        window.prompt('Copy this link:', url);
+      }
+    });
+  });
+}
 
 // pollOrderStatus fills in the order confirmation page when it was reached
 // before Stripe's webhook arrived. The buyer is redirected back the instant
@@ -159,6 +191,12 @@ function setupGallery() {
     else if (e.key === 'ArrowLeft') show(current - 1);
     else if (e.key === 'ArrowRight') show(current + 1);
   });
+
+  // /media shows only the first photo, with a button to browse the rest —
+  // the other photos are already in the DOM (just hidden), so opening the
+  // lightbox at index 0 gives access to all of them via prev/next.
+  const galleryOpen = document.querySelector('[data-gallery-open]');
+  if (galleryOpen) galleryOpen.addEventListener('click', () => open(0));
 }
 
 // embedLink asks for a YouTube or Bandcamp URL, has the server resolve it

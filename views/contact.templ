@@ -30,7 +30,7 @@ templ ContactForm(v db.ContactMessage, sent bool, errorMsg string) {
 					<label>Your email<input type="email" name="email" value={ v.Email } required maxlength="200"/></label>
 					<label>Subject<input type="text" name="subject" value={ v.Subject } placeholder="What's this about?" maxlength="200"/></label>
 					<label>Message<textarea name="message" rows="6" required maxlength="5000">{ v.Message }</textarea></label>
-					<label class="hp-field" aria-hidden="true">Leave this blank<input type="text" name="website" tabindex="-1" autocomplete="off"/></label>
+					<input type="hidden" name="website" value=""/>
 					<button type="submit" class="admin-btn">Send message</button>
 				</form>
 			}
