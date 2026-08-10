@@ -19,12 +19,11 @@ templ AdminPeople(people []db.Person, me db.User, errorMsg string) {
 				<th>Role</th>
 				<th>Photo</th>
 				<th></th>
+				<th></th>
 			</tr>
 			for _, p := range people {
 				<tr>
-					<td>
-						<a href={ templ.URL(fmt.Sprintf("/admin/people/%d", p.ID)) }>{ p.Name }</a>
-					</td>
+					<td>{ p.Name }</td>
 					<td>{ orDash(p.Role) }</td>
 					<td class="mono">
 						if p.HasPhoto() {
@@ -32,6 +31,9 @@ templ AdminPeople(people []db.Person, me db.User, errorMsg string) {
 						} else {
 							&mdash;
 						}
+					</td>
+					<td>
+						<a href={ templ.URL(fmt.Sprintf("/admin/people/%d", p.ID)) }>Edit</a>
 					</td>
 					<td>
 						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/people/%d/delete", p.ID)) } onsubmit="return confirm('Remove this profile?')">
