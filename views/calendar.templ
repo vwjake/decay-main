@@ -18,6 +18,8 @@ templ Calendar(month db.CalendarMonth) {
 				<a href={ templ.URL(db.MonthURL(month.Next)) } class="pager-link">Next &rarr;</a>
 			</nav>
 
+			@viewToggle("calendar")
+
 			<input type="checkbox" id="cal-view-toggle" class="cal-view-toggle"/>
 			<label for="cal-view-toggle" class="btn-outline mono cal-view-btn cal-view-btn-calendar">Calendar view</label>
 			<label for="cal-view-toggle" class="btn-outline mono cal-view-btn cal-view-btn-list">List view</label>
@@ -77,7 +79,6 @@ templ Calendar(month db.CalendarMonth) {
 				<p class="subscribe-note mono">Nothing scheduled this month.</p>
 			}
 
-			<a href="/events" class="btn-outline mono">List view</a>
 			<a href="/events.ics" class="btn-outline mono">Subscribe in your calendar</a>
 		</section>
 	}

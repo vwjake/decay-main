@@ -326,6 +326,14 @@ func main() {
 		return views.Bios(bios).Render(c.Request().Context(), c.Response())
 	})
 
+	e.GET("/volunteer", func(c echo.Context) error {
+		events, err := db.EventsNeedingVolunteers(conn)
+		if err != nil {
+			return err
+		}
+		return views.Volunteer(events).Render(c.Request().Context(), c.Response())
+	})
+
 	e.GET("/get-involved", func(c echo.Context) error {
 		forms, err := db.EnabledExternalForms(conn)
 		if err != nil {

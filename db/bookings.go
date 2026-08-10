@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"strings"
 	"time"
 )
 
@@ -28,6 +29,35 @@ type BookingRequest struct {
 }
 
 func (b BookingRequest) IsNew() bool { return b.Status == BookingNew }
+
+// preferredDateLayouts are the formats PreferredDate might have been typed
+// in as — it's a free-text field on the public form, not a date picker.
+var preferredDateLayouts = []string{
+	"2006-01-02",
+	"01/02/2006",
+	"1/2/2006",
+	"January 2, 2006",
+	"Jan 2, 2006",
+	"January 2 2006",
+	"Jan 2 2006",
+}
+
+// ParsePreferredDate best-effort parses PreferredDate into a real date, for
+// places (like the admin calendar) that want to plot a request against a
+// month grid. Most submissions won't parse — that's expected, not an
+// error — so it just reports whether it found one.
+func ParsePreferredDate(raw string, loc *time.Location) (time.Time, bool) {
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return time.Time{}, false
+	}
+	for _, layout := range preferredDateLayouts {
+		if t, err := time.ParseInLocation(layout, raw, loc); err == nil {
+			return t, true
+		}
+	}
+	return time.Time{}, false
+}
 
 // When renders the submission time for the queue.
 func (b BookingRequest) When() string { return b.CreatedAt.Format("Jan 2, 2006 · 3:04 PM") }

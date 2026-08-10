@@ -9,13 +9,13 @@ templ Events(months []db.EventMonth, page db.Page) {
 			<p class="about-body">Everything coming up at 402 Washington St NE. Doors are open to all ages unless a listing says otherwise.</p>
 		</section>
 		<section class="events">
+			@viewToggle("list")
 			if len(months) == 0 {
 				<p class="about-body">Nothing on the calendar right now — check back soon.</p>
 			} else {
 				@eventMonths(months)
 				@pager(page)
 			}
-			<a href="/calendar" class="btn-outline mono">Calendar view</a>
 			<a href="/events/archive" class="btn-outline mono">Past events</a>
 			<a href="/events.ics" class="btn-outline mono">Subscribe in your calendar</a>
 			<p class="subscribe-note mono">Add <span>/events.ics</span> to Nextcloud, Apple Calendar, or Google Calendar and new events show up on their own.</p>
@@ -39,6 +39,16 @@ templ EventArchive(months []db.EventMonth, page db.Page) {
 			<a href="/events" class="btn-outline mono">Upcoming events</a>
 		</section>
 	}
+}
+
+// viewToggle is the list/calendar switch shown at the top of both the
+// events list and the calendar page, so which view you're on — and how to
+// get to the other one — is obvious without scrolling to the bottom.
+templ viewToggle(active string) {
+	<div class="view-toggle mono">
+		<a href="/events" class={ "view-toggle-btn", templ.KV("is-active", active == "list") }>List view</a>
+		<a href="/calendar" class={ "view-toggle-btn", templ.KV("is-active", active == "calendar") }>Calendar view</a>
+	</div>
 }
 
 // pager renders the previous/next controls. Both slots are always laid

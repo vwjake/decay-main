@@ -1,163 +1,148 @@
 package views
 
 import (
+	"strconv"
 	"time"
 
 	"decay-main/db"
-	"decay-main/staff"
 )
 
-// StaffPage is everything the internal staff-calendar screen renders. When
-// the calendar URL isn't configured, Configured is false and the page
-// explains how to turn it on instead of showing an empty grid — Events
-// still renders either way, since it comes off the database rather than
-// Nextcloud.
+// CalCategory tags one entry on the admin calendar grid, so the on/off
+// checkboxes above it can show or hide a whole category with pure CSS.
+type CalCategory string
+
+const (
+	CalEvent   CalCategory = "event"
+	CalRequest CalCategory = "request"
+	CalStaff   CalCategory = "staff"
+)
+
+// CalEntry is one item on the admin calendar — an event, a booking request
+// with a parseable preferred date, or a staff meeting — reduced to what the
+// grid needs to render.
+type CalEntry struct {
+	Category CalCategory
+	Time     string
+	Title    string
+	Href     string
+	// Linkable is false when Href shouldn't be offered — a booking request
+	// when the viewer can't open Bookings, or a meeting, which lives on
+	// Nextcloud rather than anywhere on this site.
+	Linkable bool
+}
+
+func (e CalEntry) CategoryClass() string { return "cal-cat-" + string(e.Category) }
+
+// AdminCalDay is one cell of the admin calendar's month grid.
+type AdminCalDay struct {
+	Date    time.Time
+	InMonth bool
+	Today   bool
+	Entries []CalEntry
+}
+
+func (d AdminCalDay) Number() string { return strconv.Itoa(d.Date.Day()) }
+
+// AdminCalMonth lays events, requests, and meetings out on one shared month
+// grid, the way the admin calendar page reads them together.
+type AdminCalMonth struct {
+	Month time.Time
+	Weeks [][]AdminCalDay
+	// Prev and Next are "2006-01" values for the navigation links.
+	Prev string
+	Next string
+	// Count is how many entries (of any category) fall in the month.
+	Count int
+}
+
+func (m AdminCalMonth) Label() string { return m.Month.Format("January 2006") }
+
+// StaffPage is everything the admin calendar screen renders.
 type StaffPage struct {
 	Configured bool
 	Error      string
-	Month      staff.Month
-	Upcoming   []staff.Meeting
-	// Events is the same month of the site's own calendar, shown on a
-	// second grid below the meetings one.
-	Events db.CalendarMonth
-	Venue  *time.Location
+	Calendar   AdminCalMonth
+	Venue      *time.Location
 }
 
 templ AdminStaff(p StaffPage, me db.User) {
-	@AdminLayout("Staff · DECAY Admin", me) {
-		<p class="admin-heading">Staff calendar</p>
-		<p class="admin-sub mono">DECAY's internal staff calendar — board and organizing meetings, read live from Nextcloud. Read-only here; edit it in Nextcloud.</p>
-
-		// One nav for both grids. It reads its months off the events
-		// calendar, which is built whether or not Nextcloud is configured.
-		<nav class="pager mono">
-			<a href={ templ.URL("/admin/staff?month=" + p.Events.Prev) } class="pager-link">&larr; Prev</a>
-			<span class="pager-status">{ p.Events.Label() }</span>
-			<a href={ templ.URL("/admin/staff?month=" + p.Events.Next) } class="pager-link">Next &rarr;</a>
-		</nav>
+	@AdminLayout("Calendar · DECAY Admin", me) {
+		<p class="admin-heading">Calendar</p>
+		<p class="admin-sub mono">Events, booking requests, and staff meetings in one place. Toggle a category to focus on it.</p>
 
 		if !p.Configured {
 			<div class="admin-flash mono">
 				No staff calendar is connected yet. Set <code>STAFF_ICS_URL</code> to the
 				share link of DECAY's internal Nextcloud calendar (its read-only <code>.ics</code>
-				export URL) and restart, and it will show up here.
+				export URL) and restart, and its meetings will show up here too.
 			</div>
-		} else {
-			if p.Error != "" {
-				<div class="admin-flash admin-flash-error mono">{ p.Error }</div>
-			}
-
-			<div class="calendar-scroll">
-				<table class="calendar">
-					<thead>
-						<tr>
-							for _, day := range db.Weekdays {
-								<th class="mono">{ day }</th>
-							}
-						</tr>
-					</thead>
-					<tbody>
-						for _, week := range p.Month.Weeks {
-							<tr>
-								for _, day := range week {
-									if day.InMonth {
-										<td class={ "cal-day", templ.KV("is-today", day.Today) }>
-											<span class="cal-date mono">{ day.Number() }</span>
-											for _, m := range day.Meetings {
-												<span class="cal-event cal-meeting" title={ m.Title() }>
-													<span class="cal-event-time mono">{ m.StartClock() }</span>
-													<span class="cal-event-title">{ db.ShortTitle(m.Title()) }</span>
-												</span>
-											}
-										</td>
-									} else {
-										<td class="cal-day is-outside"></td>
-									}
-								}
-							</tr>
-						}
-					</tbody>
-				</table>
-			</div>
-			if p.Month.Count == 0 {
-				<p class="subscribe-note mono">No meetings on the staff calendar this month.</p>
-			}
+		} else if p.Error != "" {
+			<div class="admin-flash admin-flash-error mono">{ p.Error }</div>
 		}
 
-		@EventsGrid(p.Events)
+		<nav class="pager mono">
+			<a href={ templ.URL("/admin/staff?month=" + p.Calendar.Prev) } class="pager-link">&larr; Prev</a>
+			<span class="pager-status">{ p.Calendar.Label() }</span>
+			<a href={ templ.URL("/admin/staff?month=" + p.Calendar.Next) } class="pager-link">Next &rarr;</a>
+		</nav>
 
-		if p.Configured {
-			<h2 class="admin-subheading">Upcoming meetings</h2>
-			if len(p.Upcoming) == 0 {
-				<p class="subscribe-note mono">Nothing coming up on the staff calendar.</p>
-			} else {
-				<ul class="meeting-list">
-					for _, m := range p.Upcoming {
-						<li class="meeting-row">
-							<span class="meeting-when mono">
-								<span class="meeting-date">{ m.DayLabel(p.Venue) }</span>
-								<span class="meeting-time">{ m.TimeRange(p.Venue) }</span>
-							</span>
-							<span class="meeting-body">
-								<span class="meeting-title">{ m.Title() }</span>
-								if m.Location != "" {
-									<span class="meeting-loc mono">{ m.Location }</span>
+		<input type="checkbox" id="cal-filter-event" class="cal-filter-toggle" checked/>
+		<label for="cal-filter-event" class="cal-filter-btn">Events</label>
+		<input type="checkbox" id="cal-filter-request" class="cal-filter-toggle" checked/>
+		<label for="cal-filter-request" class="cal-filter-btn">Requests</label>
+		<input type="checkbox" id="cal-filter-staff" class="cal-filter-toggle" checked/>
+		<label for="cal-filter-staff" class="cal-filter-btn">Staff meetings</label>
+
+		<div class="calendar-scroll">
+			<table class="calendar">
+				<thead>
+					<tr>
+						for _, day := range db.Weekdays {
+							<th class="mono">{ day }</th>
+						}
+					</tr>
+				</thead>
+				<tbody>
+					for _, week := range p.Calendar.Weeks {
+						<tr>
+							for _, day := range week {
+								if day.InMonth {
+									<td class={ "cal-day", templ.KV("is-today", day.Today) }>
+										<span class="cal-date mono">{ day.Number() }</span>
+										for _, entry := range day.Entries {
+											@calEntry(entry)
+										}
+									</td>
+								} else {
+									<td class="cal-day is-outside"></td>
 								}
-								if m.Description != "" {
-									<span class="meeting-desc">{ m.Description }</span>
-								}
-							</span>
-						</li>
+							}
+						</tr>
 					}
-				</ul>
-			}
+				</tbody>
+			</table>
+		</div>
+		if p.Calendar.Count == 0 {
+			<p class="subscribe-note mono">Nothing on the calendar this month.</p>
 		}
 	}
 }
 
-// EventsGrid is the second calendar on the staff page: the same month of
-// the site's public schedule, laid out identically to the meetings grid
-// above it so the two read against each other. Cells link to the public
-// event page rather than the admin one, since reaching this page doesn't
-// imply permission to edit events.
-templ EventsGrid(month db.CalendarMonth) {
-	<h2 class="admin-subheading">Events</h2>
-	<p class="admin-sub mono">
-		What the public sees this month, from the site's own calendar.
-	</p>
-	<div class="calendar-scroll">
-		<table class="calendar">
-			<thead>
-				<tr>
-					for _, day := range db.Weekdays {
-						<th class="mono">{ day }</th>
-					}
-				</tr>
-			</thead>
-			<tbody>
-				for _, week := range month.Weeks {
-					<tr>
-						for _, day := range week {
-							if day.InMonth {
-								<td class={ "cal-day", templ.KV("is-today", day.Today) }>
-									<span class="cal-date mono">{ day.Day() }</span>
-									for _, ev := range day.Events {
-										<a href={ templ.URL(ev.Path()) } class="cal-event" title={ ev.Title } target="_blank" rel="noopener">
-											<span class="cal-event-time mono">{ ev.StartClock() }</span>
-											<span class="cal-event-title">{ db.ShortTitle(ev.Title) }</span>
-										</a>
-									}
-								</td>
-							} else {
-								<td class="cal-day is-outside"></td>
-							}
-						}
-					</tr>
-				}
-			</tbody>
-		</table>
-	</div>
-	if month.Count == 0 {
-		<p class="subscribe-note mono">Nothing scheduled this month.</p>
+templ calEntry(e CalEntry) {
+	if e.Linkable {
+		<a href={ templ.URL(e.Href) } class={ "cal-event", e.CategoryClass(), templ.KV("cal-meeting", e.Category == CalStaff), templ.KV("cal-request", e.Category == CalRequest) } title={ e.Title } target="_blank" rel="noopener">
+			@calEntryBody(e)
+		</a>
+	} else {
+		<span class={ "cal-event", e.CategoryClass(), templ.KV("cal-meeting", e.Category == CalStaff), templ.KV("cal-request", e.Category == CalRequest) } title={ e.Title }>
+			@calEntryBody(e)
+		</span>
 	}
+}
+
+templ calEntryBody(e CalEntry) {
+	if e.Time != "" {
+		<span class="cal-event-time mono">{ e.Time }</span>
+	}
+	<span class="cal-event-title">{ db.ShortTitle(e.Title) }</span>
 }

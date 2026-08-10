@@ -106,7 +106,7 @@ func GetInvolved(forms []db.ExternalForm) templ.Component {
 					}
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<p class=\"about-body\" style=\"margin-top:2rem\">Want to volunteer at a specific event? Open its page from the <a href=\"/events\">events list</a> and sign up there. Hoping to host something? Send a <a href=\"/book\">booking request</a>. Just have a question? <a href=\"/contact\">Get in touch</a>.</p></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<p class=\"about-body\" style=\"margin-top:2rem\">Want to volunteer at a specific event? See what <a href=\"/volunteer\">still needs a hand</a> and sign up there. Hoping to host something? Send a <a href=\"/book\">booking request</a>. Just have a question? <a href=\"/contact\">Get in touch</a>.</p></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

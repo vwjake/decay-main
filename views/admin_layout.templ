@@ -27,6 +27,9 @@ templ AdminLayout(title string, me db.User) {
 						if me.Can(db.PermEvents) {
 							<a href="/admin/events">Events</a>
 						}
+						if me.Can(db.PermStaff) {
+							<a href="/admin/staff">Calendar</a>
+						}
 						if me.Can(db.PermShop) {
 							<a href="/admin/products">Shop</a>
 						}
@@ -49,17 +52,14 @@ templ AdminLayout(title string, me db.User) {
 						if me.Can(db.PermBookings) {
 							<a href="/admin/bookings">Bookings</a>
 						}
+						if me.Can(db.PermReports) {
+							<a href="/admin/reports">Reports</a>
+						}
 						if me.Can(db.PermMessages) {
 							<a href="/admin/messages">Messages</a>
 						}
 						if me.Can(db.PermForms) {
 							<a href="/admin/forms">Forms</a>
-						}
-						if me.Can(db.PermReports) {
-							<a href="/admin/reports">Reports</a>
-						}
-						if me.Can(db.PermStaff) {
-							<a href="/admin/staff">Staff</a>
 						}
 						if me.Can(db.PermUsers) {
 							<a href="/admin/users">Accounts</a>

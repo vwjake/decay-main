@@ -323,6 +323,32 @@ a {
   background: var(--surface);
 }
 
+.view-toggle {
+  display: flex;
+  margin-top: 18px;
+}
+
+.view-toggle-btn {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 2px solid var(--ink);
+  color: var(--ink);
+  padding: 12px;
+  background: var(--surface);
+}
+
+.view-toggle-btn + .view-toggle-btn {
+  border-left: none;
+}
+
+.view-toggle-btn.is-active {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
 .subscribe-note {
   font-size: 11px;
   line-height: 1.6;
@@ -2110,6 +2136,52 @@ button.merch-item {
 
 .cal-meeting:hover .cal-event-time {
   color: var(--muted);
+}
+
+/* Booking requests share the meeting's non-inverting hover (still a real
+   link, unlike a meeting, but a dashed stripe keeps the three categories
+   visually distinct at a glance). */
+.cal-request {
+  border-left: 3px dashed #111;
+}
+
+/* Category toggles: three independent checkboxes, each hiding its own
+   category on the grid below via a pure-CSS sibling selector — same
+   technique as the nav hamburger and the public calendar's view switch. */
+.cal-filter-toggle {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cal-filter-btn {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 2px solid #111;
+  padding: 6px 10px;
+  margin: 12px 8px 0 0;
+  cursor: pointer;
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.cal-filter-toggle:checked + .cal-filter-btn {
+  background: #111;
+  color: var(--on-ink);
+}
+
+#cal-filter-event:not(:checked) ~ .calendar-scroll .cal-cat-event {
+  display: none;
+}
+
+#cal-filter-request:not(:checked) ~ .calendar-scroll .cal-cat-request {
+  display: none;
+}
+
+#cal-filter-staff:not(:checked) ~ .calendar-scroll .cal-cat-staff {
+  display: none;
 }
 
 .admin-subheading {

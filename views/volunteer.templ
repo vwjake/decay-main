@@ -1,0 +1,44 @@
+package views
+
+import "decay-main/db"
+
+// Volunteer lists upcoming events that still need a volunteer, so someone
+// looking to help can see exactly what's open without reading through
+// every event on the calendar.
+templ Volunteer(events []db.EventWithOpenRoles) {
+	@Layout("Volunteer · DECAY") {
+		<section class="about">
+			<p class="about-statement">Volunteer</p>
+			<p class="about-body">
+				These upcoming events still need a hand. Open one to sign up for a role, or
+				<a href="/get-involved">tell us you're generally interested</a> and we'll reach out.
+			</p>
+		</section>
+		<section class="events">
+			if len(events) == 0 {
+				<p class="about-body">Every upcoming event is fully staffed right now — check back soon.</p>
+			} else {
+				<div class="event-list">
+					for _, ev := range events {
+						@volunteerRow(ev)
+					}
+				</div>
+			}
+		</section>
+	}
+}
+
+templ volunteerRow(ev db.EventWithOpenRoles) {
+	<a href={ templ.URL(ev.Path()) } class="event-item">
+		<div>
+			<div class="event-title">{ ev.Title }</div>
+			<div class="event-meta mono">{ ev.TimeRange() }</div>
+			<ul class="volunteer-list">
+				for _, role := range ev.OpenRoles {
+					<li>{ role.Label() }</li>
+				}
+			</ul>
+		</div>
+		<div class="event-date mono">{ ev.Month() } { ev.Day() }</div>
+	</a>
+}

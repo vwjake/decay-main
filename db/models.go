@@ -576,6 +576,35 @@ func OpenRoles(volunteers []EventVolunteer) []EventVolunteer {
 	return open
 }
 
+// EventWithOpenRoles pairs an upcoming event with the volunteer roles it
+// still needs covered, for the public volunteer page.
+type EventWithOpenRoles struct {
+	Event
+	OpenRoles []EventVolunteer
+}
+
+// EventsNeedingVolunteers returns every upcoming event that still has at
+// least one open volunteer role, soonest first.
+func EventsNeedingVolunteers(conn *sql.DB) ([]EventWithOpenRoles, error) {
+	events, err := UpcomingEvents(conn)
+	if err != nil {
+		return nil, err
+	}
+	var out []EventWithOpenRoles
+	for _, ev := range events {
+		volunteers, err := VolunteersFor(conn, ev.ID)
+		if err != nil {
+			return nil, err
+		}
+		open := OpenRoles(volunteers)
+		if len(open) == 0 {
+			continue
+		}
+		out = append(out, EventWithOpenRoles{Event: ev, OpenRoles: open})
+	}
+	return out, nil
+}
+
 // EventMonth is a run of events sharing a calendar month, used to break
 // a long list into headed sections.
 type EventMonth struct {
