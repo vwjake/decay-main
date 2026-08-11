@@ -14,7 +14,7 @@ import (
 	"decay-main/db"
 )
 
-func AdminMedia(videos []db.Video, me db.User, errorMsg string) templ.Component {
+func AdminMedia(photos []db.Photo, groups []db.Group, videos []db.Video, me db.User, errorMsg string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -47,7 +47,7 @@ func AdminMedia(videos []db.Video, me db.User, errorMsg string) templ.Component 
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<p class=\"admin-heading\">Media</p><p class=\"admin-sub mono\">Videos embedded in the home page's media section, in the order below.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<p class=\"admin-heading\">Media</p><p class=\"admin-sub mono\">Photos and videos shown on the site's media section.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -70,137 +70,294 @@ func AdminMedia(videos []db.Video, me db.User, errorMsg string) templ.Component 
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " <p class=\"admin-heading\">Photos</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if len(videos) > 0 {
+			if len(photos) > 0 {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"merch-grid\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				for _, v := range videos {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"merch-item\"><a href=\"")
+				for _, p := range photos {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"merch-item\"><div class=\"merch-photo\"><img src=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var4 templ.SafeURL
-					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(v.WatchURL()))
+					var templ_7745c5c3_Var4 string
+					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.WebPath())
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 21, Col: 39}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 23, Col: 29}
 					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" target=\"_blank\" rel=\"noopener\" class=\"merch-photo\"><img src=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" alt=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var5 string
-					templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(v.ThumbURL())
+					templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.Alt())
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 22, Col: 30}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 23, Col: 45}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" alt=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" loading=\"lazy\"></div><form method=\"post\" action=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var6 string
-					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(v.Title)
+					var templ_7745c5c3_Var6 templ.SafeURL
+					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/photos/%d", p.ID)))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 22, Col: 46}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 25, Col: 83}
 					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\"></a><form method=\"post\" action=\"")
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var7 templ.SafeURL
-					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/media/%d", v.ID)))
-					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 24, Col: 82}
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"admin-caption-form\"><input type=\"text\" name=\"caption\" value=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" class=\"admin-form admin-media-form\"><label>Title<input type=\"text\" name=\"title\" value=\"")
+					var templ_7745c5c3_Var7 string
+					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.Caption)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 26, Col: 58}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var8 string
-					templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(v.Title)
-					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 25, Col: 66}
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" placeholder=\"Caption\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\"></label> <label>YouTube link or id<input type=\"text\" name=\"youtube\" value=\"")
+					templ_7745c5c3_Err = groupSelect(groups, p.GroupID).Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var9 string
-					templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(v.YouTubeID)
-					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 26, Col: 85}
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<button type=\"submit\" class=\"admin-btn\">Save</button></form><form method=\"post\" action=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" required></label> <label>Order<input type=\"number\" name=\"position\" value=\"")
+					var templ_7745c5c3_Var8 templ.SafeURL
+					templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/photos/%d/delete", p.ID)))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 30, Col: 90}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" onsubmit=\"return confirm('Delete this photo?')\" style=\"margin-top:8px\"><button type=\"submit\" class=\"admin-btn admin-btn-danger\">Delete</button></form></div>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, " <p class=\"admin-heading\">Upload photo</p><form method=\"post\" action=\"/admin/photos\" enctype=\"multipart/form-data\" class=\"admin-form\"><label>Image (jpg, png, gif, webp)<input type=\"file\" name=\"photo\" accept=\"image/*\" required></label> <label>Caption<input type=\"text\" name=\"caption\"></label> <label>Group (optional)@groupSelect(groups, nil)</label> <button type=\"submit\" class=\"admin-btn\">Upload</button></form><p class=\"admin-heading\">Videos</p>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if len(videos) > 0 {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div class=\"merch-grid\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				for _, v := range videos {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"merch-item\"><a href=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var9 templ.SafeURL
+					templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(v.WatchURL()))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 51, Col: 39}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" target=\"_blank\" rel=\"noopener\" class=\"merch-photo\"><img src=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var10 string
-					templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprint(v.Position))
+					templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(v.ThumbURL())
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 27, Col: 86}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 52, Col: 30}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\"></label> <button type=\"submit\" class=\"admin-btn admin-btn-small\">Save</button></form><form method=\"post\" action=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" alt=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var11 templ.SafeURL
-					templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/media/%d/delete", v.ID)))
+					var templ_7745c5c3_Var11 string
+					templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(v.Title)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 30, Col: 89}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 52, Col: 46}
 					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" onsubmit=\"return confirm('Remove this video?')\" style=\"margin-top:8px\"><button type=\"submit\" class=\"admin-btn admin-btn-small admin-btn-danger\">Delete</button></form></div>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\"></a><form method=\"post\" action=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var12 templ.SafeURL
+					templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/media/%d", v.ID)))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 54, Col: 82}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" class=\"admin-form admin-media-form\"><label>Title<input type=\"text\" name=\"title\" value=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var13 string
+					templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(v.Title)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 55, Col: 66}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\"></label> <label>YouTube link or id<input type=\"text\" name=\"youtube\" value=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var14 string
+					templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(v.YouTubeID)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 56, Col: 85}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" required></label> <button type=\"submit\" class=\"admin-btn admin-btn-small\">Save</button></form><form method=\"post\" action=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var15 templ.SafeURL
+					templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/media/%d/delete", v.ID)))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 59, Col: 89}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "\" onsubmit=\"return confirm('Remove this video?')\" style=\"margin-top:8px\"><button type=\"submit\" class=\"admin-btn admin-btn-small admin-btn-danger\">Delete</button></form></div>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, " <p class=\"admin-heading\">Add video</p><form method=\"post\" action=\"/admin/media\" class=\"admin-form\"><label>YouTube link or id<input type=\"text\" name=\"youtube\" placeholder=\"https://youtu.be/… or https://youtube.com/watch?v=…\" required></label> <label>Title<input type=\"text\" name=\"title\" placeholder=\"Optional caption\"></label> <label>Order<input type=\"number\" name=\"position\" value=\"0\"></label> <button type=\"submit\" class=\"admin-btn\">Add</button></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, " <p class=\"admin-heading\">Add video</p><form method=\"post\" action=\"/admin/media\" class=\"admin-form\"><label>YouTube link or id<input type=\"text\" name=\"youtube\" placeholder=\"https://youtu.be/… or https://youtube.com/watch?v=…\" required></label> <label>Title<input type=\"text\" name=\"title\" placeholder=\"Optional caption\"></label> <button type=\"submit\" class=\"admin-btn\">Add</button></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			return nil
 		})
 		templ_7745c5c3_Err = AdminLayout("Media · DECAY Admin", me).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+// groupSelect renders the group-tag dropdown, pre-selecting the photo's
+// current group. selected is nil for an untagged photo.
+func groupSelect(groups []db.Group, selected *int64) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var16 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var16 == nil {
+			templ_7745c5c3_Var16 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<select name=\"group_id\"><option value=\"\">No group</option> ")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		for _, g := range groups {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<option value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var17 string
+			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprint(g.ID))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 82, Col: 35}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var17)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if selected != nil && *selected == g.ID {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, " selected")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, ">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var18 string
+			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(g.Name)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_media.templ`, Line: 82, Col: 97}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</option>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</select>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

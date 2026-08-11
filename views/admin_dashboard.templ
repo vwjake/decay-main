@@ -72,8 +72,6 @@ templ AdminDashboard(c db.Counts, me db.User) {
 				"Write and publish blog posts with Markdown formatting.")
 			@dashboardCard("/admin/products", "Shop", fmt.Sprintf("%d items", c.Products),
 				"Manage products and sync inventory from Stripe.")
-			@dashboardCard("/admin/photos", "Photos", fmt.Sprintf("%d photos", c.Photos),
-				"Upload and organize photo galleries and event photos.")
 			if me.Can(db.PermPeople) {
 				@dashboardCard("/admin/people", "People", "board & staff profiles",
 					"Manage board members and staff profiles with photos and bios.")
@@ -85,8 +83,8 @@ templ AdminDashboard(c db.Counts, me db.User) {
 					"Create recurring programs and group activities.")
 			}
 			if me.Can(db.PermMedia) {
-				@dashboardCard("/admin/media", "Media", "embedded videos",
-					"Embed and manage YouTube videos and media content.")
+				@dashboardCard("/admin/media", "Media", fmt.Sprintf("%d photos", c.Photos),
+					"Upload photo galleries and embed YouTube videos.")
 			}
 			if me.Can(db.PermBookings) {
 				@dashboardCard("/admin/bookings", "Bookings", "requests to use the space",

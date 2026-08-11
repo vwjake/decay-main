@@ -17,7 +17,7 @@ func TestRolePermissions(t *testing.T) {
 
 	// A keyholder runs the space, not the site or its accounts.
 	granted := map[Permission]bool{
-		PermEvents: true, PermPhotos: true, PermBookings: true,
+		PermEvents: true, PermMedia: true, PermBookings: true,
 		PermMessages: true, PermReports: true, PermStaff: true,
 	}
 	for _, p := range AllPermissions {

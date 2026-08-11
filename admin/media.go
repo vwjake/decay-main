@@ -26,12 +26,22 @@ func listMedia(conn *sql.DB) echo.HandlerFunc {
 	}
 }
 
+// renderMedia draws the combined Media page: photos and YouTube videos
+// together, since that's how they're presented on the public /media page.
 func renderMedia(c echo.Context, conn *sql.DB, msg string) error {
+	photos, err := db.ListPhotos(conn)
+	if err != nil {
+		return err
+	}
+	groups, err := db.ListGroups(conn)
+	if err != nil {
+		return err
+	}
 	videos, err := db.ListVideos(conn)
 	if err != nil {
 		return err
 	}
-	return views.AdminMedia(videos, currentUser(c), msg).Render(c.Request().Context(), c.Response())
+	return views.AdminMedia(photos, groups, videos, currentUser(c), msg).Render(c.Request().Context(), c.Response())
 }
 
 func createVideo(conn *sql.DB) echo.HandlerFunc {
@@ -40,14 +50,9 @@ func createVideo(conn *sql.DB) echo.HandlerFunc {
 		if !ok {
 			return renderMedia(c, conn, "That doesn't look like a YouTube link. Paste a video URL or its id.")
 		}
-		position, err := parsePosition(c.FormValue("position"))
-		if err != nil {
-			return renderMedia(c, conn, "Order has to be a whole number.")
-		}
 		if _, err := db.CreateVideo(conn, db.Video{
 			YouTubeID: id,
 			Title:     strings.TrimSpace(c.FormValue("title")),
-			Position:  position,
 		}); err != nil {
 			return err
 		}
@@ -73,14 +78,9 @@ func saveVideo(conn *sql.DB) echo.HandlerFunc {
 		if !ok {
 			return renderMedia(c, conn, "That doesn't look like a YouTube link. Paste a video URL or its id.")
 		}
-		position, err := parsePosition(c.FormValue("position"))
-		if err != nil {
-			return renderMedia(c, conn, "Order has to be a whole number.")
-		}
 
 		v.YouTubeID = ytID
 		v.Title = strings.TrimSpace(c.FormValue("title"))
-		v.Position = position
 		if err := db.UpdateVideo(conn, v); err != nil {
 			return err
 		}

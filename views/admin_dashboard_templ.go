@@ -311,11 +311,6 @@ func AdminDashboard(c db.Counts, me db.User) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = dashboardCard("/admin/photos", "Photos", fmt.Sprintf("%d photos", c.Photos),
-				"Upload and organize photo galleries and event photos.").Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
 			if me.Can(db.PermPeople) {
 				templ_7745c5c3_Err = dashboardCard("/admin/people", "People", "board & staff profiles",
 					"Manage board members and staff profiles with photos and bios.").Render(ctx, templ_7745c5c3_Buffer)
@@ -340,8 +335,8 @@ func AdminDashboard(c db.Counts, me db.User) templ.Component {
 				}
 			}
 			if me.Can(db.PermMedia) {
-				templ_7745c5c3_Err = dashboardCard("/admin/media", "Media", "embedded videos",
-					"Embed and manage YouTube videos and media content.").Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = dashboardCard("/admin/media", "Media", fmt.Sprintf("%d photos", c.Photos),
+					"Upload photo galleries and embed YouTube videos.").Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -423,7 +418,7 @@ func dashboardCard(href, title, meta, desc string) templ.Component {
 		var templ_7745c5c3_Var18 templ.SafeURL
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(href))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_dashboard.templ`, Line: 116, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_dashboard.templ`, Line: 114, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
@@ -436,7 +431,7 @@ func dashboardCard(href, title, meta, desc string) templ.Component {
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_dashboard.templ`, Line: 118, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_dashboard.templ`, Line: 116, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
@@ -449,7 +444,7 @@ func dashboardCard(href, title, meta, desc string) templ.Component {
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(meta)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_dashboard.templ`, Line: 119, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_dashboard.templ`, Line: 117, Col: 47}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
@@ -462,7 +457,7 @@ func dashboardCard(href, title, meta, desc string) templ.Component {
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(desc)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_dashboard.templ`, Line: 121, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_dashboard.templ`, Line: 119, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {

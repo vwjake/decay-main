@@ -10,13 +10,13 @@ import (
 
 	"decay-main/db"
 	"decay-main/images"
-	"decay-main/views"
 
 	"github.com/labstack/echo/v4"
 )
 
+// registerPhotoRoutes wires up photo upload/edit/delete. The listing itself
+// lives on the combined /admin/media page — see media.go.
 func registerPhotoRoutes(g *echo.Group, conn *sql.DB, uploadsDir string) {
-	g.GET("/photos", listPhotos(conn))
 	g.POST("/photos", uploadPhoto(conn, uploadsDir))
 	g.POST("/photos/:id", savePhoto(conn))
 	g.POST("/photos/:id/delete", deletePhoto(conn, uploadsDir))
@@ -31,26 +31,8 @@ func savePhoto(conn *sql.DB) echo.HandlerFunc {
 		if err := db.UpdatePhoto(conn, id, c.FormValue("caption"), parseGroupID(c.FormValue("group_id"))); err != nil {
 			return err
 		}
-		return c.Redirect(http.StatusSeeOther, "/admin/photos")
+		return c.Redirect(http.StatusSeeOther, "/admin/media")
 	}
-}
-
-func listPhotos(conn *sql.DB) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		return renderPhotos(c, conn, "")
-	}
-}
-
-func renderPhotos(c echo.Context, conn *sql.DB, msg string) error {
-	photos, err := db.ListPhotos(conn)
-	if err != nil {
-		return err
-	}
-	groups, err := db.ListGroups(conn)
-	if err != nil {
-		return err
-	}
-	return views.AdminPhotos(photos, groups, currentUser(c), msg).Render(c.Request().Context(), c.Response())
 }
 
 // parseGroupID reads the photo tag dropdown: an empty value is "no group"
@@ -67,14 +49,14 @@ func uploadPhoto(conn *sql.DB, uploadsDir string) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		fileHeader, err := c.FormFile("photo")
 		if err != nil {
-			return rerenderPhotosError(c, conn, "Choose an image to upload.")
+			return renderMedia(c, conn, "Choose an image to upload.")
 		}
 
 		dir := filepath.Join(uploadsDir, db.PhotosSubdir)
 		filename, err := saveImage(fileHeader, dir)
 		if err != nil {
 			if errors.Is(err, errNotAnImage) {
-				return rerenderPhotosError(c, conn, "That file doesn't look like an image. Use jpg, png, gif, or webp.")
+				return renderMedia(c, conn, "That file doesn't look like an image. Use jpg, png, gif, or webp.")
 			}
 			return err
 		}
@@ -90,7 +72,7 @@ func uploadPhoto(conn *sql.DB, uploadsDir string) echo.HandlerFunc {
 		if err := db.CreatePhoto(conn, filename, c.FormValue("caption"), parseGroupID(c.FormValue("group_id"))); err != nil {
 			return err
 		}
-		return c.Redirect(http.StatusSeeOther, "/admin/photos")
+		return c.Redirect(http.StatusSeeOther, "/admin/media")
 	}
 }
 
@@ -107,10 +89,6 @@ func deletePhoto(conn *sql.DB, uploadsDir string) echo.HandlerFunc {
 		dir := filepath.Join(uploadsDir, db.PhotosSubdir)
 		_ = os.Remove(filepath.Join(dir, filename))
 		_ = os.Remove(filepath.Join(dir, "web", images.WebName(filename)))
-		return c.Redirect(http.StatusSeeOther, "/admin/photos")
+		return c.Redirect(http.StatusSeeOther, "/admin/media")
 	}
-}
-
-func rerenderPhotosError(c echo.Context, conn *sql.DB, msg string) error {
-	return renderPhotos(c, conn, msg)
 }

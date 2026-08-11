@@ -9,7 +9,6 @@ const (
 	PermEvents   Permission = "events"
 	PermPosts    Permission = "posts"
 	PermShop     Permission = "shop"
-	PermPhotos   Permission = "photos"
 	PermPeople   Permission = "people"
 	PermGroups   Permission = "groups"
 	PermMedia    Permission = "media"
@@ -22,7 +21,7 @@ const (
 )
 
 // AllPermissions is every permission, in the order they're displayed.
-var AllPermissions = []Permission{PermEvents, PermPosts, PermShop, PermPhotos, PermPeople, PermGroups, PermMedia, PermBookings, PermMessages, PermForms, PermReports, PermStaff, PermUsers}
+var AllPermissions = []Permission{PermEvents, PermPosts, PermShop, PermPeople, PermGroups, PermMedia, PermBookings, PermMessages, PermForms, PermReports, PermStaff, PermUsers}
 
 // Label renders a permission for display.
 func (p Permission) Label() string {
@@ -33,8 +32,6 @@ func (p Permission) Label() string {
 		return "Blog"
 	case PermShop:
 		return "Shop"
-	case PermPhotos:
-		return "Photos"
 	case PermPeople:
 		return "People"
 	case PermGroups:
@@ -80,7 +77,7 @@ var Roles = map[string][]Permission{
 	RoleMaster:  AllPermissions,
 	RoleManager: AllPermissions,
 	RoleKeyholder: {
-		PermEvents, PermPhotos, PermBookings, PermMessages, PermReports, PermStaff,
+		PermEvents, PermMedia, PermBookings, PermMessages, PermReports, PermStaff,
 	},
 }
 
@@ -110,7 +107,7 @@ func RoleDescription(role string) string {
 	case RoleManager:
 		return "Everything, including creating accounts and handing out access."
 	case RoleKeyholder:
-		return "Events, bookings, messages, photos, reports, and the staff calendar."
+		return "Events, bookings, messages, media, reports, and the staff calendar."
 	}
 	return ""
 }

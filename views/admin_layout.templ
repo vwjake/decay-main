@@ -36,9 +36,6 @@ templ AdminLayout(title string, me db.User) {
 						if me.Can(db.PermPosts) {
 							<a href="/admin/posts">Blog</a>
 						}
-						if me.Can(db.PermPhotos) {
-							<a href="/admin/photos">Photos</a>
-						}
 						if me.Can(db.PermPeople) {
 							<a href="/admin/people">People</a>
 						}

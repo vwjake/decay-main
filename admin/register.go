@@ -53,9 +53,6 @@ func Register(e *echo.Echo, conn *sql.DB, sessionSecret []byte, uploadsDir strin
 	posts := g.Group("", requirePermission(db.PermPosts))
 	registerPostRoutes(posts, conn, uploadsDir)
 
-	photos := g.Group("", requirePermission(db.PermPhotos))
-	registerPhotoRoutes(photos, conn, uploadsDir)
-
 	people := g.Group("", requirePermission(db.PermPeople))
 	registerPeopleRoutes(people, conn, uploadsDir)
 	registerBioRoutes(people, conn)
@@ -65,6 +62,7 @@ func Register(e *echo.Echo, conn *sql.DB, sessionSecret []byte, uploadsDir strin
 
 	media := g.Group("", requirePermission(db.PermMedia))
 	registerMediaRoutes(media, conn)
+	registerPhotoRoutes(media, conn, uploadsDir)
 
 	bookings := g.Group("", requirePermission(db.PermBookings))
 	registerBookingRoutes(bookings, conn, bookingMailer, venue)

@@ -230,7 +230,7 @@ neither is linked.
 grew videos; that URL now redirects, since old links and printed material
 still point at it.
 
-**Photos** are uploaded at `/admin/photos`. Files live under
+**Photos** are uploaded at `/admin/media`. Files live under
 `uploads/photos/` with web-sized copies in `uploads/photos/web/`, the
 same arrangement as flyers and product shots — the page shows the copy
 and links the original behind it. Tiles are cropped square so a grid of

@@ -6,14 +6,44 @@ import (
 	"decay-main/db"
 )
 
-templ AdminMedia(videos []db.Video, me db.User, errorMsg string) {
+templ AdminMedia(photos []db.Photo, groups []db.Group, videos []db.Video, me db.User, errorMsg string) {
 	@AdminLayout("Media · DECAY Admin", me) {
 		<p class="admin-heading">Media</p>
-		<p class="admin-sub mono">Videos embedded in the home page's media section, in the order below.</p>
+		<p class="admin-sub mono">Photos and videos shown on the site's media section.</p>
 		if errorMsg != "" {
 			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
 		}
 
+		<p class="admin-heading">Photos</p>
+		if len(photos) > 0 {
+			<div class="merch-grid">
+				for _, p := range photos {
+					<div class="merch-item">
+						<div class="merch-photo">
+							<img src={ p.WebPath() } alt={ p.Alt() } loading="lazy"/>
+						</div>
+						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/photos/%d", p.ID)) } class="admin-caption-form">
+							<input type="text" name="caption" value={ p.Caption } placeholder="Caption"/>
+							@groupSelect(groups, p.GroupID)
+							<button type="submit" class="admin-btn">Save</button>
+						</form>
+						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/photos/%d/delete", p.ID)) } onsubmit="return confirm('Delete this photo?')" style="margin-top:8px">
+							<button type="submit" class="admin-btn admin-btn-danger">Delete</button>
+						</form>
+					</div>
+				}
+			</div>
+		}
+
+		<p class="admin-heading">Upload photo</p>
+		<form method="post" action="/admin/photos" enctype="multipart/form-data" class="admin-form">
+			<label>Image (jpg, png, gif, webp)<input type="file" name="photo" accept="image/*" required/></label>
+			<label>Caption<input type="text" name="caption"/></label>
+			<label>Group (optional)@groupSelect(groups, nil)</label>
+			<button type="submit" class="admin-btn">Upload</button>
+		</form>
+
+		<p class="admin-heading">Videos</p>
 		if len(videos) > 0 {
 			<div class="merch-grid">
 				for _, v := range videos {
@@ -24,7 +54,6 @@ templ AdminMedia(videos []db.Video, me db.User, errorMsg string) {
 						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/media/%d", v.ID)) } class="admin-form admin-media-form">
 							<label>Title<input type="text" name="title" value={ v.Title }/></label>
 							<label>YouTube link or id<input type="text" name="youtube" value={ v.YouTubeID } required/></label>
-							<label>Order<input type="number" name="position" value={ fmt.Sprint(v.Position) }/></label>
 							<button type="submit" class="admin-btn admin-btn-small">Save</button>
 						</form>
 						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/media/%d/delete", v.ID)) } onsubmit="return confirm('Remove this video?')" style="margin-top:8px">
@@ -39,8 +68,18 @@ templ AdminMedia(videos []db.Video, me db.User, errorMsg string) {
 		<form method="post" action="/admin/media" class="admin-form">
 			<label>YouTube link or id<input type="text" name="youtube" placeholder="https://youtu.be/… or https://youtube.com/watch?v=…" required/></label>
 			<label>Title<input type="text" name="title" placeholder="Optional caption"/></label>
-			<label>Order<input type="number" name="position" value="0"/></label>
 			<button type="submit" class="admin-btn">Add</button>
 		</form>
 	}
+}
+
+// groupSelect renders the group-tag dropdown, pre-selecting the photo's
+// current group. selected is nil for an untagged photo.
+templ groupSelect(groups []db.Group, selected *int64) {
+	<select name="group_id">
+		<option value="">No group</option>
+		for _, g := range groups {
+			<option value={ fmt.Sprint(g.ID) } selected?={ selected != nil && *selected == g.ID }>{ g.Name }</option>
+		}
+	</select>
 }
