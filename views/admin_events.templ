@@ -2,16 +2,60 @@ package views
 
 import (
 	"fmt"
+	"time"
 
 	"decay-main/db"
 )
 
-templ AdminEvents(events []db.Event, page db.Page, users []db.User, prefill *db.BookingRequest, me db.User, errorMsg string) {
+// SeriesSummary is one row on the events list for a whole series — the
+// soonest upcoming occurrence stands in for the group, alongside how many
+// upcoming dates it has. Editing details or adding dates happens on the
+// series page, not here.
+type SeriesSummary struct {
+	SeriesID  int64
+	Title     string
+	EventType string
+	Next      time.Time
+	Count     int
+}
+
+templ AdminEvents(oneOff []db.Event, series []SeriesSummary, page db.Page, users []db.User, prefill *db.BookingRequest, me db.User, errorMsg string) {
 	@AdminLayout("Events · DECAY Admin", me) {
 		<p class="admin-heading">Events</p>
 		if errorMsg != "" {
 			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
 		}
+
+		if len(series) > 0 {
+			<p class="admin-heading">Repeating</p>
+			<p class="admin-sub mono">
+				Events stamped out by Repeat, one row per series. Manage dates and
+				shared details — title, description, location, flyer — from the
+				series page.
+			</p>
+			<table class="admin-table">
+				<tr>
+					<th>Next</th>
+					<th>Title</th>
+					<th>Type</th>
+					<th>Upcoming</th>
+					<th></th>
+				</tr>
+				for _, s := range series {
+					<tr>
+						<td class="mono nowrap">{ s.Next.Format("Jan 2") }</td>
+						<td>{ s.Title }</td>
+						<td>{ s.EventType }</td>
+						<td class="mono">{ fmt.Sprint(s.Count) }</td>
+						<td>
+							<a href={ templ.URL(fmt.Sprintf("/admin/series/%d", s.SeriesID)) } class="admin-btn admin-btn-small">Manage series</a>
+						</td>
+					</tr>
+				}
+			</table>
+		}
+
+		<p class="admin-heading">One-off</p>
 		<p class="admin-sub mono">{ page.Range() }</p>
 		<table class="admin-table">
 			<tr>
@@ -23,15 +67,10 @@ templ AdminEvents(events []db.Event, page db.Page, users []db.User, prefill *db.
 				<th></th>
 				<th></th>
 			</tr>
-			for _, ev := range events {
+			for _, ev := range oneOff {
 				<tr>
 					<td class="mono nowrap">{ ev.StartsAt.Format("Jan 2") }</td>
-					<td>
-						{ ev.Title }
-						if ev.InSeries() {
-							<a href={ templ.URL(fmt.Sprintf("/admin/series/%d", ev.SeriesID)) } class="admin-tag mono" title="Part of a recurring series">series</a>
-						}
-					</td>
+					<td>{ ev.Title }</td>
 					<td>{ ev.EventType }</td>
 					<td class="mono nowrap">{ ev.StartsAt.Format("3:04 PM") }</td>
 					<td class="mono nowrap">

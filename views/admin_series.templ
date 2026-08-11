@@ -79,10 +79,23 @@ templ AdminSeries(d SeriesPageData, me db.User) {
 			@seriesTable(d.Past)
 		}
 
+		<p class="admin-heading">Add dates</p>
 		<p class="admin-sub mono">
-			To add more dates, use Repeat on any event in the series — it'll
-			join this same group.
+			Stamps out more copies continuing after this series' last date —
+			same details, flyer, and volunteer roles as the rest of the run.
 		</p>
+		<form method="post" action={ templ.URL(seriesPath(d.SeriesID) + "/repeat") } class="admin-form">
+			<label>
+				How often
+				<select name="frequency">
+					for _, f := range db.RepeatFrequencies {
+						<option value={ f.Value }>{ f.Label }</option>
+					}
+				</select>
+			</label>
+			<label>How many dates<input type="number" name="count" value="4" min="1" max="52"/></label>
+			<button type="submit" class="admin-btn">Add dates</button>
+		</form>
 	}
 }
 

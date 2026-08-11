@@ -120,15 +120,6 @@ templ AdminEventEdit(d EventDetailData, me db.User) {
 			<label>Description<textarea name="description">{ ev.Description }</textarea></label>
 			<label>Link<input type="text" name="link" value={ ev.Link }/></label>
 			<label>
-				Web address
-				<input type="text" name="slug" value={ ev.Slug }/>
-			</label>
-			<p class="admin-sub mono">
-				Changing the address breaks links people have already shared.
-				The event keeps its calendar identity either way, so edits
-				reach subscribers as an update rather than a new event.
-			</p>
-			<label>
 				Keyholder
 				<input type="text" name="keyholder" value={ ev.Keyholder } list="keyholder-options" placeholder="Pick an account or type a name"/>
 			</label>
@@ -208,30 +199,27 @@ templ AdminEventEdit(d EventDetailData, me db.User) {
 			<button type="submit" class="admin-btn">Save volunteers</button>
 		</form>
 
-		<p class="admin-heading">Repeat</p>
-		<p class="admin-sub mono">
-			Stamp out copies of this event on a schedule. Each copy is its own
-			event — same details, flyer, and volunteer roles, on its own date and
-			with its own calendar identity — that you can edit or delete
-			separately afterward. Signups and reports aren't copied.
-			if !ev.InSeries() {
-				This turns the event into a series, with a page to keep the copies in sync.
-			} else {
-				The copies join this event's existing series.
-			}
-		</p>
-		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/events/%d/repeat", ev.ID)) } class="admin-form">
-			<label>
-				How often
-				<select name="frequency">
-					for _, f := range db.RepeatFrequencies {
-						<option value={ f.Value }>{ f.Label }</option>
-					}
-				</select>
-			</label>
-			<label>How many copies<input type="number" name="count" value="4" min="1" max="52"/></label>
-			<button type="submit" class="admin-btn">Create copies</button>
-		</form>
+		if !ev.InSeries() {
+			<p class="admin-heading">Repeat</p>
+			<p class="admin-sub mono">
+				Stamp out copies of this event on a schedule — same details, flyer,
+				and volunteer roles, on their own dates. This turns the event into a
+				series with its own page, where you can add more dates later and
+				keep the whole run in sync.
+			</p>
+			<form method="post" action={ templ.URL(fmt.Sprintf("/admin/events/%d/repeat", ev.ID)) } class="admin-form">
+				<label>
+					How often
+					<select name="frequency">
+						for _, f := range db.RepeatFrequencies {
+							<option value={ f.Value }>{ f.Label }</option>
+						}
+					</select>
+				</label>
+				<label>How many copies<input type="number" name="count" value="4" min="1" max="52"/></label>
+				<button type="submit" class="admin-btn">Create copies</button>
+			</form>
+		}
 
 		<p class="admin-heading">Delete</p>
 		<p class="admin-sub mono">

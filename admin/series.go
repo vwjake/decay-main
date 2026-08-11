@@ -19,12 +19,13 @@ import (
 )
 
 // registerSeriesRoutes wires the series page: view a repeating event's whole
-// run and push shared details or a new flyer out to every occurrence that
-// hasn't happened yet.
+// run, push shared details or a new flyer out to every occurrence that
+// hasn't happened yet, and add more dates continuing after the last one.
 func registerSeriesRoutes(g *echo.Group, conn *sql.DB, uploadsDir string) {
 	g.GET("/series/:id", showSeries(conn))
 	g.POST("/series/:id", pushSeriesDetails(conn))
 	g.POST("/series/:id/flyer", pushSeriesFlyer(conn, uploadsDir))
+	g.POST("/series/:id/repeat", addSeriesDates(conn))
 }
 
 func seriesPath(seriesID int64) string {
@@ -144,6 +145,44 @@ func pushSeriesDetails(conn *sql.DB) echo.HandlerFunc {
 			updated++
 		}
 		return c.Redirect(http.StatusSeeOther, fmt.Sprintf("%s?synced=%d", seriesPath(seriesID), updated))
+	}
+}
+
+// addSeriesDates stamps out more copies continuing after the series' last
+// date, using that last event as the template — same details, flyer, and
+// volunteer roles as the rest of the run. This is the series page's
+// replacement for repeating an arbitrary occurrence by hand: it always
+// picks up where the series actually leaves off.
+func addSeriesDates(conn *sql.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		seriesID, events, err := loadSeries(conn, c.Param("id"))
+		if err != nil {
+			return err
+		}
+
+		rerender := func(msg string) error {
+			data := seriesPageData(seriesID, events)
+			data.ErrorMsg = msg
+			return views.AdminSeries(data, currentUser(c)).Render(c.Request().Context(), c.Response())
+		}
+
+		freq := c.FormValue("frequency")
+		if !db.ValidRepeatFrequency(freq) {
+			return rerender("Pick how often it repeats.")
+		}
+		count, err := strconv.Atoi(strings.TrimSpace(c.FormValue("count")))
+		if err != nil || count < 1 {
+			return rerender("How many dates? Enter a whole number of 1 or more.")
+		}
+		if count > 52 {
+			count = 52
+		}
+
+		last := events[len(events)-1]
+		if _, _, err := db.RepeatEvent(conn, last.ID, freq, count, pacific); err != nil {
+			return err
+		}
+		return c.Redirect(http.StatusSeeOther, seriesPath(seriesID))
 	}
 }
 

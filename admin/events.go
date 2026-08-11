@@ -77,11 +77,12 @@ func listEvents(conn *sql.DB) echo.HandlerFunc {
 func renderEvents(c echo.Context, conn *sql.DB, msg string) error {
 	// Upcoming only, soonest first — same starting point as the homepage.
 	// Past events live on the calendar and (soon) behind a filter here.
-	events, err := db.UpcomingEvents(conn)
+	all, err := db.UpcomingEvents(conn)
 	if err != nil {
 		return err
 	}
-	events, page := db.Paginate(events, db.PageNumber(c.QueryParam("page")), db.PerPageAdmin)
+	oneOff, series := splitEventSeries(all)
+	oneOff, page := db.Paginate(oneOff, db.PageNumber(c.QueryParam("page")), db.PerPageAdmin)
 	page.Path = "/admin/events"
 	users, err := db.ListUsers(conn)
 	if err != nil {
@@ -95,7 +96,37 @@ func renderEvents(c echo.Context, conn *sql.DB, msg string) error {
 			}
 		}
 	}
-	return views.AdminEvents(events, page, users, prefill, currentUser(c), msg).Render(c.Request().Context(), c.Response())
+	return views.AdminEvents(oneOff, series, page, users, prefill, currentUser(c), msg).Render(c.Request().Context(), c.Response())
+}
+
+// splitEventSeries separates a soonest-first upcoming event list into
+// standalone events and one summary row per series, so the events page can
+// list them apart instead of showing every occurrence as its own row.
+// Events must already be sorted soonest first — the first one seen for a
+// given series is its next upcoming date.
+func splitEventSeries(events []db.Event) ([]db.Event, []views.SeriesSummary) {
+	var oneOff []db.Event
+	index := map[int64]int{}
+	var series []views.SeriesSummary
+	for _, ev := range events {
+		if !ev.InSeries() {
+			oneOff = append(oneOff, ev)
+			continue
+		}
+		if i, ok := index[ev.SeriesID]; ok {
+			series[i].Count++
+			continue
+		}
+		index[ev.SeriesID] = len(series)
+		series = append(series, views.SeriesSummary{
+			SeriesID:  ev.SeriesID,
+			Title:     ev.Title,
+			EventType: ev.EventType,
+			Next:      ev.StartsAt,
+			Count:     1,
+		})
+	}
+	return oneOff, series
 }
 
 // eventDetailData bundles an event for AdminEventEdit, looking up its email
