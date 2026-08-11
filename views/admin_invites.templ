@@ -1,0 +1,79 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/db"
+)
+
+templ AdminInvites(invites []db.Invite, me db.User, errorMsg, status string) {
+	@AdminLayout("Invites · DECAY Admin", me) {
+		<a href="/admin/users" class="admin-back">&larr; All accounts</a>
+		<p class="admin-heading">Invites</p>
+		<p class="admin-sub mono">
+			Send someone a link instead of picking a password for them — they choose
+			their own username when they open it.
+		</p>
+		if errorMsg != "" {
+			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+		}
+		if status != "" {
+			<div class="admin-flash mono">{ status }</div>
+		}
+
+		if len(invites) == 0 {
+			<p class="admin-sub mono">No open invites.</p>
+		} else {
+			<table class="admin-table">
+				<tr>
+					<th>Role</th>
+					<th>Email</th>
+					<th>Expires</th>
+					<th></th>
+				</tr>
+				for _, inv := range invites {
+					<tr>
+						<td>{ inv.RoleLabel() }</td>
+						<td class="mono">
+							if inv.Email != "" {
+								{ inv.Email }
+							} else {
+								&mdash;
+							}
+						</td>
+						<td class="mono">
+							if inv.Expired() {
+								expired
+							} else {
+								{ inv.ExpiresLabel() }
+							}
+						</td>
+						<td>
+							<span class="admin-row-actions">
+								<form method="post" action={ templ.URL(fmt.Sprintf("/admin/invites/%d/revoke", inv.ID)) } onsubmit="return confirm('Revoke this invite?')">
+									<button type="submit" class="admin-btn admin-btn-small admin-btn-danger">Revoke</button>
+								</form>
+							</span>
+						</td>
+					</tr>
+				}
+			</table>
+		}
+
+		<p class="admin-heading">Send an invite</p>
+		<form method="post" action="/admin/invites" class="admin-form">
+			<label>Email (optional — leave blank to just copy the link)<input type="email" name="email" autocomplete="off"/></label>
+			<label>Display name (optional)<input type="text" name="display_name" autocomplete="off"/></label>
+			<label>
+				Role
+				<select name="role">
+					for _, r := range me.AssignableRoles() {
+						<option value={ r } selected?={ r == db.RoleKeyholder }>{ db.RoleLabelFor(r) }</option>
+					}
+				</select>
+			</label>
+			@RoleKey(me)
+			<button type="submit" class="admin-btn">Create invite</button>
+		</form>
+	}
+}

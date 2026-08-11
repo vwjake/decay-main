@@ -9,6 +9,10 @@ import (
 templ AdminUsers(users []db.User, me db.User, errorMsg string) {
 	@AdminLayout("Accounts · DECAY Admin", me) {
 		<p class="admin-heading">Accounts</p>
+		<p class="admin-sub mono">
+			Rather have someone pick their own username and password?
+			<a href="/admin/invites">Send a signup link</a> instead.
+		</p>
 		if errorMsg != "" {
 			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
 		}

@@ -14,6 +14,7 @@ import (
 
 	"decay-main/bookingmail"
 	"decay-main/db"
+	"decay-main/mail"
 
 	"github.com/labstack/echo/v4"
 )
@@ -46,7 +47,7 @@ func panelFor(t *testing.T, signInAs string) (*http.Client, string, map[string]d
 
 	e := echo.New()
 	Register(e, conn, []byte("test-session-secret-000000000000"), t.TempDir(),
-		time.UTC, "", bookingmail.New(bookingmail.Config{}), false)
+		time.UTC, "", bookingmail.New(bookingmail.Config{}), false, mail.FromEnv(), "http://localhost:8080")
 	server := httptest.NewServer(e)
 	t.Cleanup(server.Close)
 

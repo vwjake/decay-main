@@ -7,6 +7,7 @@ import (
 
 	"decay-main/bookingmail"
 	"decay-main/db"
+	"decay-main/mail"
 	"decay-main/staff"
 	"decay-main/views"
 
@@ -20,8 +21,10 @@ import (
 // internal staff calendar (empty disables the staff page), and bookingMailer
 // reads/replies to the booking mailbox for the booking detail page (a
 // disabled Handler just hides that panel). secureCookies marks the session
-// cookie Secure (HTTPS-only) in production.
-func Register(e *echo.Echo, conn *sql.DB, sessionSecret []byte, uploadsDir string, venue *time.Location, staffURL string, bookingMailer *bookingmail.Handler, secureCookies bool) {
+// cookie Secure (HTTPS-only) in production. mailer sends invite emails (a
+// disabled Mailer just means the link has to be shared by hand), and
+// siteURL is what a signup link is built on.
+func Register(e *echo.Echo, conn *sql.DB, sessionSecret []byte, uploadsDir string, venue *time.Location, staffURL string, bookingMailer *bookingmail.Handler, secureCookies bool, mailer *mail.Mailer, siteURL string) {
 	store := sessions.NewCookieStore(sessionSecret)
 	store.Options = &sessions.Options{
 		Path:     "/",
@@ -80,9 +83,14 @@ func Register(e *echo.Echo, conn *sql.DB, sessionSecret []byte, uploadsDir strin
 	registerStaffRoutes(staffGroup, conn, staffClient, venue)
 
 	registerUserRoutes(g, conn, uploadsDir)
+	registerInviteRoutes(g, conn, mailer, siteURL)
 
 	// Everyone has an account page, whatever else their role reaches.
 	registerAccountRoutes(g, conn, uploadsDir)
+
+	// The signup form itself is public — the token in the link is what
+	// stands in for being signed in.
+	registerSignupRoutes(e, conn)
 }
 
 func dashboard(conn *sql.DB) echo.HandlerFunc {

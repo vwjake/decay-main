@@ -64,6 +64,25 @@ CREATE TABLE IF NOT EXISTS users (
 -- both exist and confuse who is who.
 CREATE UNIQUE INDEX IF NOT EXISTS users_username ON users(lower(username));
 
+-- Signup links a master or manager sends out so someone can create their
+-- own account rather than being handed a password. role and email are set
+-- when the link is issued; display_name is just a suggestion the signup
+-- form prefills, left blank if there isn't one yet. used_at marks the link
+-- spent — a token is good for one account, once, before it expires.
+CREATE TABLE IF NOT EXISTS invites (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    token TEXT NOT NULL,
+    role TEXT NOT NULL,
+    email TEXT NOT NULL DEFAULT '',
+    display_name TEXT NOT NULL DEFAULT '',
+    invited_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    expires_at TEXT NOT NULL,
+    used_at TEXT
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS invites_token ON invites(token);
+
 CREATE TABLE IF NOT EXISTS posts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     slug TEXT UNIQUE NOT NULL,

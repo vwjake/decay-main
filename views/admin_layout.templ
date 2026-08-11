@@ -62,6 +62,7 @@ templ AdminLayout(title string, me db.User) {
 						}
 						if me.Can(db.PermUsers) {
 							<a href="/admin/users">Accounts</a>
+							<a href="/admin/invites">Invites</a>
 						}
 						<a href="/" target="_blank" rel="noopener">View site</a>
 						// Your own name is the way into your account page —

@@ -1,0 +1,64 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/db"
+)
+
+templ Signup(invite db.Invite, errorMsg string) {
+	@signupShell("Set up your account · DECAY Admin") {
+		<p class="admin-heading">Set up your account</p>
+		<p class="admin-sub mono">
+			You're joining as a { invite.RoleLabel() }. Choose a username and password below.
+		</p>
+		if errorMsg != "" {
+			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+		}
+		<form method="post" action={ templ.URL(invite.SignupPath()) } class="admin-form">
+			<label>Username<input type="text" name="username" required autocomplete="off" autofocus/></label>
+			<label>Display name (optional)<input type="text" name="display_name" value={ invite.DisplayName } autocomplete="off"/></label>
+			<label>
+				{ fmt.Sprintf("Password (at least %d characters)", db.MinPasswordLength) }
+				<input type="password" name="password" required autocomplete="new-password" minlength={ fmt.Sprint(db.MinPasswordLength) }/>
+			</label>
+			<label>
+				Confirm password
+				<input type="password" name="password_confirm" required autocomplete="new-password" minlength={ fmt.Sprint(db.MinPasswordLength) }/>
+			</label>
+			<button type="submit" class="admin-btn">Create account</button>
+		</form>
+	}
+}
+
+templ SignupExpired() {
+	@signupShell("Invite not found · DECAY Admin") {
+		<p class="admin-heading">This link isn't good anymore</p>
+		<p class="admin-sub mono">
+			It's already been used, revoked, or has expired. Ask whoever invited you
+			to send a new one.
+		</p>
+	}
+}
+
+// signupShell is a bare page, like the login screen — a new account has
+// nothing to sign in with yet, so this can't sit behind AdminLayout's nav.
+templ signupShell(title string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<title>{ title }</title>
+			<link rel="preconnect" href="https://fonts.googleapis.com"/>
+			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+			<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+			<link rel="stylesheet" href="/static/css/style.css"/>
+		</head>
+		<body>
+			<div class="admin-login-wrap">
+				{ children... }
+			</div>
+		</body>
+	</html>
+}

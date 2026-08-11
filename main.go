@@ -168,7 +168,7 @@ func main() {
 
 	// The internal staff calendar is read from a separate Nextcloud
 	// share; an unset URL simply leaves that admin page dormant.
-	admin.Register(e, conn, sessionSecret(), uploadsDir, venue, os.Getenv("STAFF_ICS_URL"), bookingMailer, secureCookies)
+	admin.Register(e, conn, sessionSecret(), uploadsDir, venue, os.Getenv("STAFF_ICS_URL"), bookingMailer, secureCookies, mailer, siteURL)
 
 	e.GET("/", func(c echo.Context) error {
 		events, err := db.ListUpcomingEvents(conn, 4)
