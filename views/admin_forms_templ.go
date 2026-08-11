@@ -70,7 +70,7 @@ func AdminForms(forms []db.ExternalForm, me db.User, errorMsg string) templ.Comp
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " <p class=\"admin-heading\">Built into the site</p><p class=\"admin-sub mono\">Also linked from Get Involved, but part of the site's code rather than a form link — nothing to edit here, just where to find them.</p><table class=\"admin-table\"><tr><th>Title</th><th>Address</th><th></th></tr><tr><td>Community impact survey</td><td class=\"mono\">/community-survey</td><td><a href=\"/community-survey\" target=\"_blank\" rel=\"noopener\">Open</a></td></tr><tr><td>Design an event icon</td><td class=\"mono\">/get-involved/icons</td><td><a href=\"/get-involved/icons\" target=\"_blank\" rel=\"noopener\">Open</a></td></tr></table><p class=\"admin-heading\">Form links</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -83,7 +83,7 @@ func AdminForms(forms []db.ExternalForm, me db.User, errorMsg string) templ.Comp
 					var templ_7745c5c3_Var4 templ.SafeURL
 					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/forms/%d", f.ID)))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_forms.templ`, Line: 22, Col: 80}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_forms.templ`, Line: 46, Col: 80}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 					if templ_7745c5c3_Err != nil {
@@ -96,7 +96,7 @@ func AdminForms(forms []db.ExternalForm, me db.User, errorMsg string) templ.Comp
 					var templ_7745c5c3_Var5 string
 					templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(f.Title)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_forms.templ`, Line: 23, Col: 64}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_forms.templ`, Line: 47, Col: 64}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 					if templ_7745c5c3_Err != nil {
@@ -109,7 +109,7 @@ func AdminForms(forms []db.ExternalForm, me db.User, errorMsg string) templ.Comp
 					var templ_7745c5c3_Var6 string
 					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(f.Description)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_forms.templ`, Line: 24, Col: 82}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_forms.templ`, Line: 48, Col: 82}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 					if templ_7745c5c3_Err != nil {
@@ -122,7 +122,7 @@ func AdminForms(forms []db.ExternalForm, me db.User, errorMsg string) templ.Comp
 					var templ_7745c5c3_Var7 string
 					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(f.URL)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_forms.templ`, Line: 25, Col: 62}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_forms.templ`, Line: 49, Col: 62}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 					if templ_7745c5c3_Err != nil {
@@ -135,7 +135,7 @@ func AdminForms(forms []db.ExternalForm, me db.User, errorMsg string) templ.Comp
 					var templ_7745c5c3_Var8 string
 					templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprint(f.Position))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_forms.templ`, Line: 26, Col: 84}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_forms.templ`, Line: 50, Col: 84}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
 					if templ_7745c5c3_Err != nil {
@@ -158,7 +158,7 @@ func AdminForms(forms []db.ExternalForm, me db.User, errorMsg string) templ.Comp
 					var templ_7745c5c3_Var9 templ.SafeURL
 					templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(f.URL))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_forms.templ`, Line: 30, Col: 32}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_forms.templ`, Line: 54, Col: 32}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 					if templ_7745c5c3_Err != nil {
@@ -171,7 +171,7 @@ func AdminForms(forms []db.ExternalForm, me db.User, errorMsg string) templ.Comp
 					var templ_7745c5c3_Var10 templ.SafeURL
 					templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/forms/%d/delete", f.ID)))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_forms.templ`, Line: 33, Col: 87}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_forms.templ`, Line: 57, Col: 87}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 					if templ_7745c5c3_Err != nil {

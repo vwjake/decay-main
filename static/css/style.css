@@ -248,6 +248,15 @@ a {
   padding: 4px 8px;
 }
 
+/* Any link inline in a paragraph gets the same tan-on-black treatment,
+   so it reads as a link at a glance instead of blending into the text. */
+p a {
+  display: inline-block;
+  background: #111;
+  color: var(--on-ink);
+  padding: 1px 6px;
+}
+
 /* Events */
 
 .events {
@@ -1535,6 +1544,20 @@ button.merch-item {
 .admin-flash-error {
   border-color: #a00;
   color: #a00;
+}
+
+.upload-progress {
+  height: 8px;
+  border: 2px solid #111;
+  margin-top: 10px;
+  padding: 1px;
+}
+
+.upload-progress-bar {
+  height: 100%;
+  width: 0;
+  background: #111;
+  transition: width 0.15s linear;
 }
 
 .admin-login-wrap {

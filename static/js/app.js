@@ -53,7 +53,60 @@ document.addEventListener('DOMContentLoaded', () => {
   pollOrderStatus();
   setupGallery();
   setupShareButtons();
+  setupUploadProgress();
 });
+
+// setupUploadProgress adds a progress bar to every file-upload form (flyers,
+// avatars, gallery photos, and the like) so a slow connection shows visible
+// movement instead of a form that looks stuck. Plain multipart submission is
+// the fallback if JS is off; this just intercepts it to add the bar, then
+// follows the same redirect the server would have sent the browser to
+// anyway.
+function setupUploadProgress() {
+  document.querySelectorAll('form[enctype="multipart/form-data"]').forEach((form) => {
+    const fileInput = form.querySelector('input[type="file"]');
+    if (!fileInput) return;
+
+    const bar = document.createElement('div');
+    bar.className = 'upload-progress';
+    bar.hidden = true;
+    bar.innerHTML = '<div class="upload-progress-bar"></div>';
+    form.appendChild(bar);
+    const fill = bar.querySelector('.upload-progress-bar');
+
+    form.addEventListener('submit', (e) => {
+      if (!fileInput.files || fileInput.files.length === 0) return;
+      e.preventDefault();
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
+      bar.hidden = false;
+      fill.style.width = '0%';
+
+      const xhr = new XMLHttpRequest();
+      xhr.open(form.method || 'POST', form.action, true);
+      xhr.upload.addEventListener('progress', (evt) => {
+        if (evt.lengthComputable) {
+          fill.style.width = Math.round((evt.loaded / evt.total) * 100) + '%';
+        }
+      });
+      const fail = () => {
+        bar.hidden = true;
+        if (submitBtn) submitBtn.disabled = false;
+        window.alert('Upload failed. Please try again.');
+      };
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 400) {
+          window.location.href = xhr.responseURL || form.action;
+        } else {
+          fail();
+        }
+      };
+      xhr.onerror = fail;
+      xhr.send(new FormData(form));
+    });
+  });
+}
 
 // setupShareButtons wires up "Share" buttons on event and group pages: the
 // native share sheet where the browser has one (mostly mobile), falling

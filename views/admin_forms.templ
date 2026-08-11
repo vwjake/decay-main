@@ -17,6 +17,30 @@ templ AdminForms(forms []db.ExternalForm, me db.User, errorMsg string) {
 			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
 		}
 
+		<p class="admin-heading">Built into the site</p>
+		<p class="admin-sub mono">
+			Also linked from Get Involved, but part of the site's code rather than a
+			form link — nothing to edit here, just where to find them.
+		</p>
+		<table class="admin-table">
+			<tr>
+				<th>Title</th>
+				<th>Address</th>
+				<th></th>
+			</tr>
+			<tr>
+				<td>Community impact survey</td>
+				<td class="mono">/community-survey</td>
+				<td><a href="/community-survey" target="_blank" rel="noopener">Open</a></td>
+			</tr>
+			<tr>
+				<td>Design an event icon</td>
+				<td class="mono">/get-involved/icons</td>
+				<td><a href="/get-involved/icons" target="_blank" rel="noopener">Open</a></td>
+			</tr>
+		</table>
+
+		<p class="admin-heading">Form links</p>
 		if len(forms) > 0 {
 			for _, f := range forms {
 				<form method="post" action={ templ.URL(fmt.Sprintf("/admin/forms/%d", f.ID)) } class="admin-form">
