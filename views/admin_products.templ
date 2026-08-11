@@ -54,9 +54,6 @@ templ AdminProducts(products []db.Product, me db.User, errorMsg, notice string, 
 					</td>
 					<td class="admin-row-actions">
 						<a class="admin-btn" href={ templ.URL(fmt.Sprintf("/admin/products/%d", p.ID)) }>Edit</a>
-						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/products/%d/delete", p.ID)) } onsubmit="return confirm('Delete this product?')">
-							<button type="submit" class="admin-btn admin-btn-danger">Delete</button>
-						</form>
 					</td>
 				</tr>
 			}

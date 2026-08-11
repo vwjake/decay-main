@@ -70,7 +70,7 @@ func AdminGroups(groups []db.Group, me db.User, errorMsg string) templ.Component
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " <table class=\"admin-table\"><tr><th>Order</th><th>Name</th><th>Address</th><th>Listed</th><th></th><th></th></tr>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " <table class=\"admin-table\"><tr><th>Order</th><th>Name</th><th>Address</th><th>Listed</th><th></th></tr>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -82,7 +82,7 @@ func AdminGroups(groups []db.Group, me db.User, errorMsg string) templ.Component
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(g.Position))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_groups.templ`, Line: 27, Col: 46}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_groups.templ`, Line: 26, Col: 46}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
@@ -95,7 +95,7 @@ func AdminGroups(groups []db.Group, me db.User, errorMsg string) templ.Component
 				var templ_7745c5c3_Var5 templ.SafeURL
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/groups/%d", g.ID)))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_groups.templ`, Line: 29, Col: 64}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_groups.templ`, Line: 28, Col: 64}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -108,7 +108,7 @@ func AdminGroups(groups []db.Group, me db.User, errorMsg string) templ.Component
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(g.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_groups.templ`, Line: 29, Col: 75}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_groups.templ`, Line: 28, Col: 75}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
@@ -121,7 +121,7 @@ func AdminGroups(groups []db.Group, me db.User, errorMsg string) templ.Component
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(g.Slug)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_groups.templ`, Line: 31, Col: 38}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_groups.templ`, Line: 30, Col: 38}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
@@ -149,31 +149,18 @@ func AdminGroups(groups []db.Group, me db.User, errorMsg string) templ.Component
 				var templ_7745c5c3_Var8 templ.SafeURL
 				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(g.Path()))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_groups.templ`, Line: 40, Col: 35}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_groups.templ`, Line: 39, Col: 35}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" target=\"_blank\" rel=\"noopener\">View</a></td><td><form method=\"post\" action=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var9 templ.SafeURL
-				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/groups/%d/delete", g.ID)))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_groups.templ`, Line: 43, Col: 90}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" onsubmit=\"return confirm('Delete this group?')\"><button type=\"submit\" class=\"admin-btn admin-btn-danger\">Delete</button></form></td></tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" target=\"_blank\" rel=\"noopener\">View</a></td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</table><p class=\"admin-heading\">Add group</p><form method=\"post\" action=\"/admin/groups\" class=\"admin-form\"><label>Name<input type=\"text\" name=\"name\" required></label> <label>Address (optional)<input type=\"text\" name=\"slug\" placeholder=\"made from the name if blank\"></label> <label>Summary<textarea name=\"summary\" placeholder=\"One or two lines for the list card.\"></textarea></label> <label class=\"inline\"><input type=\"checkbox\" name=\"enabled\" value=\"1\" checked> Listed publicly</label><p class=\"admin-sub mono\">Add the description, sections, and photo after creating it.</p><button type=\"submit\" class=\"admin-btn\">Create</button></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</table><p class=\"admin-heading\">Add group</p><form method=\"post\" action=\"/admin/groups\" class=\"admin-form\"><label>Name<input type=\"text\" name=\"name\" required></label> <label>Address (optional)<input type=\"text\" name=\"slug\" placeholder=\"made from the name if blank\"></label> <label>Summary<textarea name=\"summary\" placeholder=\"One or two lines for the list card.\"></textarea></label> <label class=\"inline\"><input type=\"checkbox\" name=\"enabled\" value=\"1\" checked> Listed publicly</label><p class=\"admin-sub mono\">Add the description, sections, and photo after creating it.</p><button type=\"submit\" class=\"admin-btn\">Create</button></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

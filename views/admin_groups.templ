@@ -20,7 +20,6 @@ templ AdminGroups(groups []db.Group, me db.User, errorMsg string) {
 				<th>Address</th>
 				<th>Listed</th>
 				<th></th>
-				<th></th>
 			</tr>
 			for _, g := range groups {
 				<tr>
@@ -38,11 +37,6 @@ templ AdminGroups(groups []db.Group, me db.User, errorMsg string) {
 					</td>
 					<td>
 						<a href={ templ.URL(g.Path()) } target="_blank" rel="noopener">View</a>
-					</td>
-					<td>
-						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/groups/%d/delete", g.ID)) } onsubmit="return confirm('Delete this group?')">
-							<button type="submit" class="admin-btn admin-btn-danger">Delete</button>
-						</form>
 					</td>
 				</tr>
 			}

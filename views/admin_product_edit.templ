@@ -48,5 +48,10 @@ templ AdminProductEdit(p db.Product, me db.User, errorMsg string) {
 			</label>
 			<button type="submit" class="admin-btn">Save photo</button>
 		</form>
+
+		<p class="admin-heading">Delete</p>
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/products/%d/delete", p.ID)) } onsubmit="return confirm('Delete this product? This cannot be undone.')" class="admin-form">
+			<button type="submit" class="admin-btn admin-btn-danger">Delete item</button>
+		</form>
 	}
 }

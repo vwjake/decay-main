@@ -41,9 +41,6 @@ templ AdminPosts(posts []db.Post, me db.User, errorMsg string) {
 								<button type="submit" class="admin-btn">Publish</button>
 							</form>
 						}
-						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/posts/%d/delete", p.ID)) } onsubmit="return confirm('Delete this post?')" style="display:inline">
-							<button type="submit" class="admin-btn admin-btn-danger">Delete</button>
-						</form>
 					</td>
 				</tr>
 			}

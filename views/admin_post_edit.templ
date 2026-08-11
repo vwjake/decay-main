@@ -61,6 +61,11 @@ templ AdminPostEdit(post db.Post, postImages []db.PostImage, me db.User, errorMs
 				<button type="submit" class="admin-btn">Publish</button>
 			}
 		</form>
+
+		<p class="admin-heading">Delete</p>
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/posts/%d/delete", post.ID)) } onsubmit="return confirm('Delete this post? This cannot be undone.')" class="admin-form">
+			<button type="submit" class="admin-btn admin-btn-danger">Delete post</button>
+		</form>
 	}
 }
 

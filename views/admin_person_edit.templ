@@ -38,5 +38,10 @@ templ AdminPersonEdit(p db.Person, me db.User, errorMsg string) {
 			</label>
 			<button type="submit" class="admin-btn">Save photo</button>
 		</form>
+
+		<p class="admin-heading">Delete</p>
+		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/people/%d/delete", p.ID)) } onsubmit="return confirm('Remove this profile? This cannot be undone.')" class="admin-form">
+			<button type="submit" class="admin-btn admin-btn-danger">Delete profile</button>
+		</form>
 	}
 }

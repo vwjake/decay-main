@@ -170,25 +170,12 @@ func AdminPosts(posts []db.Post, me db.User, errorMsg string) templ.Component {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<form method=\"post\" action=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var9 templ.SafeURL
-				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/posts/%d/delete", p.ID)))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_posts.templ`, Line: 44, Col: 89}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" onsubmit=\"return confirm('Delete this post?')\" style=\"display:inline\"><button type=\"submit\" class=\"admin-btn admin-btn-danger\">Delete</button></form></td></tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</table><p class=\"admin-heading\">New post</p><form method=\"post\" action=\"/admin/posts\" class=\"admin-form\"><label>Title<input type=\"text\" name=\"title\" required></label> <label>Slug<input type=\"text\" name=\"slug\" placeholder=\"my-post-title\" required></label> <label>Body (Markdown)")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</table><p class=\"admin-heading\">New post</p><form method=\"post\" action=\"/admin/posts\" class=\"admin-form\"><label>Title<input type=\"text\" name=\"title\" required></label> <label>Slug<input type=\"text\" name=\"slug\" placeholder=\"my-post-title\" required></label> <label>Body (Markdown)")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -196,7 +183,7 @@ func AdminPosts(posts []db.Post, me db.User, errorMsg string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</label> <label class=\"inline mono\"><input type=\"checkbox\" name=\"publish\"> Publish immediately</label> <button type=\"submit\" class=\"admin-btn\">Save</button></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</label> <label class=\"inline mono\"><input type=\"checkbox\" name=\"publish\"> Publish immediately</label> <button type=\"submit\" class=\"admin-btn\">Save</button></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

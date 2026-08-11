@@ -130,7 +130,7 @@ templ AdminStaff(p StaffPage, me db.User) {
 
 templ calEntry(e CalEntry) {
 	if e.Linkable {
-		<a href={ templ.URL(e.Href) } class={ "cal-event", e.CategoryClass(), templ.KV("cal-meeting", e.Category == CalStaff), templ.KV("cal-request", e.Category == CalRequest) } title={ e.Title } target="_blank" rel="noopener">
+		<a href={ templ.URL(e.Href) } class={ "cal-event", e.CategoryClass(), templ.KV("cal-meeting", e.Category == CalStaff), templ.KV("cal-request", e.Category == CalRequest) } title={ e.Title }>
 			@calEntryBody(e)
 		</a>
 	} else {

@@ -73,7 +73,7 @@ func buildAdminCalendar(events []db.Event, requests []db.BookingRequest, meeting
 			Category: views.CalEvent,
 			Time:     ev.StartClock(),
 			Title:    ev.Title,
-			Href:     ev.Path(),
+			Href:     eventPath(ev.ID),
 			Linkable: true,
 		})
 		if inMonth(t) {

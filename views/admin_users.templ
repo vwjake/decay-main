@@ -41,11 +41,6 @@ templ AdminUsers(users []db.User, me db.User, errorMsg string) {
 					<td>
 						<span class="admin-row-actions">
 							<a href={ templ.URL(fmt.Sprintf("/admin/users/%d", u.ID)) } class="admin-btn admin-btn-small">Edit</a>
-							if u.ID != me.ID {
-								<form method="post" action={ templ.URL(fmt.Sprintf("/admin/users/%d/delete", u.ID)) } onsubmit="return confirm('Delete this account?')">
-									<button type="submit" class="admin-btn admin-btn-small admin-btn-danger">Delete</button>
-								</form>
-							}
 						</span>
 					</td>
 				</tr>
@@ -145,6 +140,13 @@ templ AdminUserEdit(user db.User, me db.User, errorMsg string) {
 			}
 			<button type="submit" class="admin-btn">Set password</button>
 		</form>
+
+		if user.ID != me.ID {
+			<p class="admin-heading">Delete</p>
+			<form method="post" action={ templ.URL(fmt.Sprintf("/admin/users/%d/delete", user.ID)) } onsubmit="return confirm('Delete this account? This cannot be undone.')" class="admin-form">
+				<button type="submit" class="admin-btn admin-btn-danger">Delete account</button>
+			</form>
+		}
 	}
 }
 

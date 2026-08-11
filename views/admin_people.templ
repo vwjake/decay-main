@@ -38,9 +38,6 @@ templ AdminPeople(people []db.Person, bios []db.CommunityBio, me db.User, people
 					</td>
 					<td>
 						<a href={ templ.URL(fmt.Sprintf("/admin/people/%d", p.ID)) } class="admin-btn">Edit</a>
-						<form method="post" action={ templ.URL(fmt.Sprintf("/admin/people/%d/delete", p.ID)) } onsubmit="return confirm('Remove this profile?')">
-							<button type="submit" class="admin-btn admin-btn-danger">Delete</button>
-						</form>
 					</td>
 				</tr>
 			}
