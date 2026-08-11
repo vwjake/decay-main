@@ -1,0 +1,72 @@
+package views
+
+import (
+	"fmt"
+	"strings"
+
+	"decay-main/db"
+)
+
+// CandidateGroup is a set of ungrouped events sharing a title and event
+// type — a likely repeat that predates series tracking, offered up for an
+// admin to confirm and link via the group-series tool.
+type CandidateGroup struct {
+	Title     string
+	EventType string
+	Events    []db.Event // chronological
+}
+
+func (g CandidateGroup) idsValue() string {
+	ids := make([]string, len(g.Events))
+	for i, ev := range g.Events {
+		ids[i] = fmt.Sprint(ev.ID)
+	}
+	return strings.Join(ids, ",")
+}
+
+func (g CandidateGroup) dateRange() string {
+	if len(g.Events) == 0 {
+		return ""
+	}
+	first := g.Events[0].StartsAt.Format("Jan 2, 2006")
+	last := g.Events[len(g.Events)-1].StartsAt.Format("Jan 2, 2006")
+	if first == last {
+		return first
+	}
+	return first + " – " + last
+}
+
+templ AdminGroupSeries(groups []CandidateGroup, me db.User, flashNotice string) {
+	@AdminLayout("Group events into series · DECAY Admin", me) {
+		<a href="/admin/events" class="admin-back">&larr; All events</a>
+		<p class="admin-heading">Group events into series</p>
+		<p class="admin-sub mono">
+			One-time cleanup for events that repeat but predate series
+			tracking — same title and type, not already linked. Review each
+			group below; uncheck any that shouldn't be linked (a coincidence,
+			or events that aren't really the same recurring thing) before
+			applying. This only links them — nothing about the events
+			themselves changes.
+		</p>
+		if flashNotice != "" {
+			<div class="admin-flash mono">{ flashNotice }</div>
+		}
+		if len(groups) == 0 {
+			<p class="admin-sub mono">
+				No candidates found — either everything repeatable is already
+				grouped, or nothing shares both a title and a type.
+			</p>
+		} else {
+			<form method="post" action="/admin/events/group-series" class="admin-form">
+				for _, g := range groups {
+					<label class="admin-check">
+						<input type="checkbox" name="group" value={ g.idsValue() } checked/>
+						{ g.Title } &middot; { g.EventType } &middot;
+						{ fmt.Sprintf("%d events", len(g.Events)) } &middot; { g.dateRange() }
+					</label>
+				}
+				<button type="submit" class="admin-btn">Group checked into series</button>
+			</form>
+		}
+	}
+}

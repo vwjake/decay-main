@@ -25,6 +25,10 @@ templ AdminEvents(oneOff []db.Event, series []SeriesSummary, page db.Page, users
 		if errorMsg != "" {
 			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
 		}
+		<p class="admin-sub mono">
+			Events that repeat but aren't listed below under Repeating probably
+			predate series tracking. <a href="/admin/events/group-series">Group them into a series</a>.
+		</p>
 
 		if len(series) > 0 {
 			<p class="admin-heading">Repeating</p>

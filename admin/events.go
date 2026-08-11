@@ -50,6 +50,7 @@ func registerEventRoutes(g *echo.Group, conn *sql.DB, uploadsDir string, booking
 	g.POST("/events/:id/reply/preview", previewEventReply(conn, bookingMailer))
 	g.POST("/events/:id/reply/send", sendEventReply(conn, bookingMailer))
 	registerSeriesRoutes(g, conn, uploadsDir)
+	registerGroupSeriesRoutes(g, conn)
 }
 
 // deleteSignup removes a volunteer offer once it's been handled.
