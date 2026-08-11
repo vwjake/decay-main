@@ -18,7 +18,6 @@ templ AdminPersonEdit(p db.Person, me db.User, errorMsg string) {
 			<label>Pronouns (optional)<input type="text" name="pronouns" value={ p.Pronouns } placeholder="they/them"/></label>
 			<label>Role<input type="text" name="role" value={ p.Role } placeholder="Board of Directors, Events Coordinator…"/></label>
 			<label>Bio<textarea name="bio">{ p.Bio }</textarea></label>
-			<label>Order<input type="number" name="position" value={ fmt.Sprint(p.Position) }/></label>
 			<button type="submit" class="admin-btn">Save profile</button>
 		</form>
 

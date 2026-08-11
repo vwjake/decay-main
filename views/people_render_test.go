@@ -26,7 +26,10 @@ func TestPeopleViewsRender(t *testing.T) {
 	if err := About(nil).Render(context.Background(), io.Discard); err != nil {
 		t.Fatalf("About(nil) render: %v", err)
 	}
-	if err := AdminPeople(people, me, "").Render(context.Background(), io.Discard); err != nil {
+	bios := []db.CommunityBio{
+		{ID: 1, Name: "Riley Regular", Role: "DJ", Bio: "Spins on Fridays.", Public: true},
+	}
+	if err := AdminPeople(people, bios, me, "", "").Render(context.Background(), io.Discard); err != nil {
 		t.Fatalf("AdminPeople render: %v", err)
 	}
 	if err := AdminPersonEdit(people[1], me, "").Render(context.Background(), io.Discard); err != nil {

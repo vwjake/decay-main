@@ -14,7 +14,7 @@ import (
 	"decay-main/db"
 )
 
-func AdminPeople(people []db.Person, me db.User, errorMsg string) templ.Component {
+func AdminPeople(people []db.Person, bios []db.CommunityBio, me db.User, peopleErr string, bioErr string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -47,19 +47,19 @@ func AdminPeople(people []db.Person, me db.User, errorMsg string) templ.Componen
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<p class=\"admin-heading\">People</p><p class=\"admin-sub mono\">Board and staff profiles shown on the About page, in the order below.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<p class=\"admin-heading\">People</p><p class=\"admin-sub mono\">Everyone who shows up on the site — board &amp; staff on the About page, the wider community on the Bios page.</p><p class=\"admin-heading\">Board &amp; staff</p><p class=\"admin-sub mono\">Shown on the About page, in the order below.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if errorMsg != "" {
+			if peopleErr != "" {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"admin-flash admin-flash-error mono\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var3 string
-				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(errorMsg)
+				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(peopleErr)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_people.templ`, Line: 14, Col: 61}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_people.templ`, Line: 17, Col: 62}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 				if templ_7745c5c3_Err != nil {
@@ -82,7 +82,7 @@ func AdminPeople(people []db.Person, me db.User, errorMsg string) templ.Componen
 				var templ_7745c5c3_Var4 templ.SafeURL
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/people/%d", p.ID)))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_people.templ`, Line: 26, Col: 64}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_people.templ`, Line: 29, Col: 64}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
@@ -95,7 +95,7 @@ func AdminPeople(people []db.Person, me db.User, errorMsg string) templ.Componen
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(p.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_people.templ`, Line: 26, Col: 75}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_people.templ`, Line: 29, Col: 75}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -108,7 +108,7 @@ func AdminPeople(people []db.Person, me db.User, errorMsg string) templ.Componen
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(orDash(p.Role))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_people.templ`, Line: 28, Col: 25}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_people.templ`, Line: 31, Col: 25}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
@@ -136,7 +136,7 @@ func AdminPeople(people []db.Person, me db.User, errorMsg string) templ.Componen
 				var templ_7745c5c3_Var7 templ.SafeURL
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/people/%d", p.ID)))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_people.templ`, Line: 37, Col: 64}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_people.templ`, Line: 40, Col: 64}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
@@ -149,7 +149,7 @@ func AdminPeople(people []db.Person, me db.User, errorMsg string) templ.Componen
 				var templ_7745c5c3_Var8 templ.SafeURL
 				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/people/%d/delete", p.ID)))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_people.templ`, Line: 38, Col: 90}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_people.templ`, Line: 41, Col: 90}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
@@ -160,7 +160,135 @@ func AdminPeople(people []db.Person, me db.User, errorMsg string) templ.Componen
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</table><p class=\"admin-heading\">Add person</p><form method=\"post\" action=\"/admin/people\" class=\"admin-form\"><label>Name<input type=\"text\" name=\"name\" required></label> <label>Pronouns (optional)<input type=\"text\" name=\"pronouns\" placeholder=\"they/them\"></label> <label>Role<input type=\"text\" name=\"role\" placeholder=\"Board of Directors, Events Coordinator…\"></label> <label>Bio<textarea name=\"bio\"></textarea></label> <label>Order<input type=\"number\" name=\"position\" value=\"0\"></label><p class=\"admin-sub mono\">Add the photo after creating the profile.</p><button type=\"submit\" class=\"admin-btn\">Create</button></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</table><p class=\"admin-heading\">Add board or staff person</p><form method=\"post\" action=\"/admin/people\" class=\"admin-form\"><label>Name<input type=\"text\" name=\"name\" required></label> <label>Pronouns (optional)<input type=\"text\" name=\"pronouns\" placeholder=\"they/them\"></label> <label>Role<input type=\"text\" name=\"role\" placeholder=\"Board of Directors, Events Coordinator…\"></label> <label>Bio<textarea name=\"bio\"></textarea></label><p class=\"admin-sub mono\">Add the photo after creating the profile.</p><button type=\"submit\" class=\"admin-btn\">Create</button></form><p class=\"admin-heading\">Community</p><p class=\"admin-sub mono\">People in the wider DECAY community, shown on the public <a href=\"/bios\" target=\"_blank\" rel=\"noopener\">bios page</a>. Uncheck \"shown\" to keep a bio on file without publishing it.</p>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if bioErr != "" {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div class=\"admin-flash admin-flash-error mono\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var9 string
+				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(bioErr)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_people.templ`, Line: 66, Col: 59}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, " ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if len(bios) > 0 {
+				for _, b := range bios {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<form method=\"post\" action=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var10 templ.SafeURL
+					templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/bios/%d", b.ID)))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_people.templ`, Line: 70, Col: 79}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" class=\"admin-form\"><label>Name<input type=\"text\" name=\"name\" value=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var11 string
+					templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(b.Name)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_people.templ`, Line: 71, Col: 61}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" required></label> <label>Pronouns<input type=\"text\" name=\"pronouns\" value=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var12 string
+					templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(b.Pronouns)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_people.templ`, Line: 72, Col: 73}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" placeholder=\"e.g. they/them\"></label> <label>Role<input type=\"text\" name=\"role\" value=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var13 string
+					templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(b.Role)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_people.templ`, Line: 73, Col: 61}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" placeholder=\"e.g. DJ, Artist, Volunteer\"></label> <label>Bio<textarea name=\"bio\" rows=\"4\">")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var14 string
+					templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(b.Bio)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_people.templ`, Line: 74, Col: 52}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</textarea></label> <label class=\"admin-check\"><input type=\"checkbox\" name=\"public\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					if b.Public {
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, " checked")
+						if templ_7745c5c3_Err != nil {
+							return templ_7745c5c3_Err
+						}
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "> Shown on the bios page</label> <button type=\"submit\" class=\"admin-btn admin-btn-small\">Save</button></form><form method=\"post\" action=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var15 templ.SafeURL
+					templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(fmt.Sprintf("/admin/bios/%d/delete", b.ID)))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/admin_people.templ`, Line: 78, Col: 86}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" onsubmit=\"return confirm('Delete this bio?')\" style=\"margin-bottom:24px\"><button type=\"submit\" class=\"admin-btn admin-btn-small admin-btn-danger\">Delete</button></form>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+			} else {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<p class=\"admin-sub mono\">No community bios yet. Add one below.</p>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, " <p class=\"admin-heading\">Add community bio</p><form method=\"post\" action=\"/admin/bios\" class=\"admin-form\"><label>Name<input type=\"text\" name=\"name\" required></label> <label>Pronouns<input type=\"text\" name=\"pronouns\" placeholder=\"e.g. they/them\"></label> <label>Role<input type=\"text\" name=\"role\" placeholder=\"e.g. DJ, Artist, Volunteer\"></label> <label>Bio<textarea name=\"bio\" rows=\"4\" placeholder=\"A short bio. Blank lines start new paragraphs.\"></textarea></label> <label class=\"admin-check\"><input type=\"checkbox\" name=\"public\" checked> Shown on the bios page</label> <button type=\"submit\" class=\"admin-btn\">Add</button></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

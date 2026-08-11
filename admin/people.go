@@ -34,12 +34,23 @@ func listPeople(conn *sql.DB) echo.HandlerFunc {
 	}
 }
 
+// renderPeople re-renders the merged People page (board/staff plus the
+// community bios below them) with a message attributed to the board/staff
+// section.
 func renderPeople(c echo.Context, conn *sql.DB, msg string) error {
+	return renderPeoplePage(c, conn, msg, "")
+}
+
+func renderPeoplePage(c echo.Context, conn *sql.DB, peopleErr, bioErr string) error {
 	people, err := db.ListPeople(conn)
 	if err != nil {
 		return err
 	}
-	return views.AdminPeople(people, currentUser(c), msg).Render(c.Request().Context(), c.Response())
+	bios, err := db.ListCommunityBios(conn)
+	if err != nil {
+		return err
+	}
+	return views.AdminPeople(people, bios, currentUser(c), peopleErr, bioErr).Render(c.Request().Context(), c.Response())
 }
 
 func createPerson(conn *sql.DB) echo.HandlerFunc {

@@ -6,12 +6,15 @@ import (
 	"decay-main/db"
 )
 
-templ AdminPeople(people []db.Person, me db.User, errorMsg string) {
+templ AdminPeople(people []db.Person, bios []db.CommunityBio, me db.User, peopleErr string, bioErr string) {
 	@AdminLayout("People · DECAY Admin", me) {
 		<p class="admin-heading">People</p>
-		<p class="admin-sub mono">Board and staff profiles shown on the About page, in the order below.</p>
-		if errorMsg != "" {
-			<div class="admin-flash admin-flash-error mono">{ errorMsg }</div>
+		<p class="admin-sub mono">Everyone who shows up on the site — board &amp; staff on the About page, the wider community on the Bios page.</p>
+
+		<p class="admin-heading">Board &amp; staff</p>
+		<p class="admin-sub mono">Shown on the About page, in the order below.</p>
+		if peopleErr != "" {
+			<div class="admin-flash admin-flash-error mono">{ peopleErr }</div>
 		}
 		<table class="admin-table">
 			<tr>
@@ -43,15 +46,51 @@ templ AdminPeople(people []db.Person, me db.User, errorMsg string) {
 			}
 		</table>
 
-		<p class="admin-heading">Add person</p>
+		<p class="admin-heading">Add board or staff person</p>
 		<form method="post" action="/admin/people" class="admin-form">
 			<label>Name<input type="text" name="name" required/></label>
 			<label>Pronouns (optional)<input type="text" name="pronouns" placeholder="they/them"/></label>
 			<label>Role<input type="text" name="role" placeholder="Board of Directors, Events Coordinator…"/></label>
 			<label>Bio<textarea name="bio"></textarea></label>
-			<label>Order<input type="number" name="position" value="0"/></label>
 			<p class="admin-sub mono">Add the photo after creating the profile.</p>
 			<button type="submit" class="admin-btn">Create</button>
+		</form>
+
+		<p class="admin-heading">Community</p>
+		<p class="admin-sub mono">
+			People in the wider DECAY community, shown on the public
+			<a href="/bios" target="_blank" rel="noopener">bios page</a>. Uncheck "shown" to keep a
+			bio on file without publishing it.
+		</p>
+		if bioErr != "" {
+			<div class="admin-flash admin-flash-error mono">{ bioErr }</div>
+		}
+		if len(bios) > 0 {
+			for _, b := range bios {
+				<form method="post" action={ templ.URL(fmt.Sprintf("/admin/bios/%d", b.ID)) } class="admin-form">
+					<label>Name<input type="text" name="name" value={ b.Name } required/></label>
+					<label>Pronouns<input type="text" name="pronouns" value={ b.Pronouns } placeholder="e.g. they/them"/></label>
+					<label>Role<input type="text" name="role" value={ b.Role } placeholder="e.g. DJ, Artist, Volunteer"/></label>
+					<label>Bio<textarea name="bio" rows="4">{ b.Bio }</textarea></label>
+					<label class="admin-check"><input type="checkbox" name="public" checked?={ b.Public }/> Shown on the bios page</label>
+					<button type="submit" class="admin-btn admin-btn-small">Save</button>
+				</form>
+				<form method="post" action={ templ.URL(fmt.Sprintf("/admin/bios/%d/delete", b.ID)) } onsubmit="return confirm('Delete this bio?')" style="margin-bottom:24px">
+					<button type="submit" class="admin-btn admin-btn-small admin-btn-danger">Delete</button>
+				</form>
+			}
+		} else {
+			<p class="admin-sub mono">No community bios yet. Add one below.</p>
+		}
+
+		<p class="admin-heading">Add community bio</p>
+		<form method="post" action="/admin/bios" class="admin-form">
+			<label>Name<input type="text" name="name" required/></label>
+			<label>Pronouns<input type="text" name="pronouns" placeholder="e.g. they/them"/></label>
+			<label>Role<input type="text" name="role" placeholder="e.g. DJ, Artist, Volunteer"/></label>
+			<label>Bio<textarea name="bio" rows="4" placeholder="A short bio. Blank lines start new paragraphs."></textarea></label>
+			<label class="admin-check"><input type="checkbox" name="public" checked/> Shown on the bios page</label>
+			<button type="submit" class="admin-btn">Add</button>
 		</form>
 	}
 }

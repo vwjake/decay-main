@@ -106,7 +106,7 @@ func GetInvolved(forms []db.ExternalForm) templ.Component {
 					}
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<p class=\"about-body\" style=\"margin-top:2rem\">Want to volunteer at a specific event? See what <a href=\"/volunteer\">still needs a hand</a> and sign up there. Hoping to host something? Send a <a href=\"/book\">booking request</a>. Just have a question? <a href=\"/contact\">Get in touch</a>.</p></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<p class=\"about-body\" style=\"margin-top:2rem\">Want to volunteer at a specific event? See what <a href=\"/volunteer\">still needs a hand</a> and sign up there. Hoping to host something? Send a <a href=\"/book\">booking request</a>. Just have a question? <a href=\"/contact\">Get in touch</a>.</p></section><section class=\"events\"><span class=\"section-label mono\">Community impact survey</span><p class=\"about-body\">Tell us what's working and what isn't — anonymous, and it feeds directly into how we report our impact to funders. <a href=\"/community-survey\">Take the survey</a>.</p></section><section class=\"events\"><span class=\"section-label mono\">Design an event icon</span><p class=\"about-body\">We're building a set of icons for event tags and could use some help. <a href=\"/get-involved/icons\">See what's needed</a>.</p></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

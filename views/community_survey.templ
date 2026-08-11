@@ -1,0 +1,82 @@
+package views
+
+// CommunitySurvey is the public Community Impact Survey, carried over from
+// the old site. It's anonymous and grant-facing: responses feed the impact
+// reporting DECAY does for funders.
+templ CommunitySurvey(sent bool) {
+	@Layout("Community Impact Survey · DECAY") {
+		<section class="about">
+			<p class="about-statement">Community impact survey</p>
+			<p class="about-body">
+				Help us understand what's working and what isn't. This is anonymous and
+				takes about five minutes — every answer feeds directly into how we report
+				our impact to funders and plan future programming.
+			</p>
+		</section>
+
+		<section class="events">
+			if sent {
+				<div class="admin-flash mono">
+					Thank you for helping make DECAY a better space for everyone!
+				</div>
+				<a href="/get-involved" class="btn-outline mono">Back to Get Involved</a>
+			} else {
+				<form method="post" action="/community-survey" class="admin-form">
+					<input type="hidden" name="website" value=""/>
+
+					<div>
+						<label>Q1 &nbsp; How many events have you attended in the past year at DECAY?</label>
+						<label class="inline admin-check"><input type="radio" name="events_attended" value="1-4"/> 1 &lt; 5</label>
+						<label class="inline admin-check"><input type="radio" name="events_attended" value="5-14"/> 6 &lt; 15</label>
+						<label class="inline admin-check"><input type="radio" name="events_attended" value="15-29"/> 16 &lt; 30</label>
+						<label class="inline admin-check"><input type="radio" name="events_attended" value="30-49"/> 31 &lt; 50</label>
+						<label class="inline admin-check"><input type="radio" name="events_attended" value="50-plus"/> 50 &lt;</label>
+					</div>
+
+					@likertQuestion("Q2", "q2_safe", "DECAY feels physically safe and accessible to me.")
+					@likertQuestion("Q3", "q3_future", "I expect DECAY will continue to have events I find interesting and engaging.")
+					@likertQuestion("Q4", "q4_diversity", "DECAY's events and programming reflect the diversity of our community.")
+
+					<div>
+						<label>Q5 &nbsp; What types of programming do you frequent most at DECAY? (Select all that apply)</label>
+						<label class="inline admin-check"><input type="checkbox" name="programs" value="Live music / performances"/> Live music / performances</label>
+						<label class="inline admin-check"><input type="checkbox" name="programs" value="Youth-focused programming"/> Youth-focused programming</label>
+						<label class="inline admin-check"><input type="checkbox" name="programs" value="Visual art exhibitions"/> Visual art exhibitions</label>
+						<label class="inline admin-check"><input type="checkbox" name="programs" value="Workshops & skill-shares"/> Workshops &amp; skill-shares</label>
+						<label class="inline admin-check"><input type="checkbox" name="programs" value="STEM / technology events"/> STEM / technology events</label>
+						<label class="inline admin-check"><input type="checkbox" name="programs" value="Community meetings & organizing"/> Community meetings &amp; organizing</label>
+						<label class="inline admin-check"><input type="checkbox" name="programs" value="Other"/> Other</label>
+						<input type="text" name="programs_other" placeholder="If other, tell us more" maxlength="200"/>
+					</div>
+
+					@likertQuestion("Q6", "q6_connect", "DECAY has helped me connect with other people or artists in Olympia.")
+					@likertQuestion("Q7", "q7_gaps", "DECAY fills gaps that exist in other public spaces in my community.")
+
+					<label>Q8 &nbsp; Is there anything DECAY could do differently to better serve you or your community?
+						<textarea name="q8_suggestions" rows="4" maxlength="1000"></textarea>
+					</label>
+
+					<div>
+						<label>Q9 &nbsp; Are you a current volunteer at DECAY?</label>
+						<label class="inline admin-check"><input type="radio" name="q9_volunteer" value="yes"/> Yes!</label>
+						<label class="inline admin-check"><input type="radio" name="q9_volunteer" value="interested"/> No, but I'm interested.</label>
+						<label class="inline admin-check"><input type="radio" name="q9_volunteer" value="no"/> No, I'm not interested at this time.</label>
+					</div>
+
+					<button type="submit" class="admin-btn">Submit</button>
+				</form>
+			}
+		</section>
+	}
+}
+
+templ likertQuestion(num, name, prompt string) {
+	<div>
+		<label>{ num } &nbsp; { prompt }</label>
+		<label class="inline admin-check"><input type="radio" name={ name } value="strongly-disagree"/> Strongly disagree</label>
+		<label class="inline admin-check"><input type="radio" name={ name } value="disagree"/> Disagree</label>
+		<label class="inline admin-check"><input type="radio" name={ name } value="neutral"/> Neutral</label>
+		<label class="inline admin-check"><input type="radio" name={ name } value="agree"/> Agree</label>
+		<label class="inline admin-check"><input type="radio" name={ name } value="strongly-agree"/> Strongly agree</label>
+	</div>
+}

@@ -304,6 +304,13 @@ a {
   color: var(--on-ink);
 }
 
+/* Role chips keep their tan background on hover, so their text has to stay
+   dark rather than inheriting the card's inverted (tan-on-black) color —
+   otherwise it's tan text on a tan chip. */
+.event-item:hover .volunteer-list li {
+  color: var(--muted);
+}
+
 .event-date {
   font-size: 13px;
   font-weight: 700;

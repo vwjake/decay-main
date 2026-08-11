@@ -342,6 +342,18 @@ func main() {
 		return views.GetInvolved(forms).Render(c.Request().Context(), c.Response())
 	})
 
+	e.GET("/get-involved/icons", func(c echo.Context) error {
+		return views.IconSubmit().Render(c.Request().Context(), c.Response())
+	})
+
+	e.GET("/community-survey", func(c echo.Context) error {
+		return views.CommunitySurvey(c.QueryParam("sent") != "").Render(c.Request().Context(), c.Response())
+	})
+
+	e.POST("/community-survey", func(c echo.Context) error {
+		return submitCommunitySurvey(c, conn, mailer)
+	})
+
 	e.POST("/volunteer-signup", func(c echo.Context) error {
 		if strings.TrimSpace(c.FormValue("website")) != "" {
 			return c.Redirect(http.StatusSeeOther, "/get-involved?signed=1")
@@ -563,6 +575,59 @@ func submitContact(c echo.Context, conn *sql.DB, mailer *mail.Mailer) error {
 	}
 	notifyContact(mailer, m)
 	return c.Redirect(http.StatusSeeOther, "/contact?sent=1")
+}
+
+// submitCommunitySurvey stores an anonymous survey response as a contact
+// message (subject "Community Impact Survey") so it shows up in the existing
+// admin message queue without a dedicated table. A filled honeypot field is
+// treated as a bot and silently dropped.
+func submitCommunitySurvey(c echo.Context, conn *sql.DB, mailer *mail.Mailer) error {
+	if strings.TrimSpace(c.FormValue("website")) != "" {
+		return c.Redirect(http.StatusSeeOther, "/community-survey?sent=1")
+	}
+	params, err := c.FormParams()
+	if err != nil {
+		return err
+	}
+	m := db.ContactMessage{
+		Name:    "Community survey (anonymous)",
+		Subject: "Community Impact Survey",
+		Message: surveyMessageBody(params),
+	}
+	if err := db.CreateContactMessage(conn, m); err != nil {
+		return err
+	}
+	notifyContact(mailer, m)
+	return c.Redirect(http.StatusSeeOther, "/community-survey?sent=1")
+}
+
+// surveyMessageBody renders the submitted answers as readable text for the
+// admin message queue and email notification.
+func surveyMessageBody(params map[string][]string) string {
+	answer := func(name string) string {
+		if v, ok := params[name]; ok && len(v) > 0 {
+			return v[0]
+		}
+		return "(no answer)"
+	}
+	programs := strings.Join(params["programs"], ", ")
+	if programs == "" {
+		programs = "(none selected)"
+	}
+	if other := strings.TrimSpace(answer("programs_other")); other != "" && other != "(no answer)" {
+		programs += " — Other: " + other
+	}
+	var b strings.Builder
+	fmt.Fprintf(&b, "Q1 Events attended in the past year: %s\n", answer("events_attended"))
+	fmt.Fprintf(&b, "Q2 DECAY feels physically safe and accessible to me: %s\n", answer("q2_safe"))
+	fmt.Fprintf(&b, "Q3 I expect DECAY will continue to have events I find interesting: %s\n", answer("q3_future"))
+	fmt.Fprintf(&b, "Q4 DECAY's programming reflects the diversity of our community: %s\n", answer("q4_diversity"))
+	fmt.Fprintf(&b, "Q5 Programming frequented most: %s\n", programs)
+	fmt.Fprintf(&b, "Q6 DECAY has helped me connect with others in Olympia: %s\n", answer("q6_connect"))
+	fmt.Fprintf(&b, "Q7 DECAY fills gaps in other public spaces in my community: %s\n", answer("q7_gaps"))
+	fmt.Fprintf(&b, "Q8 Suggestions: %s\n", answer("q8_suggestions"))
+	fmt.Fprintf(&b, "Q9 Current volunteer: %s\n", answer("q9_volunteer"))
+	return b.String()
 }
 
 // notifyContact emails the saved message to the DECAY inbox off the request's

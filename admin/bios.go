@@ -8,30 +8,23 @@ import (
 	"strings"
 
 	"decay-main/db"
-	"decay-main/views"
 
 	"github.com/labstack/echo/v4"
 )
 
 func registerBioRoutes(g *echo.Group, conn *sql.DB) {
-	g.GET("/bios", listBios(conn))
+	g.GET("/bios", func(c echo.Context) error {
+		return c.Redirect(http.StatusMovedPermanently, "/admin/people")
+	})
 	g.POST("/bios", createBio(conn))
 	g.POST("/bios/:id", saveBio(conn))
 	g.POST("/bios/:id/delete", deleteBio(conn))
 }
 
-func listBios(conn *sql.DB) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		return renderBios(c, conn, "")
-	}
-}
-
+// renderBios re-renders the merged People page with a message attributed to
+// the community bios section.
 func renderBios(c echo.Context, conn *sql.DB, msg string) error {
-	bios, err := db.ListCommunityBios(conn)
-	if err != nil {
-		return err
-	}
-	return views.AdminBios(bios, currentUser(c), msg).Render(c.Request().Context(), c.Response())
+	return renderPeoplePage(c, conn, "", msg)
 }
 
 func createBio(conn *sql.DB) echo.HandlerFunc {
@@ -43,7 +36,7 @@ func createBio(conn *sql.DB) echo.HandlerFunc {
 		if _, err := db.CreateCommunityBio(conn, b); err != nil {
 			return err
 		}
-		return c.Redirect(http.StatusSeeOther, "/admin/bios")
+		return c.Redirect(http.StatusSeeOther, "/admin/people")
 	}
 }
 
@@ -68,7 +61,7 @@ func saveBio(conn *sql.DB) echo.HandlerFunc {
 		if err := db.UpdateCommunityBio(conn, b); err != nil {
 			return err
 		}
-		return c.Redirect(http.StatusSeeOther, "/admin/bios")
+		return c.Redirect(http.StatusSeeOther, "/admin/people")
 	}
 }
 
@@ -81,7 +74,7 @@ func deleteBio(conn *sql.DB) echo.HandlerFunc {
 		if err := db.DeleteCommunityBio(conn, id); err != nil {
 			return err
 		}
-		return c.Redirect(http.StatusSeeOther, "/admin/bios")
+		return c.Redirect(http.StatusSeeOther, "/admin/people")
 	}
 }
 
