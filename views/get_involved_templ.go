@@ -45,68 +45,76 @@ func GetInvolved(forms []db.ExternalForm) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"about\"><p class=\"about-statement\">Get involved</p><p class=\"about-body\">DECAY runs on the people who show up. Fill out a survey, sign up to volunteer at an event, propose something of your own — every bit helps shape the space.</p></section><section class=\"events\"><span class=\"section-label mono\">Volunteer signup</span><p class=\"about-body\">Tell us you're interested in volunteering at DECAY. We'll get in touch with opportunities and shifts that match your interests and availability.</p><form method=\"POST\" action=\"/volunteer-signup\" class=\"volunteer-form\"><input type=\"text\" name=\"name\" placeholder=\"Name\" required> <input type=\"email\" name=\"email\" placeholder=\"Email\" required> <textarea name=\"interests\" placeholder=\"What interests you? (tech, sound, door, community organizing, etc.)\" rows=\"4\"></textarea> <input type=\"hidden\" name=\"website\" value=\"\"> <button type=\"submit\" class=\"btn-outline mono\">Sign up</button></form></section><section class=\"events\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"about\"><p class=\"about-statement\">Get involved</p><p class=\"about-body\">DECAY runs on the people who show up. Fill out a survey, sign up to volunteer at an event, propose something of your own — every bit helps shape the space.</p></section><section class=\"events\"><a href=\"/volunteer\" class=\"section-label section-label-link mono\">Volunteer signup</a><p class=\"about-body\">Tell us you're interested in volunteering at DECAY. We'll get in touch with opportunities and shifts that match your interests and availability.</p><form method=\"POST\" action=\"/volunteer-signup\" class=\"volunteer-form\"><input type=\"text\" name=\"name\" placeholder=\"Name\" required> <input type=\"email\" name=\"email\" placeholder=\"Email\" required> <textarea name=\"interests\" placeholder=\"What interests you? (tech, sound, door, community organizing, etc.)\" rows=\"4\"></textarea> <input type=\"hidden\" name=\"website\" value=\"\"> <button type=\"submit\" class=\"btn-outline mono\">Sign up</button></form></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(forms) > 0 {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<section class=\"events\"><span class=\"section-label section-label-link mono\">Open forms</span><div class=\"event-list\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 				for _, f := range forms {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<a href=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<a href=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var3 templ.SafeURL
 					templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(f.URL))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/get_involved.templ`, Line: 34, Col: 31}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/get_involved.templ`, Line: 36, Col: 32}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" target=\"_blank\" rel=\"noopener\" class=\"event-item\"><div><div class=\"event-title\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" target=\"_blank\" rel=\"noopener\" class=\"event-item\"><div><div class=\"event-title\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var4 string
 					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(f.Title)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/get_involved.templ`, Line: 36, Col: 41}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/get_involved.templ`, Line: 38, Col: 42}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					if f.Description != "" {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"event-meta mono\">")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"event-meta mono\">")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 						var templ_7745c5c3_Var5 string
 						templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(f.Description)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/get_involved.templ`, Line: 38, Col: 52}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/get_involved.templ`, Line: 40, Col: 53}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div>")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div>")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div><div class=\"event-date mono\">Open &rarr;</div></a>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div><div class=\"event-date mono\">Open &rarr;</div></a>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></section>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<p class=\"about-body\" style=\"margin-top:2rem\">Want to volunteer at a specific event? See what <a href=\"/volunteer\">still needs a hand</a> and sign up there. Hoping to host something? Send a <a href=\"/book\">booking request</a>. Just have a question? <a href=\"/contact\">Get in touch</a>.</p></section><section class=\"events\"><span class=\"section-label mono\">Community impact survey</span><p class=\"about-body\">Tell us what's working and what isn't — anonymous, and it feeds directly into how we report our impact to funders. <a href=\"/community-survey\">Take the survey</a>.</p></section><section class=\"events\"><span class=\"section-label mono\">Design an event icon</span><p class=\"about-body\">We're building a set of icons for event tags and could use some help. <a href=\"/get-involved/icons\">See what's needed</a>.</p></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, " <section class=\"events\"><a href=\"/community-survey\" class=\"section-label section-label-link mono\">Community impact survey</a><p class=\"about-body\">Tell us what's working and what isn't — anonymous, and it feeds directly into how we report our impact to funders. <a href=\"/community-survey\">Take the survey</a>.</p></section><section class=\"events\"><a href=\"/get-involved/icons\" class=\"section-label section-label-link mono\">Design an event icon</a><p class=\"about-body\">We're building a set of icons for event tags and could use some help. <a href=\"/get-involved/icons\">See what's needed</a>.</p></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

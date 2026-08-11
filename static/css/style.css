@@ -241,6 +241,13 @@ a {
   color: var(--muted);
 }
 
+.section-label-link {
+  display: inline-block;
+  background: #111;
+  color: var(--on-ink);
+  padding: 4px 8px;
+}
+
 /* Events */
 
 .events {

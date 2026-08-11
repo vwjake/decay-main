@@ -15,7 +15,7 @@ templ GetInvolved(forms []db.ExternalForm) {
 		</section>
 
 		<section class="events">
-			<span class="section-label mono">Volunteer signup</span>
+			<a href="/volunteer" class="section-label section-label-link mono">Volunteer signup</a>
 			<p class="about-body">
 				Tell us you're interested in volunteering at DECAY. We'll get in touch with opportunities and shifts that match your interests and availability.
 			</p>
@@ -28,31 +28,27 @@ templ GetInvolved(forms []db.ExternalForm) {
 			</form>
 		</section>
 
-		<section class="events">
-			if len(forms) > 0 {
-				for _, f := range forms {
-					<a href={ templ.URL(f.URL) } target="_blank" rel="noopener" class="event-item">
-						<div>
-							<div class="event-title">{ f.Title }</div>
-							if f.Description != "" {
-								<div class="event-meta mono">{ f.Description }</div>
-							}
-						</div>
-						<div class="event-date mono">Open &rarr;</div>
-					</a>
-				}
-			}
-
-			<p class="about-body" style="margin-top:2rem">
-				Want to volunteer at a specific event? See what
-				<a href="/volunteer">still needs a hand</a> and sign up there. Hoping to host something?
-				Send a <a href="/book">booking request</a>. Just have a question?
-				<a href="/contact">Get in touch</a>.
-			</p>
-		</section>
+		if len(forms) > 0 {
+			<section class="events">
+				<span class="section-label section-label-link mono">Open forms</span>
+				<div class="event-list">
+					for _, f := range forms {
+						<a href={ templ.URL(f.URL) } target="_blank" rel="noopener" class="event-item">
+							<div>
+								<div class="event-title">{ f.Title }</div>
+								if f.Description != "" {
+									<div class="event-meta mono">{ f.Description }</div>
+								}
+							</div>
+							<div class="event-date mono">Open &rarr;</div>
+						</a>
+					}
+				</div>
+			</section>
+		}
 
 		<section class="events">
-			<span class="section-label mono">Community impact survey</span>
+			<a href="/community-survey" class="section-label section-label-link mono">Community impact survey</a>
 			<p class="about-body">
 				Tell us what's working and what isn't — anonymous, and it feeds directly
 				into how we report our impact to funders.
@@ -61,7 +57,7 @@ templ GetInvolved(forms []db.ExternalForm) {
 		</section>
 
 		<section class="events">
-			<span class="section-label mono">Design an event icon</span>
+			<a href="/get-involved/icons" class="section-label section-label-link mono">Design an event icon</a>
 			<p class="about-body">
 				We're building a set of icons for event tags and could use some help.
 				<a href="/get-involved/icons">See what's needed</a>.
