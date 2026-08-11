@@ -49,6 +49,7 @@ func registerEventRoutes(g *echo.Group, conn *sql.DB, uploadsDir string, booking
 	g.POST("/events/:id/signups/:signupID/delete", deleteSignup(conn))
 	g.POST("/events/:id/reply/preview", previewEventReply(conn, bookingMailer))
 	g.POST("/events/:id/reply/send", sendEventReply(conn, bookingMailer))
+	registerSeriesRoutes(g, conn, uploadsDir)
 }
 
 // deleteSignup removes a volunteer offer once it's been handled.
@@ -387,8 +388,9 @@ func createEvent(conn *sql.DB) echo.HandlerFunc {
 }
 
 // repeatEvent stamps out copies of an event on a schedule — a lightweight
-// stand-in for calendar recurrence. Each copy is an ordinary, independently
-// editable event, so there's no recurrence rule to maintain.
+// stand-in for calendar recurrence. Each copy is its own editable event, but
+// shares a series id with the source and the other copies, so their shared
+// details can be kept in sync afterward from the series page.
 func repeatEvent(conn *sql.DB, bookingMailer *bookingmail.Handler, venue *time.Location) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ev, volunteers, signups, users, err := loadEvent(conn, c.Param("id"))
@@ -413,10 +415,11 @@ func repeatEvent(conn *sql.DB, bookingMailer *bookingmail.Handler, venue *time.L
 			count = 52
 		}
 
-		if _, err := db.RepeatEvent(conn, ev.ID, freq, count, pacific); err != nil {
+		_, seriesID, err := db.RepeatEvent(conn, ev.ID, freq, count, pacific)
+		if err != nil {
 			return err
 		}
-		return c.Redirect(http.StatusSeeOther, "/admin/events")
+		return c.Redirect(http.StatusSeeOther, seriesPath(seriesID))
 	}
 }
 

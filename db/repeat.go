@@ -63,21 +63,32 @@ func RepeatDates(start time.Time, freq string, count int, loc *time.Location) []
 // copy is an independent event with its own uid and slug, carrying the title,
 // type, description, location, link, flyer, and the same volunteer roles (left
 // unassigned). It does not copy who signed up, assigned names, or any reports
-// or donations. Returns the new ids in date order.
-func RepeatEvent(conn *sql.DB, sourceID int64, freq string, count int, loc *time.Location) ([]int64, error) {
+// or donations. The source and every copy share a series id — the source's
+// own, if this isn't its first time being repeated, or a freshly assigned one
+// otherwise — so the series page can find and sync them later. Returns the
+// new ids in date order, and the series id they (and the source) now share.
+func RepeatEvent(conn *sql.DB, sourceID int64, freq string, count int, loc *time.Location) ([]int64, int64, error) {
 	src, err := EventByID(conn, sourceID)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	dates := RepeatDates(src.StartsAt, freq, count, loc)
 	if len(dates) == 0 {
-		return nil, fmt.Errorf("repeat: bad frequency %q or count %d", freq, count)
+		return nil, 0, fmt.Errorf("repeat: bad frequency %q or count %d", freq, count)
+	}
+
+	seriesID := src.SeriesID
+	if seriesID == 0 {
+		seriesID = src.ID
+		if _, err := conn.Exec(`UPDATE events SET series_id = ? WHERE id = ?`, seriesID, src.ID); err != nil {
+			return nil, 0, err
+		}
 	}
 
 	// The roles the source needs, recreated as open (unassigned) on each copy.
 	vols, err := VolunteersFor(conn, sourceID)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	var roles []string
 	for _, v := range vols {
@@ -99,6 +110,7 @@ func RepeatEvent(conn *sql.DB, sourceID int64, freq string, count int, loc *time
 			Description: src.Description,
 			Link:        src.Link,
 			Flyer:       src.Flyer,
+			SeriesID:    seriesID,
 			// UID and Slug left blank so CreateEvent mints fresh unique ones.
 		}
 		if src.EndsAt != nil {
@@ -107,14 +119,14 @@ func RepeatEvent(conn *sql.DB, sourceID int64, freq string, count int, loc *time
 		}
 		id, err := CreateEvent(conn, dup)
 		if err != nil {
-			return ids, err
+			return ids, seriesID, err
 		}
 		if len(roles) > 0 {
 			if err := SetVolunteerRoles(conn, id, roles); err != nil {
-				return ids, err
+				return ids, seriesID, err
 			}
 		}
 		ids = append(ids, id)
 	}
-	return ids, nil
+	return ids, seriesID, nil
 }

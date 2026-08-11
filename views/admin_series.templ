@@ -1,0 +1,110 @@
+package views
+
+import (
+	"fmt"
+
+	"decay-main/db"
+)
+
+// SeriesPageData is everything the series page renders: every event
+// stamped out together by Repeat, split into what's still ahead and what's
+// already happened. Representative is whichever occurrence the sync form
+// is prefilled from — see seriesPageData in admin/series.go for how it's
+// picked.
+type SeriesPageData struct {
+	SeriesID       int64
+	Representative db.Event
+	Upcoming       []db.Event
+	Past           []db.Event
+	ErrorMsg       string
+	FlashNotice    string
+}
+
+templ AdminSeries(d SeriesPageData, me db.User) {
+	{{ rep := d.Representative }}
+	@AdminLayout(rep.Title+" (series) · DECAY Admin", me) {
+		<a href="/admin/events" class="admin-back">&larr; All events</a>
+		<p class="admin-heading">{ rep.Title }</p>
+		<p class="admin-sub mono">
+			{ fmt.Sprintf("%d upcoming · %d past", len(d.Upcoming), len(d.Past)) } &middot;
+			every event stamped out together by Repeat.
+		</p>
+		if d.FlashNotice != "" {
+			<div class="admin-flash mono">{ d.FlashNotice }</div>
+		}
+		if d.ErrorMsg != "" {
+			<div class="admin-flash admin-flash-error mono">{ d.ErrorMsg }</div>
+		}
+
+		<p class="admin-heading">Sync shared details</p>
+		<p class="admin-sub mono">
+			Applies to the { fmt.Sprint(len(d.Upcoming)) } event(s) below that haven't
+			happened yet. Past events keep whatever they showed at the time — a
+			historical record, not something to rewrite. Each event's own date,
+			keyholder, and volunteers stay individual and aren't touched here.
+		</p>
+		<form method="post" action={ templ.URL(seriesPath(d.SeriesID)) } class="admin-form">
+			<label>Title<input type="text" name="title" value={ rep.Title } required/></label>
+			<label>Type<input type="text" name="event_type" value={ rep.EventType } required/></label>
+			<label>Location<input type="text" name="location" value={ rep.Location }/></label>
+			<label>Description<textarea name="description">{ rep.Description }</textarea></label>
+			<label>Link<input type="text" name="link" value={ rep.Link }/></label>
+			<button type="submit" class="admin-btn">Apply to upcoming events</button>
+		</form>
+
+		<p class="admin-heading">Flyer</p>
+		if rep.HasFlyer() {
+			<img class="admin-flyer-preview" src={ rep.FlyerWebPath() } alt={ "Flyer for " + rep.Title }/>
+		} else {
+			<p class="admin-sub mono">No flyer yet.</p>
+		}
+		<form method="post" action={ templ.URL(seriesPath(d.SeriesID) + "/flyer") } enctype="multipart/form-data" class="admin-form">
+			<label>
+				if rep.HasFlyer() {
+					Replace flyer on upcoming events
+				} else {
+					Upload flyer for upcoming events
+				}
+				<input type="file" name="flyer" accept="image/*" required/>
+			</label>
+			<button type="submit" class="admin-btn">Apply to upcoming events</button>
+		</form>
+
+		if len(d.Upcoming) > 0 {
+			<p class="admin-heading">Upcoming</p>
+			@seriesTable(d.Upcoming)
+		}
+		if len(d.Past) > 0 {
+			<p class="admin-heading">Past</p>
+			@seriesTable(d.Past)
+		}
+
+		<p class="admin-sub mono">
+			To add more dates, use Repeat on any event in the series — it'll
+			join this same group.
+		</p>
+	}
+}
+
+templ seriesTable(events []db.Event) {
+	<table class="admin-table">
+		<tr>
+			<th>Date</th>
+			<th>Start</th>
+			<th></th>
+		</tr>
+		for _, ev := range events {
+			<tr>
+				<td class="mono nowrap">{ ev.StartsAt.Format("Jan 2, 2006") }</td>
+				<td class="mono nowrap">{ ev.StartsAt.Format("3:04 PM") }</td>
+				<td>
+					<a href={ templ.URL(fmt.Sprintf("/admin/events/%d", ev.ID)) } class="admin-btn admin-btn-small">Edit</a>
+				</td>
+			</tr>
+		}
+	</table>
+}
+
+func seriesPath(seriesID int64) string {
+	return fmt.Sprintf("/admin/series/%d", seriesID)
+}

@@ -30,8 +30,8 @@ func CreateEvent(conn *sql.DB, e Event) (int64, error) {
 		e.Slug = slug
 	}
 	res, err := conn.Exec(
-		`INSERT INTO events (title, event_type, starts_at, ends_at, location, description, link, uid, flyer, slug, keyholder, contact_name, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		e.Title, e.EventType, e.StartsAt.Format(timeLayout), endsAt, e.Location, e.Description, e.Link, e.UID, e.Flyer, e.Slug, e.Keyholder, e.ContactName, e.Email,
+		`INSERT INTO events (title, event_type, starts_at, ends_at, location, description, link, uid, flyer, slug, keyholder, contact_name, email, series_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		e.Title, e.EventType, e.StartsAt.Format(timeLayout), endsAt, e.Location, e.Description, e.Link, e.UID, e.Flyer, e.Slug, e.Keyholder, e.ContactName, e.Email, e.SeriesID,
 	)
 	if err != nil {
 		return 0, err
@@ -43,7 +43,9 @@ func CreateEvent(conn *sql.DB, e Event) (int64, error) {
 // uid alone: subscribers key on it, so changing it would make everyone's
 // calendar drop the event and re-add it as a new one. Slug is editable
 // but defaults to unchanged for the same reason — it's published in the
-// feed and in any link people have shared.
+// feed and in any link people have shared. series_id is left alone too —
+// membership in a series is only ever set by RepeatEvent, never by a plain
+// details edit, so a caller building an Event without one can't wipe it.
 func UpdateEvent(conn *sql.DB, e Event) error {
 	var endsAt any
 	if e.EndsAt != nil {

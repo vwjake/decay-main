@@ -55,6 +55,14 @@ templ AdminEventEdit(d EventDetailData, me db.User) {
 		<p class="admin-sub mono">
 			Public page: <a href={ templ.URL(ev.Path()) } target="_blank" rel="noopener">{ ev.Path() }</a>
 		</p>
+		if ev.InSeries() {
+			<p class="admin-sub mono">
+				Part of a <a href={ templ.URL(seriesPath(ev.SeriesID)) }>recurring series</a>.
+				Title, type, description, location, link, and flyer can be pushed to
+				every upcoming event in the series from there — editing them here
+				only changes this date.
+			</p>
+		}
 		if d.FlashNotice != "" {
 			<div class="admin-flash mono">{ d.FlashNotice }</div>
 		}
@@ -206,6 +214,11 @@ templ AdminEventEdit(d EventDetailData, me db.User) {
 			event — same details, flyer, and volunteer roles, on its own date and
 			with its own calendar identity — that you can edit or delete
 			separately afterward. Signups and reports aren't copied.
+			if !ev.InSeries() {
+				This turns the event into a series, with a page to keep the copies in sync.
+			} else {
+				The copies join this event's existing series.
+			}
 		</p>
 		<form method="post" action={ templ.URL(fmt.Sprintf("/admin/events/%d/repeat", ev.ID)) } class="admin-form">
 			<label>

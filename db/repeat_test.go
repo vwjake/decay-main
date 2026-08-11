@@ -93,15 +93,21 @@ func TestRepeatEvent(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ids, err := RepeatEvent(conn, srcID, "weekly", 2, loc)
+	ids, seriesID, err := RepeatEvent(conn, srcID, "weekly", 2, loc)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if len(ids) != 2 {
 		t.Fatalf("created %d copies, want 2", len(ids))
 	}
+	if seriesID != srcID {
+		t.Errorf("series id = %d, want the source's own id %d (its first time repeating)", seriesID, srcID)
+	}
 
 	src, _ := EventByID(conn, srcID)
+	if src.SeriesID != seriesID {
+		t.Errorf("source series id = %d, want %d", src.SeriesID, seriesID)
+	}
 	for i, id := range ids {
 		cp, err := EventByID(conn, id)
 		if err != nil {
@@ -110,6 +116,9 @@ func TestRepeatEvent(t *testing.T) {
 		// Details carried over, flyer shared.
 		if cp.Title != src.Title || cp.Flyer != src.Flyer || cp.Description != src.Description {
 			t.Errorf("copy %d didn't carry details: %+v", i, cp)
+		}
+		if cp.SeriesID != seriesID {
+			t.Errorf("copy %d series id = %d, want %d", i, cp.SeriesID, seriesID)
 		}
 		// Fresh, distinct identity.
 		if cp.UID == "" || cp.UID == src.UID {
@@ -140,6 +149,31 @@ func TestRepeatEvent(t *testing.T) {
 	// Source is untouched — still has Ada on the door.
 	if vols, _ := VolunteersFor(conn, srcID); volunteerNamed(vols, "door") != "Ada" {
 		t.Error("source event's assignment was disturbed")
+	}
+
+	// Repeating one of the copies (already in the series) joins the same
+	// group rather than starting a new one.
+	moreIDs, moreSeriesID, err := RepeatEvent(conn, ids[0], "weekly", 1, loc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if moreSeriesID != seriesID {
+		t.Errorf("repeating a series member started series %d, want the existing %d", moreSeriesID, seriesID)
+	}
+	more, err := EventByID(conn, moreIDs[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if more.SeriesID != seriesID {
+		t.Errorf("new copy series id = %d, want %d", more.SeriesID, seriesID)
+	}
+
+	all, err := EventsInSeries(conn, seriesID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(all) != 4 {
+		t.Errorf("series has %d events, want 4 (source + 2 + 1 more)", len(all))
 	}
 }
 

@@ -24,7 +24,13 @@ CREATE TABLE IF NOT EXISTS events (
     -- event is converted from a booking request. Lets the admin event page
     -- show the same email correspondence lookup the booking page has.
     contact_name TEXT NOT NULL DEFAULT '',
-    email TEXT NOT NULL DEFAULT ''
+    email TEXT NOT NULL DEFAULT '',
+    -- Groups events stamped out together by the Repeat tool so their shared
+    -- details (title, type, description, location, link, flyer) can be kept
+    -- in sync from one place. 0 means the event isn't part of a series; a
+    -- non-zero value is the id of the series' first event, whether or not
+    -- that row still exists.
+    series_id INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS events_slug ON events(slug) WHERE slug <> '';

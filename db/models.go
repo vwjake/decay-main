@@ -11,7 +11,7 @@ import (
 
 // eventColumns is the select list every event query shares, so scanEvents
 // stays in step with it.
-const eventColumns = `id, title, event_type, starts_at, ends_at, location, description, link, uid, flyer, slug, keyholder, contact_name, email`
+const eventColumns = `id, title, event_type, starts_at, ends_at, location, description, link, uid, flyer, slug, keyholder, contact_name, email, series_id`
 
 const timeLayout = "2006-01-02T15:04:05-07:00"
 
@@ -39,7 +39,13 @@ type Event struct {
 	// is what the admin page's correspondence lookup keys on.
 	ContactName string
 	Email       string
+	// SeriesID groups this event with others stamped out by the Repeat
+	// tool at the same time. 0 means it isn't part of a series.
+	SeriesID int64
 }
+
+// InSeries reports whether this event is grouped with others via Repeat.
+func (e Event) InSeries() bool { return e.SeriesID != 0 }
 
 // Slug builds an event's URL segment from its date and title, e.g.
 // "2026-07-25-free-mask-distro". The date leads so that a recurring title
@@ -318,7 +324,7 @@ func scanEvents(rows *sql.Rows) ([]Event, error) {
 		var ev Event
 		var startsAt string
 		var endsAt sql.NullString
-		if err := rows.Scan(&ev.ID, &ev.Title, &ev.EventType, &startsAt, &endsAt, &ev.Location, &ev.Description, &ev.Link, &ev.UID, &ev.Flyer, &ev.Slug, &ev.Keyholder, &ev.ContactName, &ev.Email); err != nil {
+		if err := rows.Scan(&ev.ID, &ev.Title, &ev.EventType, &startsAt, &endsAt, &ev.Location, &ev.Description, &ev.Link, &ev.UID, &ev.Flyer, &ev.Slug, &ev.Keyholder, &ev.ContactName, &ev.Email, &ev.SeriesID); err != nil {
 			return nil, err
 		}
 		var err error
@@ -424,6 +430,17 @@ func EventByID(conn *sql.DB, id int64) (Event, error) {
 		return Event{}, sql.ErrNoRows
 	}
 	return events[0], nil
+}
+
+// EventsInSeries returns every event sharing seriesID, soonest first —
+// including past occurrences, so the series page can show the whole run.
+func EventsInSeries(conn *sql.DB, seriesID int64) ([]Event, error) {
+	rows, err := conn.Query(`SELECT `+eventColumns+` FROM events WHERE series_id = ? ORDER BY starts_at`, seriesID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	return scanEvents(rows)
 }
 
 // ProductByID fetches one shop item for editing.

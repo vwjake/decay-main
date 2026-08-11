@@ -26,7 +26,12 @@ templ AdminEvents(events []db.Event, page db.Page, users []db.User, prefill *db.
 			for _, ev := range events {
 				<tr>
 					<td class="mono nowrap">{ ev.StartsAt.Format("Jan 2") }</td>
-					<td>{ ev.Title }</td>
+					<td>
+						{ ev.Title }
+						if ev.InSeries() {
+							<a href={ templ.URL(fmt.Sprintf("/admin/series/%d", ev.SeriesID)) } class="admin-tag mono" title="Part of a recurring series">series</a>
+						}
+					</td>
 					<td>{ ev.EventType }</td>
 					<td class="mono nowrap">{ ev.StartsAt.Format("3:04 PM") }</td>
 					<td class="mono nowrap">
